@@ -153,8 +153,8 @@ RUN if [ "$TARGETPLATFORM" = "linux/amd64" ] && [ -e "/physicsnemo/deps/torch_sc
         git clone https://github.com/rusty1s/pytorch_scatter.git; \
         cd pytorch_scatter; \
         git checkout tags/2.1.2; \
-        python setup.py bdist_wheel && \
-        pip install --no-cache-dir dist/*.whl && \
+        MAX_JOBS=64 python setup.py bdist_wheel && \
+        MAX_JOBS=64 python setup.py install && \
         cd ../ && rm -r pytorch_scatter; \
     fi
 RUN if [ "$TARGETPLATFORM" = "linux/amd64" ] && [ -e "/physicsnemo/deps/torch_cluster-1.6.3-cp312-cp312-linux_x86_64.whl" ]; then \
@@ -167,8 +167,8 @@ RUN if [ "$TARGETPLATFORM" = "linux/amd64" ] && [ -e "/physicsnemo/deps/torch_cl
         git clone https://github.com/rusty1s/pytorch_cluster.git; \
         cd pytorch_cluster; \
         git checkout tags/1.6.3; \
-        python setup.py bdist_wheel && \
-        pip install --no-cache-dir dist/*.whl && \
+        MAX_JOBS=64 python setup.py bdist_wheel && \
+        MAX_JOBS=64 python setup.py install && \
         cd ../ && rm -r pytorch_cluster; \
     fi
 
