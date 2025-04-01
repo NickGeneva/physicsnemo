@@ -164,7 +164,9 @@ RUN if [ "$TARGETPLATFORM" = "linux/amd64" ] && [ -e "/physicsnemo/deps/torch_sc
         git clone https://github.com/rusty1s/pytorch_scatter.git; \
         cd pytorch_scatter; \
         git checkout tags/2.1.2; \
-        pip install . ; \
+        python setup.py bdist_wheel && \
+        pip install --no-cache-dir dist/*.whl && \
+        cd ../ && rm -r pytorch_scatter; \
     fi
 RUN if [ "$TARGETPLATFORM" = "linux/amd64" ] && [ -e "/physicsnemo/deps/torch_cluster-1.6.3-cp312-cp312-linux_x86_64.whl" ]; then \
         echo "Installing torch_cluster and for: $TARGETPLATFORM" && \
@@ -176,7 +178,9 @@ RUN if [ "$TARGETPLATFORM" = "linux/amd64" ] && [ -e "/physicsnemo/deps/torch_cl
         git clone https://github.com/rusty1s/pytorch_cluster.git; \
         cd pytorch_cluster; \
         git checkout tags/1.6.3; \
-        pip install . ; \
+        python setup.py bdist_wheel && \
+        pip install --no-cache-dir dist/*.whl && \
+        cd ../ && rm -r pytorch_cluster; \
     fi
 RUN pip install --no-cache-dir "torch_geometric==2.5.3"
 
