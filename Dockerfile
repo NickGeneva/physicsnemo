@@ -142,6 +142,8 @@ RUN pip install --no-cache-dir "mlflow>=2.1.1"
 
 COPY . /physicsnemo/
 
+RUN cd /physicsnemo/ && pip install -e .[makani,fignet] && pip uninstall nvidia-physicsnemo -y
+
 # Install torch-scatter, torch-cluster, and pyg
 RUN if [ "$TARGETPLATFORM" = "linux/amd64" ] && [ -e "/physicsnemo/deps/torch_scatter-2.1.2-cp312-cp312-linux_x86_64.whl" ]; then \
         echo "Installing torch_scatter and for: $TARGETPLATFORM" && \
@@ -191,8 +193,6 @@ RUN pip install --no-cache-dir "numpy-stl" "scikit-image>=0.24.0" "sparse-dot-mk
 
 # Install MSC
 RUN pip install --no-cache-dir "multi-storage-client[boto3]>=0.14.0"
-
-RUN cd /physicsnemo/ && pip install -e .[makani,fignet] && pip uninstall nvidia-physicsnemo -y
 
 # cleanup of stage
 RUN rm -rf /physicsnemo/
