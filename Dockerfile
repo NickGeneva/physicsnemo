@@ -142,9 +142,8 @@ RUN pip install --no-cache-dir "mlflow>=2.1.1"
 
 COPY . /physicsnemo/
 
-RUN cd /physicsnemo/ && pip install -e .[makani,fignet] && pip uninstall nvidia-physicsnemo -y
-
 # Install torch-scatter, torch-cluster, and pyg
+ENV TORCH_CUDA_ARCH_LIST="7.5 8.0 8.6 9.0 10.0 12.0+PTX"
 RUN if [ "$TARGETPLATFORM" = "linux/amd64" ] && [ -e "/physicsnemo/deps/torch_scatter-2.1.2-cp312-cp312-linux_x86_64.whl" ]; then \
         echo "Installing torch_scatter and for: $TARGETPLATFORM" && \
         pip install --force-reinstall --no-cache-dir /physicsnemo/deps/torch_scatter-2.1.2-cp312-cp312-linux_x86_64.whl; \
@@ -155,10 +154,11 @@ RUN if [ "$TARGETPLATFORM" = "linux/amd64" ] && [ -e "/physicsnemo/deps/torch_sc
         git clone https://github.com/rusty1s/pytorch_scatter.git; \
         cd pytorch_scatter; \
         git checkout tags/2.1.2; \
-        MAX_JOBS=64 python setup.py bdist_wheel && \
-        MAX_JOBS=64 python setup.py install && \
+	FORCE_CUDA=1 MAX_JOBS=64 python setup.py bdist_wheel && \
+        pip install dist/*.whl --force-reinstall --no-cache-dir && \
         cd ../ && rm -r pytorch_scatter; \
     fi
+
 RUN if [ "$TARGETPLATFORM" = "linux/amd64" ] && [ -e "/physicsnemo/deps/torch_cluster-1.6.3-cp312-cp312-linux_x86_64.whl" ]; then \
         echo "Installing torch_cluster and for: $TARGETPLATFORM" && \
         pip install --force-reinstall --no-cache-dir /physicsnemo/deps/torch_cluster-1.6.3-cp312-cp312-linux_x86_64.whl; \
@@ -169,8 +169,8 @@ RUN if [ "$TARGETPLATFORM" = "linux/amd64" ] && [ -e "/physicsnemo/deps/torch_cl
         git clone https://github.com/rusty1s/pytorch_cluster.git; \
         cd pytorch_cluster; \
         git checkout tags/1.6.3; \
-        MAX_JOBS=64 python setup.py bdist_wheel && \
-        MAX_JOBS=64 python setup.py install && \
+	FORCE_CUDA=1 MAX_JOBS=64 python setup.py bdist_wheel && \
+        pip install dist/*.whl --force-reinstall --no-cache-dir && \
         cd ../ && rm -r pytorch_cluster; \
     fi
 
@@ -181,10 +181,13 @@ RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
         echo "Installing tensorflow and warp-lang for: $TARGETPLATFORM is not supported presently"; \
     fi
 
-RUN pip install --no-cache-dir "black==22.10.0" "interrogate==1.5.0" "coverage==6.5.0" "protobuf==3.20.3" "moto[s3]>=5.0.28"
+# Install the fignet and makani dependencies
+RUN pip install --no-cache-dir "torch-harmonics>=0.6.5,<0.7.1" "tensorly>=0.8.1" "tensorly-torch>=0.4.0" "jaxtyping>=0.2" "torchinfo>=1.8" "webdataset>=0.2"
 
 # TODO(akamenev): install Makani via direct URL, see comments in pyproject.toml.
 RUN pip install --no-cache-dir --no-deps -e git+https://github.com/NVIDIA/modulus-makani.git@v0.1.0#egg=makani
+
+RUN pip install --no-cache-dir "black==22.10.0" "interrogate==1.5.0" "coverage==6.5.0" "protobuf==3.20.3" "moto[s3]>=5.0.28"
 
 RUN pip install --no-cache-dir "torch_geometric==2.5.3"
 
