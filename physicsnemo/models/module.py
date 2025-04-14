@@ -22,6 +22,11 @@ import os
 import tarfile
 import tempfile
 import warnings
+
+# NOTE: This is for backport compatibility, some entry points seem to be using this old class
+# Exact cause of this is unknown but it seems to be related to multiple versions
+# of importlib being present in the environment
+from importlib.metadata import EntryPoint
 from pathlib import Path
 from typing import Any, Dict, Union
 
@@ -31,6 +36,16 @@ import physicsnemo
 from physicsnemo.models.meta import ModelMetaData
 from physicsnemo.registry import ModelRegistry
 from physicsnemo.utils.filesystem import _download_cached, _get_fs
+
+ENTRY_POINT_CLASSES = [
+    EntryPoint,
+]
+try:
+    from importlib_metadata import EntryPoint as EntryPointOld  # noqa: E402
+
+    ENTRY_POINT_CLASSES.append(EntryPointOld)
+except ImportError:
+    pass
 
 
 class Module(torch.nn.Module):
@@ -189,7 +204,7 @@ class Module(torch.nn.Module):
                 _cls = cls
 
         # This works with the importlib.metadata.EntryPoint
-        if isinstance(_cls, importlib.metadata.EntryPoint):
+        if isinstance(_cls, tuple(ENTRY_POINT_CLASSES)):
             _cls = _cls.load()
 
         return _cls(**arg_dict["__args__"])
