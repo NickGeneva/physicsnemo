@@ -1,0 +1,30 @@
+[importlinter]
+root_package = physicsnemo
+include_external_packages = True
+
+
+
+[importlinter:contract:physicsnemo-modules]
+name = Prevent Upward Imports in the PhysicsNemo Structure
+type = layers
+containers=
+    physicsnemo
+layers = 
+    models : experimental : registry : datapipes : launch : metrics : domain_parallel
+    utils
+    distributed |  nn
+    core
+
+
+[importlinter:contract:physicsnemo-models]
+name = Prevent Imports between physicsnemo models
+type = layers
+containers=
+    physicsnemo.models
+layers = 
+    mesh_reduced
+    afno | dlwp | dlwp_healpix | domino | dpot | fengwu | figconvnet | fno | graphcast | meshgraphnet | pangu | pix2pix | rnn |  srrn | swinvrnn | topodiff | transolver  | vfgn 
+    unet | diffusion | gnn_layers | dlwp_healpix_layers 
+    layers
+    utils
+
