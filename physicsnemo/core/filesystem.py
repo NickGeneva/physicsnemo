@@ -19,7 +19,7 @@ import json
 import logging
 import os
 import re
-import urllib.request
+import urllib
 import zipfile
 from pathlib import Path
 

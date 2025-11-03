@@ -32,9 +32,9 @@ from typing import Any, Dict, Optional, Set, Union
 import torch
 
 import physicsnemo
+from physicsnemo.core.filesystem import _download_cached, _get_fs
 from physicsnemo.models.meta import ModelMetaData
 from physicsnemo.registry import ModelRegistry
-from physicsnemo.utils.filesystem import _download_cached, _get_fs
 
 # Used for saving checkpoints of nested modules
 _BASE_CKPT_PREFIX = "__physicsnemo.Module__"

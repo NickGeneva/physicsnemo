@@ -18,7 +18,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from physicsnemo.utils.version_check import (
+from physicsnemo.core.version_check import (
     VERSION_REQUIREMENTS,
     check_min_version,
     check_module_requirements,
@@ -84,7 +84,7 @@ def test_check_min_version_package_not_found():
 def test_check_module_requirements_success():
     """Test that check_module_requirements succeeds when all requirements are met"""
     with patch(
-        "physicsnemo.utils.version_check.check_min_version"
+        "physicsnemo.core.version_check.check_min_version"
     ) as mock_check_min_version:
         mock_check_min_version.return_value = True
 
@@ -96,7 +96,7 @@ def test_check_module_requirements_success():
 def test_check_module_requirements_unknown_module():
     """Test that check_module_requirements does nothing for unknown modules"""
     with patch(
-        "physicsnemo.utils.version_check.check_min_version"
+        "physicsnemo.core.version_check.check_min_version"
     ) as mock_check_min_version:
         # Should not call check_min_version for unknown module
         check_module_requirements("unknown.module.path")

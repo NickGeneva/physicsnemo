@@ -20,7 +20,7 @@ from pathlib import Path
 
 import pytest
 
-from physicsnemo.utils import filesystem
+from physicsnemo.core import filesystem
 
 
 def calculate_checksum(file_path):
