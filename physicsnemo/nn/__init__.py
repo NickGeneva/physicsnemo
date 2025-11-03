@@ -13,27 +13,3 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-
-# There is a minimum version of pytorch required for shard tensor.
-# 2.6.0+ works
-# 2.5.X and lower does not work
-
-import torch
-
-from physicsnemo.core.version_check import check_module_requirements
-
-from .autograd import all_gather_v, gather_v, indexed_all_to_all_v, scatter_v
-from .config import ProcessGroupConfig, ProcessGroupNode
-
-# Load and register custom ops:
-from .manager import (
-    DistributedManager,
-    PhysicsNeMoUndefinedGroupError,
-    PhysicsNeMoUninitializedDistributedManagerWarning,
-)
-from .utils import (
-    mark_module_as_shared,
-    reduce_loss,
-    unmark_module_as_shared,
-)

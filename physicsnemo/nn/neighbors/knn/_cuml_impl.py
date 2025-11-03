@@ -16,7 +16,7 @@
 
 import torch
 
-from physicsnemo.utils.version_check import check_min_version
+from physicsnemo.core.version_check import check_min_version
 
 CUML_AVAILABLE = check_min_version("cuml", "24.0.0", hard_fail=False)
 
