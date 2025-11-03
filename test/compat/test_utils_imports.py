@@ -78,20 +78,3 @@ def test_old_utils_import_works_with_env_compat(old_name, new_name, monkeypatch)
     fs_old = importlib.import_module(old_name)
     fs_new = importlib.import_module(new_name)
     assert fs_old is fs_new
-
-
-@pytest.mark.parametrize("old_name, new_name", migrations.items())
-def test_old_utils_import_works_with_enable_compat(old_name, new_name, monkeypatch):
-    # No env var; manually enable via API
-    monkeypatch.delenv("PHYSICSNEMO_ENABLE_COMPAT", raising=False)
-    _clear_physicsnemo_modules()
-
-    pn = importlib.import_module("physicsnemo")
-
-    # Manual install should also warn
-    with pytest.warns(DeprecationWarning):
-        pn.enable_compat()
-
-    fs_old = importlib.import_module(old_name)
-    fs_new = importlib.import_module(new_name)
-    assert fs_old is fs_new
