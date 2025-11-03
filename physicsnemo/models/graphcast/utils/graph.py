@@ -22,7 +22,10 @@ from sklearn.neighbors import NearestNeighbors
 from torch import Tensor
 
 from physicsnemo.models.gnn_layers.utils import GraphType
-from physicsnemo.utils.graphcast.graph_backend import DglGraphBackend, PyGGraphBackend
+from physicsnemo.models.graphcast.utils.graph_backend import (
+    DglGraphBackend,
+    PyGGraphBackend,
+)
 
 from .graph_utils import (
     get_face_centroids,

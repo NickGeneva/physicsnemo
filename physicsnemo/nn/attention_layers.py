@@ -17,7 +17,7 @@
 import torch
 from torch import nn
 
-from ..utils import get_earth_position_index, trunc_normal_
+from physicsnemo.models.utils import get_earth_position_index, trunc_normal_
 
 
 class EarthAttention3D(nn.Module):

@@ -28,6 +28,8 @@ except ImportError:
     # for Python versions < 3.11
     from typing_extensions import Self
 
+from physicsnemo.core.meta import ModelMetaData
+from physicsnemo.core.module import Module
 from physicsnemo.models.gnn_layers.embedder import (
     GraphCastDecoderEmbedder,
     GraphCastEncoderEmbedder,
@@ -36,10 +38,8 @@ from physicsnemo.models.gnn_layers.mesh_graph_decoder import MeshGraphDecoder
 from physicsnemo.models.gnn_layers.mesh_graph_encoder import MeshGraphEncoder
 from physicsnemo.models.gnn_layers.mesh_graph_mlp import MeshGraphMLP
 from physicsnemo.models.gnn_layers.utils import CuGraphCSC, set_checkpoint_fn
-from physicsnemo.models.layers import get_activation
-from physicsnemo.models.meta import ModelMetaData
-from physicsnemo.models.module import Module
-from physicsnemo.utils.graphcast.graph import Graph
+from physicsnemo.models.graphcast.utils.graph import Graph
+from physicsnemo.nn import get_activation
 
 from .graph_cast_processor import (
     GraphCastProcessor,

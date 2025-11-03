@@ -41,7 +41,7 @@ except ImportError:
     PyGData: TypeAlias = NoneType
 
 from physicsnemo.models.gnn_layers.utils import GraphType
-from physicsnemo.utils.graphcast.graph_utils import (
+from physicsnemo.models.graphcast.utils.graph_utils import (
     azimuthal_angle,
     geospatial_rotation,
     polar_angle,

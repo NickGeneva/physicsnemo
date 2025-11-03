@@ -16,7 +16,7 @@
 
 import torch
 
-from physicsnemo.utils.graphcast.loss import (
+from physicsnemo.models.graphcast.utils.loss import (
     CellAreaWeightedLossFunction,
     CustomCellAreaWeightedLossFunction,
 )

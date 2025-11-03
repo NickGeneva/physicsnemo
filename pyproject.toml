@@ -67,6 +67,7 @@ dev = [
     "moto[s3]>=5.0.28",
     "pre-commit>=4.0.0",
     "pytest-timeout",
+    "import-linter",
 ]
 
 # makani = [

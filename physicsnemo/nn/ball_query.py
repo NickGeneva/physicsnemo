@@ -26,7 +26,7 @@ import torch
 import torch.nn as nn
 from einops import rearrange
 
-from physicsnemo.utils.neighbors import radius_search
+from physicsnemo.nn.neighbors import radius_search
 
 
 class BQWarp(nn.Module):

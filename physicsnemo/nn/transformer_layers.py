@@ -21,7 +21,7 @@ from timm.layers import to_2tuple
 from timm.models.swin_transformer import SwinTransformerStage
 from torch import nn
 
-from ..utils import (
+from physicsnemo.models.utils import (
     PatchEmbed2D,
     PatchRecovery2D,
     crop2d,
@@ -32,6 +32,7 @@ from ..utils import (
     window_partition,
     window_reverse,
 )
+
 from .attention_layers import EarthAttention2D, EarthAttention3D
 from .drop import DropPath
 from .mlp_layers import Mlp
