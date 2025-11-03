@@ -71,7 +71,7 @@ def tet_verts(flip_x=1):
 @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
 @pytest.mark.parametrize("device", ["cpu", "cuda"])
 def test_sdf(pytestconfig, dtype, device):
-    from physicsnemo.utils.sdf import signed_distance_field
+    from physicsnemo.core.sdf import signed_distance_field
 
     mesh_vertices = tet_verts().reshape(-1, 3)
 
