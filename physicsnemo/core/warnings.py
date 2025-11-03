@@ -14,14 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import warnings
 
-
-
-
-warnings.warn(
-    "You are importing from 'physicsnemo.experimental'. The APIs in this namespace are experimental, under active development, "
-    "and may change without notice. Expect possible back-compatibility breaking changes and only partial test coverage.",
-    ExperimentalFeatureWarning,
-    stacklevel=2,
-)
+class ExperimentalFeatureWarning(UserWarning):
+    """Warning raised when using experimental features that may change without notice."""

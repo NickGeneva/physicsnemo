@@ -31,10 +31,9 @@ from typing import Any, Dict, Optional, Set, Union
 
 import torch
 
-import physicsnemo
 from physicsnemo.core.filesystem import _download_cached, _get_fs
-from physicsnemo.models.meta import ModelMetaData
-from physicsnemo.registry import ModelRegistry
+from physicsnemo.core.meta import ModelMetaData
+from physicsnemo.core.registry import ModelRegistry
 
 # Used for saving checkpoints of nested modules
 _BASE_CKPT_PREFIX = "__physicsnemo.Module__"
@@ -485,7 +484,7 @@ class Module(torch.nn.Module):
 
             # Save the physicsnemo version and git hash (if available)
             metadata_info = {
-                "physicsnemo_version": physicsnemo.__version__,
+                "physicsnemo_version": importlib.metadata.version("nvidia-physicsnemo"),
                 "mdlus_file_version": self.__model_checkpoint_version__,
             }
 
@@ -590,7 +589,7 @@ class Module(torch.nn.Module):
         file_name: str,
         override_args: Optional[Dict[str, Any]] = None,
         strict: bool = True,
-    ) -> physicsnemo.Module:
+    ) -> "Module":
         """Simple utility for constructing a model from a checkpoint
 
         Parameters

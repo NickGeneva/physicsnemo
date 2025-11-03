@@ -23,7 +23,7 @@ import nvtx
 import torch
 import tqdm
 
-from physicsnemo.experimental import ExperimentalFeatureWarning
+from physicsnemo.core.warnings import ExperimentalFeatureWarning
 from physicsnemo.utils.diffusion import StackedRandomGenerator, time_range
 
 ############################################################################
