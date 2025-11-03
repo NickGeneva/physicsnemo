@@ -21,8 +21,8 @@ import pytest
 import torch
 
 import physicsnemo
-from physicsnemo.models.meta import ModelMetaData
-from physicsnemo.registry import ModelRegistry
+from physicsnemo.core.meta import ModelMetaData
+from physicsnemo.core.registry import ModelRegistry
 
 registry = ModelRegistry()
 
