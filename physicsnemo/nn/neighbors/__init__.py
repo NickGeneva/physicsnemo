@@ -15,8 +15,10 @@
 # limitations under the License.
 
 
-from .knn import knn
-from .radius_search import radius_search
+from .knn import knn as _knn
+from .radius_search import radius_search as _radius_search
+
+print(_knn)
 
 # This is exclusively for the autodoc to generate the api docs:
-__all__ = ["radius_search"]
+__all__ = ["radius_search", "knn"]

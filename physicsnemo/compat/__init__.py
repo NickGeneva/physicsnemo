@@ -32,6 +32,19 @@ import warnings
 COMPAT_MAP = {
     "physicsnemo.utils.filesystem": "physicsnemo.core.filesystem",
     "physicsnemo.utils.version_check": "physicsnemo.core.version_check",
+    "physicsnemo.models.meta": "physicsnemo.core.meta",
+    "physicsnemo.models.module": "physicsnemo.core.module",
+    "physicsnemo.utils.neighbors": "physicsnemo.nn.neighbors",
+    "physicsnemo.utils.neighbors.radius_search": "physicsnemo.nn.neighbors.radius_search",
+    "physicsnemo.utils.neighbors.radius_search._torch_impl": "physicsnemo.nn.neighbors.radius_search._torch_impl",
+    "physicsnemo.utils.neighbors.radius_search._warp_impl": "physicsnemo.nn.neighbors.radius_search._warp_impl",
+    "physicsnemo.utils.neighbors.radius_search.kernels": "physicsnemo.nn.neighbors.radius_search.kernels",
+    
+    "physicsnemo.utils.neighbors.knn": "physicsnemo.nn.neighbors.knn",
+    "physicsnemo.utils.neighbors.knn._cuml_impl": "physicsnemo.nn.neighbors.knn._cuml_impl",
+    "physicsnemo.utils.neighbors.knn._scipy_impl": "physicsnemo.nn.neighbors.knn._scipy_impl",
+    "physicsnemo.utils.neighbors.knn._torch_impl": "physicsnemo.nn.neighbors.knn._torch_impl",
+    "physicsnemo.utils.sdf": "physicsnemo.nn.sdf",
 }
 
 
@@ -62,6 +75,6 @@ def install():
             )
 
         warnings.warn(
-            f"[compat] {old_name} is deprecated; use {new_name} instead",
+            f"[compat] {old_name} is moved; use {new_name} instead",
             DeprecationWarning,
         )

@@ -30,9 +30,9 @@ if os.getenv("PHYSICSNEMO_ENABLE_COMPAT") in {
     _compat_install()
 
 
-from .datapipes.datapipe import Datapipe  # noqa E402
-from .datapipes.meta import DatapipeMetaData  # noqa E402
-from .models.meta import ModelMetaData  # noqa E402
-from .models.module import Module  # noqa E402
+# from .datapipes.datapipe import Datapipe  # noqa E402
+# from .datapipes.meta import DatapipeMetaData  # noqa E402
+from .core.meta import ModelMetaData  # noqa E402
+from .core.module import Module  # noqa E402
 
 __version__ = "1.3.0a0"
