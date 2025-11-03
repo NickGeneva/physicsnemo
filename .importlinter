@@ -10,7 +10,8 @@ type = layers
 containers=
     physicsnemo
 layers = 
-    models : experimental : registry : datapipes : launch : metrics : domain_parallel
+    experimental
+    models  : registry : datapipes : launch : metrics : domain_parallel
     utils
     distributed |  nn
     core
