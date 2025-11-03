@@ -17,10 +17,10 @@
 import pytest
 import torch
 
-from physicsnemo.utils.neighbors import knn
-from physicsnemo.utils.neighbors.knn._cuml_impl import knn_impl as knn_cuml
-from physicsnemo.utils.neighbors.knn._scipy_impl import knn_impl as knn_scipy
-from physicsnemo.utils.version_check import check_min_version
+from physicsnemo.core.version_check import check_min_version
+from physicsnemo.nn.neighbors import knn
+from physicsnemo.nn.neighbors._knn._cuml_impl import knn_impl as knn_cuml
+from physicsnemo.nn.neighbors._knn._scipy_impl import knn_impl as knn_scipy
 
 
 @pytest.mark.parametrize("device", ["cpu", "cuda"])

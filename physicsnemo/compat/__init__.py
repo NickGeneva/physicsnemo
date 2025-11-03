@@ -35,15 +35,14 @@ COMPAT_MAP = {
     "physicsnemo.models.meta": "physicsnemo.core.meta",
     "physicsnemo.models.module": "physicsnemo.core.module",
     "physicsnemo.utils.neighbors": "physicsnemo.nn.neighbors",
-    "physicsnemo.utils.neighbors.radius_search": "physicsnemo.nn.neighbors.radius_search",
-    "physicsnemo.utils.neighbors.radius_search._torch_impl": "physicsnemo.nn.neighbors.radius_search._torch_impl",
-    "physicsnemo.utils.neighbors.radius_search._warp_impl": "physicsnemo.nn.neighbors.radius_search._warp_impl",
-    "physicsnemo.utils.neighbors.radius_search.kernels": "physicsnemo.nn.neighbors.radius_search.kernels",
-    
-    "physicsnemo.utils.neighbors.knn": "physicsnemo.nn.neighbors.knn",
-    "physicsnemo.utils.neighbors.knn._cuml_impl": "physicsnemo.nn.neighbors.knn._cuml_impl",
-    "physicsnemo.utils.neighbors.knn._scipy_impl": "physicsnemo.nn.neighbors.knn._scipy_impl",
-    "physicsnemo.utils.neighbors.knn._torch_impl": "physicsnemo.nn.neighbors.knn._torch_impl",
+    # "physicsnemo.utils.neighbors.radius_search": "physicsnemo.nn.neighbors.radius_search",
+    # "physicsnemo.utils.neighbors.radius_search._torch_impl": "physicsnemo.nn.neighbors.radius_search._torch_impl",
+    # "physicsnemo.utils.neighbors.radius_search._warp_impl": "physicsnemo.nn.neighbors.radius_search._warp_impl",
+    # "physicsnemo.utils.neighbors.radius_search.kernels": "physicsnemo.nn.neighbors.radius_search.kernels",
+    # # "physicsnemo.utils.neighbors.knn": "physicsnemo.nn.neighbors._knn.knn",
+    # "physicsnemo.utils.neighbors.knn._cuml_impl": "physicsnemo.nn.neighbors._knn._cuml_impl",
+    # "physicsnemo.utils.neighbors.knn._scipy_impl": "physicsnemo.nn.neighbors._knn._scipy_impl",
+    # "physicsnemo.utils.neighbors.knn._torch_impl": "physicsnemo.nn.neighbors._knn._torch_impl",
     "physicsnemo.utils.sdf": "physicsnemo.nn.sdf",
 }
 
