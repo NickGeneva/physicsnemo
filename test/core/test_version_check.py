@@ -121,7 +121,7 @@ def test_require_version_success():
         mock_import.return_value = mock_module
 
         # Create a decorated function
-        from physicsnemo.utils.version_check import require_version
+        from physicsnemo.core.version_check import require_version
 
         @require_version("torch", "2.5.0")
         def test_function():
@@ -140,7 +140,7 @@ def test_require_version_failure():
         mock_import.return_value = mock_module
 
         # Create a decorated function
-        from physicsnemo.utils.version_check import require_version
+        from physicsnemo.core.version_check import require_version
 
         @require_version("torch", "2.6.0")
         def test_function():
@@ -157,7 +157,7 @@ def test_require_version_package_not_found():
     """Test that require_version decorator raises ImportError when package is not installed"""
     with patch("importlib.import_module", side_effect=ImportError("Package not found")):
         # Create a decorated function
-        from physicsnemo.utils.version_check import require_version
+        from physicsnemo.core.version_check import require_version
 
         @require_version("nonexistent_package", "1.0.0")
         def test_function():
