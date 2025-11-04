@@ -21,7 +21,7 @@ from timm.layers import to_2tuple
 from timm.models.swin_transformer import SwinTransformerStage
 from torch import nn
 
-from physicsnemo.models.utils import (
+from physicsnemo.nn.utils import (
     PatchEmbed2D,
     PatchRecovery2D,
     crop2d,

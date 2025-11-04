@@ -36,6 +36,7 @@ COMPAT_MAP = {
     "physicsnemo.models.module": "physicsnemo.core.module",
     "physicsnemo.utils.neighbors": "physicsnemo.nn.neighbors",
     "physicsnemo.utils.sdf": "physicsnemo.nn.sdf",
+    "physicsnemo.models.layers": "physicsnemo.nn",
     # "physicsnemo.models.layers.activations": "physicsnemo.nn.activations",
     # "physicsnemo.models.layers.attention_layers": "physicsnemo.nn.layers.attention_layers",
     # "physicsnemo.models.layers.ball_query": "physicsnemo.nn.layers.ball_query",
@@ -57,7 +58,9 @@ COMPAT_MAP = {
     # "physicsnemo.models.layers.weight_fact": "physicsnemo.nn.layers.weight_fact",
     # "physicsnemo.models.layers.weight_norm": "physicsnemo.nn.layers.weight_norm",
     # "physicsnemo.utils.graphcast": "physicsnemo.models.graphcast.utils",
-    "physicsnemo.utils.graphcast.loss": "physicsnemo.models.graphcast.utils.loss",
+    "physicsnemo.utils.graphcast": "physicsnemo.models.graphcast.utils",
+    "physicsnemo.utils.diffusion": "physicsnemo.models.diffusion.utils",
+    "physicsnemo.utils.patching": "physicsnemo.nn.patching",
 }
 
 
