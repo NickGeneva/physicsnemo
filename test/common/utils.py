@@ -188,9 +188,7 @@ def validate_accuracy(
     else:
         device: torch.device = output[0].device
 
-    file_name: Path = (
-        Path(__file__).parents[1].resolve() / Path("data") / Path(file_name.lower())
-    )
+    file_name: Path = Path(__file__).parents[1].resolve() / Path(file_name.lower())
     # If file does not exist, we will create it then error
     # Model should then reproduce it on next pytest run
     if not file_name.exists():

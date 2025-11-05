@@ -110,12 +110,10 @@ def validate_forward_accuracy(
         output = (output,)
 
     # File name / path
-    # Output files should live in test/models/data
+    # It should be relative to test/
     if file_name is None:
         file_name = model.meta.name + "_output.pth"
-    file_name = (
-        Path(__file__).parents[1].resolve() / Path("data") / Path(file_name.lower())
-    )
+    file_name = Path(__file__).parents[1].resolve() / Path(file_name.lower())
     # If file does not exist, we will create it then error
     # Model should then reproduce it on next pytest run
     if not file_name.exists():
@@ -164,7 +162,7 @@ def validate_tensor_accuracy(
         Target output tensor file for this model was not found
     """
     # File name / path
-    # Output files should live in test/utils/data
+    # Output files should be relative to test/
 
     # Always use tuples for this comparison / saving
     if isinstance(output, Tensor):
@@ -173,9 +171,7 @@ def validate_tensor_accuracy(
     else:
         device = output[0].device
 
-    file_name = (
-        Path(__file__).parents[1].resolve() / Path("data") / Path(file_name.lower())
-    )
+    file_name = Path(__file__).parents[1].resolve() / Path(file_name.lower())
     # If file does not exist, we will create it then error
     # Model should then reproduce it on next pytest run
     if not file_name.exists():

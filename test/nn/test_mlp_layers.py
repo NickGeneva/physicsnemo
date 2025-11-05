@@ -17,9 +17,8 @@
 import pytest
 import torch
 
-from physicsnemo.models.layers import Mlp
-
-from .common import (
+from physicsnemo.nn import Mlp
+from test.common import (
     validate_forward_accuracy,
 )
 
@@ -35,7 +34,8 @@ def test_mlp_forward_accuracy(device):
     )  # Assuming a batch size of 1 for simplicity
     model(input_tensor)
 
-    file_name = "mlp_output.pth"
+    # Relative to test/
+    file_name = "nn/data/mlp_output.pth"
 
     # Tack this on for the test, since model is not a physicsnemo Module:
     model.device = target_device

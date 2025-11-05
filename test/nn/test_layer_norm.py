@@ -26,7 +26,7 @@ import torch
 
 from physicsnemo.core.meta import ModelMetaData
 from physicsnemo.core.module import Module
-from physicsnemo.launch.utils import load_checkpoint, save_checkpoint
+from physicsnemo.utils import load_checkpoint, save_checkpoint
 from test.conftest import requires_module
 
 LAYER_NORM_PATH = "physicsnemo.nn.layer_norm"

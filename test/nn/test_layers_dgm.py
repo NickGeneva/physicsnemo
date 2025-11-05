@@ -17,7 +17,7 @@
 import pytest
 import torch
 
-from physicsnemo.models.layers import DGMLayer
+from physicsnemo.nn import DGMLayer
 
 
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])

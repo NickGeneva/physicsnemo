@@ -17,7 +17,7 @@
 import pytest
 import torch
 
-from physicsnemo.models.layers import FourierFilter, FourierLayer, GaborFilter
+from physicsnemo.nn import FourierFilter, FourierLayer, GaborFilter
 
 
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])

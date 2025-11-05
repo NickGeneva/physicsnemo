@@ -19,20 +19,19 @@ import random
 import pytest
 import torch
 
-from physicsnemo.models.layers.activations import (
+from physicsnemo.nn.activations import (
     CappedGELU,
     CappedLeakyReLU,
     Identity,
     SquarePlus,
     Stan,
 )
-
-from . import common
+from test import common
 
 
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_activation_identity(device):
-    """Test identity function in layers"""
+    """Test identity function in physicsnemo.nn"""
     func = Identity().to(device)
     # Random tensor of random size
     tensor_dim = random.randint(1, 5)
@@ -45,7 +44,7 @@ def test_activation_identity(device):
 
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_activation_stan(device):
-    """Test Stan function in layers"""
+    """Test Stan function in physicsnemo.nn"""
     func = Stan(out_features=2).to(device)
     # Doc string example handles accuracy
     bsize = random.randint(1, 8)
@@ -67,7 +66,7 @@ def test_activation_stan(device):
 
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_activation_squareplus(device):
-    """Test square plus function in layers"""
+    """Test square plus function in physicsnemo.nn"""
     func = SquarePlus().to(device)
     func.b = 0
     # Ones tensor of random size
@@ -81,7 +80,7 @@ def test_activation_squareplus(device):
 
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_activation_capped_leaky_relu(device):
-    """Test capped_gelu function in layers"""
+    """Test capped_gelu function in physicsnemo.nn"""
     func = CappedLeakyReLU(cap_value=1.0).to(device)
     leaky_relu_func = torch.nn.LeakyReLU()
 
@@ -106,7 +105,7 @@ def test_activation_capped_leaky_relu(device):
 
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_activation_capped_gelu(device):
-    """Test capped_gelu function in layers"""
+    """Test capped_gelu function in physicsnemo.nn"""
     func = CappedGELU(cap_value=1.0).to(device)
     gelu_func = torch.nn.GELU()
 
@@ -137,7 +136,7 @@ def test_activation_capped_gelu(device):
 def test_activation_fused_silu(device):
     """Test fused SiLU implementation"""
 
-    from physicsnemo.models.layers.fused_silu import (
+    from physicsnemo.nn.fused_silu import (
         FusedSiLU,
         FusedSiLU_deriv_1,
         FusedSiLU_deriv_2,

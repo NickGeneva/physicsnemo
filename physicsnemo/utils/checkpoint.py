@@ -26,10 +26,10 @@ from torch.cuda.amp import GradScaler
 from torch.optim.lr_scheduler import _LRScheduler
 
 import physicsnemo
+from physicsnemo.core.filesystem import LOCAL_CACHE, _download_cached
 from physicsnemo.distributed import DistributedManager
 from physicsnemo.launch.logging import PythonLogger
 from physicsnemo.utils.capture import _StaticCapture
-from physicsnemo.utils.filesystem import LOCAL_CACHE, _download_cached
 
 optimizer = NewType("optimizer", torch.optim)
 scheduler = NewType("scheduler", _LRScheduler)
@@ -171,7 +171,7 @@ def _unique_model_names(
             is_compiled = False
         # Base name of model is meta.name unless pytorch model
         base_name = model0.__class__.__name__
-        if isinstance(model0, physicsnemo.models.Module):
+        if isinstance(model0, physicsnemo.core.Module):
             if model0.meta and getattr(model0.meta, "name", None):
                 base_name = model0.meta.name
         # Warning in case of attempt to load into a compiled model
@@ -214,7 +214,7 @@ def save_checkpoint(
     - Model checkpoints (when ``models`` are provided):
       "{model_name}{model_id}.{model_parallel_rank}.{epoch}.{ext}"
       where ext is ".mdlus" for instances of
-      :class:`~physicsnemo.models.Module` or ".pt" for PyTorch models.
+      :class:`~physicsnemo.core.Module` or ".pt" for PyTorch models.
 
     - Training state (when optimizer/scheduler/scaler are provided):
       "checkpoint.{model_parallel_rank}.{epoch}.pt"
@@ -230,7 +230,7 @@ def save_checkpoint(
     The function :func:`~physicsnemo.launch.utils.checkpoint.load_checkpoint`
     can be used to restore from these files with models that are **already instantiated**.
     To load only the model checkpoint (even when the models are **not** already instantiated),
-    use the method :meth:`~physicsnemo.models.module.Module.from_checkpoint` to
+    use the method :meth:`~physicsnemo.core.module.Module.from_checkpoint` to
     instantiate and load the model from the checkpoint.
 
     Parameters
@@ -269,9 +269,7 @@ def save_checkpoint(
         models = _unique_model_names(models)
         for name, model in models.items():
             # Get model type
-            model_type = (
-                "mdlus" if isinstance(model, physicsnemo.models.Module) else "pt"
-            )
+            model_type = "mdlus" if isinstance(model, physicsnemo.core.Module) else "pt"
 
             # Get full file path / name
             file_name = _get_checkpoint_filename(
@@ -279,7 +277,7 @@ def save_checkpoint(
             )
 
             # Save state dictionary
-            if isinstance(model, physicsnemo.models.Module):
+            if isinstance(model, physicsnemo.core.Module):
                 model.save(file_name)
             else:
                 with fs.open(file_name, "wb") as fp:
@@ -390,9 +388,7 @@ def load_checkpoint(
         models = _unique_model_names(models, loading=True)
         for name, model in models.items():
             # Get model type
-            model_type = (
-                "mdlus" if isinstance(model, physicsnemo.models.Module) else "pt"
-            )
+            model_type = "mdlus" if isinstance(model, physicsnemo.core.Module) else "pt"
 
             # Get full file path / name
             file_name = _get_checkpoint_filename(
@@ -404,7 +400,7 @@ def load_checkpoint(
                 )
                 continue
             # Load state dictionary
-            if isinstance(model, physicsnemo.models.Module):
+            if isinstance(model, physicsnemo.core.Module):
                 model.load(file_name)
             else:
                 file_to_load = _cache_if_needed(file_name)
