@@ -19,13 +19,14 @@ import pytest
 import torch
 import validate_utils
 from einops import rearrange, repeat
-from pytest_utils import import_or_fail
+
+from test.conftest import requires_module
 
 
-@import_or_fail("cftime")
+@requires_module(["cftime"])
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_grid_patching_2d(pytestconfig, device):
-    from physicsnemo.utils.patching import GridPatching2D
+    from physicsnemo.nn.patching import GridPatching2D
 
     torch.manual_seed(0)
     # Test cases: (H, W, H_p, W_p, overlap_pix, boundary_pix, N_patches)
@@ -78,10 +79,10 @@ def test_grid_patching_2d(pytestconfig, device):
         assert input_tensor.grad is not None, error_msg
 
 
-@import_or_fail("cftime")
+@requires_module(["cftime"])
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_image_fuse_basic(pytestconfig, device):
-    from physicsnemo.utils.patching import image_fuse
+    from physicsnemo.nn.patching import image_fuse
 
     # Basic test: No overlap, no boundary, one patch
     batch_size = 1
@@ -115,10 +116,10 @@ def test_image_fuse_basic(pytestconfig, device):
         assert input_tensor.grad is not None
 
 
-@import_or_fail("cftime")
+@requires_module("cftime")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_image_fuse_with_boundary(pytestconfig, device):
-    from physicsnemo.utils.patching import image_fuse
+    from physicsnemo.nn.patching import image_fuse
 
     # Test with boundary pixels
     overlap_pix = 0
@@ -147,10 +148,10 @@ def test_image_fuse_with_boundary(pytestconfig, device):
     assert input_tensor.grad is not None
 
 
-@import_or_fail("cftime")
+@requires_module("cftime")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_image_fuse_with_multiple_batches(pytestconfig, device):
-    from physicsnemo.utils.patching import image_batching, image_fuse
+    from physicsnemo.nn.patching import image_batching, image_fuse
 
     # Test with multiple batches
     batch_size = 2
@@ -205,10 +206,10 @@ def test_image_fuse_with_multiple_batches(pytestconfig, device):
         assert original_image.grad is not None
 
 
-@import_or_fail("cftime")
+@requires_module("cftime")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_image_batching_basic(pytestconfig, device):
-    from physicsnemo.utils.patching import image_batching
+    from physicsnemo.nn.patching import image_batching
 
     # Test with no overlap, no boundary, no input_interp
     batch_size = 1
@@ -238,10 +239,10 @@ def test_image_batching_basic(pytestconfig, device):
     assert input_tensor.grad is not None
 
 
-@import_or_fail("cftime")
+@requires_module("cftime")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_image_batching_with_boundary(pytestconfig, device):
-    from physicsnemo.utils.patching import image_batching
+    from physicsnemo.nn.patching import image_batching
 
     # Test with boundary pixels, no overlap, no input_interp
     patch_shape_y = 8
@@ -275,10 +276,10 @@ def test_image_batching_with_boundary(pytestconfig, device):
     assert input_tensor.grad is not None
 
 
-@import_or_fail("cftime")
+@requires_module("cftime")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_image_batching_with_input_interp(device, pytestconfig):
-    from physicsnemo.utils.patching import image_batching
+    from physicsnemo.nn.patching import image_batching
 
     # Test with input_interp tensor
     patch_shape_x = patch_shape_y = 4

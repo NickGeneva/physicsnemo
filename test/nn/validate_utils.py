@@ -146,7 +146,7 @@ def validate_accuracy(
         Target output tensor file for this model was not found
     """
     # File name / path
-    # Output files should live in test/utils/data
+    # Output files should live in test/nn/patching_data
 
     # Always use tuples for this comparison / saving
     if isinstance(output, Tensor):
@@ -156,7 +156,9 @@ def validate_accuracy(
         device = output[0].device
 
     file_name = (
-        Path(__file__).parents[0].resolve() / Path("data") / Path(file_name.lower())
+        Path(__file__).parents[0].resolve()
+        / Path("patching_data")
+        / Path(file_name.lower())
     )
     # If file does not exist, we will create it then error
     # Model should then reproduce it on next pytest run
