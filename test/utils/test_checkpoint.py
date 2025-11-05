@@ -24,10 +24,10 @@ import fsspec
 import pytest
 import torch
 import torch.nn as nn
-from pytest_utils import import_or_fail
 
 from physicsnemo.distributed import DistributedManager
 from physicsnemo.models.mlp import FullyConnected
+from test.conftest import requires_module
 
 mock_aws = pytest.importorskip("moto.mock_aws")
 
@@ -63,7 +63,7 @@ def model_generator(request) -> Callable:
 
 
 @mock_aws
-@import_or_fail(["wandb", "mlflow", "boto3"])
+@requires_module(["wandb", "mlflow", "boto3"])
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_model_checkpointing(
     device,
