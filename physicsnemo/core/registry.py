@@ -20,6 +20,8 @@ import warnings
 from importlib.metadata import EntryPoint, entry_points
 from typing import List, Union
 
+from physicsnemo.core.module import Module
+
 # NOTE: This is for backport compatibility, some entry points seem to be using this old class
 # Exact cause of this is unknown but it seems to be related to multiple versions
 # of importlib being present in the environment
@@ -32,8 +34,6 @@ try:
     ENTRY_POINT_CLASSES.append(EntryPointOld)
 except ImportError:
     pass
-
-import physicsnemo  # noqa: E402
 
 
 # This model registry follows conventions similar to fsspec,
@@ -74,9 +74,7 @@ class ModelRegistry:
 
         return registry
 
-    def register(
-        self, model: type[physicsnemo.Module], name: Union[str, None] = None
-    ) -> None:
+    def register(self, model: type[Module], name: Union[str, None] = None) -> None:
         """
         Registers a physicsnemo model class in the model registry under the provided name. If no name
         is provided, the model's name (from its `__name__` attribute) is used. If the
@@ -84,7 +82,7 @@ class ModelRegistry:
 
         Parameters
         ----------
-        model : physicsnemo.Module
+        model : physicsnemo.core.Module
             The model class to be registered.
         name : str, optional
             The name to register the model under. If None, the model's name is used.
@@ -96,9 +94,9 @@ class ModelRegistry:
         """
 
         # Check if model is a physicsnemo model
-        if not issubclass(model, physicsnemo.Module):
+        if not issubclass(model, Module):
             raise ValueError(
-                f"Only subclasses of physicsnemo.Module can be registered. "
+                f"Only subclasses of physicsnemo.core.Module can be registered. "
                 f"Provided model is of type {type(model)}"
             )
 
@@ -113,7 +111,7 @@ class ModelRegistry:
         # Add this class to the dict of model registry
         self._model_registry[name] = model
 
-    def factory(self, name: str) -> "physicsnemo.Module":
+    def factory(self, name: str) -> Module:
         """
         Returns a registered model given its name.
 
@@ -124,7 +122,7 @@ class ModelRegistry:
 
         Returns
         -------
-        model : physicsnemo.Module
+        model : physicsnemo.core.Module
             The registered model.
 
         Raises

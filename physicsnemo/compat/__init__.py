@@ -65,6 +65,7 @@ COMPAT_MAP = {
     "physicsnemo.utils.insolation": "physicsnemo.nn.insolation",
     "physicsnemo.utils.zenith_angle": "physicsnemo.nn.zenith_angle",
     "physicsnemo.launch.utils.checkpoint": "physicsnemo.utils.checkpoint",
+    "physicsnemo.launch.logging": "physicsnemo.utils.logging",
 }
 
 

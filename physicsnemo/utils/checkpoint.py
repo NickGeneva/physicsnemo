@@ -28,8 +28,8 @@ from torch.optim.lr_scheduler import _LRScheduler
 import physicsnemo
 from physicsnemo.core.filesystem import LOCAL_CACHE, _download_cached
 from physicsnemo.distributed import DistributedManager
-from physicsnemo.launch.logging import PythonLogger
 from physicsnemo.utils.capture import _StaticCapture
+from physicsnemo.utils.logging import PythonLogger
 
 optimizer = NewType("optimizer", torch.optim)
 scheduler = NewType("scheduler", _LRScheduler)
