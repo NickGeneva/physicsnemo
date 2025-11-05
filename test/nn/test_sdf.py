@@ -18,7 +18,8 @@
 
 import pytest
 import torch
-from pytest_utils import import_or_fail
+
+from test.conftest import requires_module
 
 
 def tet_verts(flip_x=1):
@@ -67,11 +68,11 @@ def tet_verts(flip_x=1):
     return tet
 
 
-@import_or_fail("warp")
+@requires_module("warp")
 @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
 @pytest.mark.parametrize("device", ["cpu", "cuda"])
 def test_sdf(pytestconfig, dtype, device):
-    from physicsnemo.core.sdf import signed_distance_field
+    from physicsnemo.nn.sdf import signed_distance_field
 
     mesh_vertices = tet_verts().reshape(-1, 3)
 
