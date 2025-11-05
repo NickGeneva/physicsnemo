@@ -20,7 +20,9 @@ import random
 import numpy as np
 import pytest
 import torch
-from pytest_utils import import_or_fail
+
+# from pytest_utils import import_or_fail
+from test.conftest import requires_module
 
 stl = pytest.importorskip("stl")
 
@@ -46,7 +48,7 @@ def sphere_stl(tmp_path):
     return file_path
 
 
-@import_or_fail(["vtk", "warp"])
+@requires_module(["vtk", "warp"])
 def test_mesh_utils(tmp_path, pytestconfig):
     """Tests the utility for combining VTP files and converting tesselated files."""
 
@@ -180,7 +182,7 @@ def test_mesh_utils(tmp_path, pytestconfig):
     assert os.path.exists(tmp_path / "converted/random.vtp")
 
 
-@import_or_fail(["warp", "skimage", "stl", "pyvista"])
+@requires_module(["warp", "skimage", "stl", "pyvista"])
 @pytest.mark.parametrize("backend", ["warp", "skimage"])
 def test_stl_gen(pytestconfig, backend, sphere_stl, tmp_path):
     from stl import mesh

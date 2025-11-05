@@ -22,10 +22,8 @@ import torch.nn as nn
 from torch import Tensor
 
 import physicsnemo  # noqa: F401 for docs
-from physicsnemo.models.layers import FCLayer, get_activation
-
-from ..meta import ModelMetaData
-from ..module import Module
+from physicsnemo.core import ModelMetaData, Module
+from physicsnemo.nn import FCLayer, get_activation
 
 
 @dataclass

@@ -13,6 +13,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+import importlib
 import os
 import pathlib
 from collections import defaultdict
@@ -138,3 +140,21 @@ def pytest_collection_modifyitems(config, items):
                 or "multigpu_static" in item.keywords
             ):
                 item.add_marker(skip_all)
+
+
+def requires_module(names):
+    """
+    Decorator to skip a test if *any* of the given modules are missing.
+    Accepts a single module name or a list/tuple of names.
+    """
+    if isinstance(names, str):
+        names = [names]
+
+    missing = [n for n in names if importlib.util.find_spec(n) is None]
+
+    if missing:
+        reason = f"Missing dependencies: {', '.join(missing)}"
+        return pytest.mark.skipif(True, reason=reason)
+    else:
+        # No missing dependencies → no skip mark
+        return pytest.mark.skipif(False, reason="")
