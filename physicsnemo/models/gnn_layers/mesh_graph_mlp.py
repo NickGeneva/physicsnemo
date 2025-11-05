@@ -22,7 +22,7 @@ import torch.nn.functional as F
 from torch import Tensor
 from torch.autograd.function import once_differentiable
 
-from physicsnemo.models.layers.layer_norm import get_layer_norm_class
+from physicsnemo.nn.layer_norm import get_layer_norm_class
 from physicsnemo.utils.profiling import profile
 
 from .utils import GraphType, concat_efeat, concat_efeat_hetero, sum_efeat

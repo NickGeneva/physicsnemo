@@ -25,8 +25,8 @@ import numpy as np
 import torch
 import torch.distributed as dist
 
+from physicsnemo.core.version_check import check_min_version, require_version
 from physicsnemo.distributed.config import ProcessGroupConfig, ProcessGroupNode
-from physicsnemo.utils.version_check import check_min_version, require_version
 
 # warnings.simplefilter("default", DeprecationWarning)
 

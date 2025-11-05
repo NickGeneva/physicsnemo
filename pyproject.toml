@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools", "setuptools-scm<9.0.0"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "nvidia-physicsnemo"
@@ -25,6 +25,7 @@ dependencies = [
     "treelib>=1.2.5",
     "xarray>=2023.1.0",
     "zarr>=2.14.2",
+    
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -39,6 +40,14 @@ Issues = "https://github.com/NVIDIA/physicsnemo/issues"
 Changelog = "https://github.com/NVIDIA/physicsnemo/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
+phsysicsnemo-core = [
+    "packaging",
+    "fsspec",
+    "requests",
+    "s3fs",
+]
+
+
 launch = [
     "hydra-core>=1.2.0",
     "termcolor>=2.1.1",
@@ -56,37 +65,36 @@ dev = [
     "coverage==6.5.0",
     "ruff==0.12.5",
     "moto[s3]>=5.0.28",
-    "pre-commit>=4.0.0"
+    "pre-commit>=4.0.0",
+    "pytest-timeout",
+    "import-linter",
 ]
 
-makani = [
-    # TODO(akamenev): PyPI does not allow direct URL deps, update once Makani is in PyPI
-    # "makani @ git+https://github.com/NVIDIA/modulus-makani.git@v0.1.0",
-    "torch-harmonics>=0.6.5,<0.7.1",
-    "tensorly>=0.8.1",
-    "tensorly-torch>=0.4.0",
-]
+# makani = [
+#     # TODO(akamenev): PyPI does not allow direct URL deps, update once Makani is in PyPI
+#     # "makani @ git+https://github.com/NVIDIA/modulus-makani.git@v0.1.0",
+#     "torch-harmonics>=0.6.5,<0.7.1",
+#     "tensorly>=0.8.1",
+#     "tensorly-torch>=0.4.0",
+# ]
 
-fignet = [
-    "jaxtyping>=0.2",
-    "torch_scatter>=2.1",
-    "torchinfo>=1.8",
-    "warp-lang>=1.0",
-    "webdataset>=0.2",
-]
+# fignet = [
+#     "jaxtyping>=0.2",
+#     "torch_scatter>=2.1",
+#     "torchinfo>=1.8",
+#     "warp-lang>=1.0",
+#     "webdataset>=0.2",
+# ]
 
 storage = [
     "multi-storage-client[boto3]>=0.14.0",
 ]
 
-shardtensor = [
-    "wrapt>=1.15.0",
-]
 
-natten = [
-    "natten",
-    "einops",
-]
+
+
+[tool.hatch.version]
+path = "physicsnemo/__init__.py"
 
 all = [
     "nvidia_dali_cuda120>=1.35.0",
@@ -112,11 +120,15 @@ all = [
 ]
 
 
-[tool.setuptools.dynamic]
-version = {attr = "physicsnemo.__version__"}
 
-[tool.setuptools.packages.find]
-include = ["physicsnemo", "physicsnemo.*"]
+[tool.hatch.build]
+include = [
+    "physicsnemo",
+    "physicsnemo/*",
+    "LICENSE"
+]
+exclude = ["tests", "examples"]
+
 
 [tool.ruff]
 # Enable flake8/pycodestyle (`E`), Pyflakes (`F`), flake8-bandit (`S`),

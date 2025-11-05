@@ -24,7 +24,7 @@ from typing import Any, Callable, Dict, NewType, Optional, Union
 
 import torch
 
-import physicsnemo
+from physicsnemo.core.module import Module as physicsnemo_module
 
 float16 = NewType("float16", torch.float16)
 bfloat16 = NewType("bfloat16", torch.bfloat16)
@@ -54,7 +54,7 @@ class _StaticCapture(object):
 
     def __init__(
         self,
-        model: "physicsnemo.Module",
+        model: physicsnemo_module,
         optim: Optional[optim] = None,
         logger: Optional[Logger] = None,
         use_graphs: bool = True,
@@ -71,12 +71,10 @@ class _StaticCapture(object):
         self.label = label if label else f"scaler_{len(self.amp_scalers.keys())}"
 
         # DDP fix
-        if not isinstance(model, physicsnemo.models.Module) and hasattr(
-            model, "module"
-        ):
+        if not isinstance(model, physicsnemo_module) and hasattr(model, "module"):
             model = model.module
 
-        if not isinstance(model, physicsnemo.models.Module):
+        if not isinstance(model, physicsnemo_module):
             self.logger.error("Model not a PhysicsNeMo Module!")
             raise ValueError("Model not a PhysicsNeMo Module!")
         if compile:
@@ -410,7 +408,7 @@ class StaticCaptureTraining(_StaticCapture):
 
     def __init__(
         self,
-        model: "physicsnemo.Module",
+        model: physicsnemo_module,
         optim: torch.optim,
         logger: Optional[Logger] = None,
         use_graphs: bool = True,
@@ -489,7 +487,7 @@ class StaticCaptureEvaluateNoGrad(_StaticCapture):
 
     def __init__(
         self,
-        model: "physicsnemo.Module",
+        model: physicsnemo_module,
         logger: Optional[Logger] = None,
         use_graphs: bool = True,
         use_amp: bool = True,

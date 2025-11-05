@@ -17,8 +17,6 @@
 import warnings
 
 
-class ExperimentalFeatureWarning(UserWarning):
-    """Warning raised when using experimental features that may change without notice."""
 
 
 warnings.warn(
