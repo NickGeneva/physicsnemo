@@ -23,13 +23,13 @@ from dataclasses import dataclass
 
 import pytest
 import torch
-from pytest_utils import import_or_fail
 
+from physicsnemo.core.meta import ModelMetaData
+from physicsnemo.core.module import Module
 from physicsnemo.launch.utils import load_checkpoint, save_checkpoint
-from physicsnemo.models.meta import ModelMetaData
-from physicsnemo.models.module import Module
+from test.conftest import requires_module
 
-LAYER_NORM_PATH = "physicsnemo.models.layers.layer_norm"
+LAYER_NORM_PATH = "physicsnemo.nn.layer_norm"
 
 
 def reload_layer_norm():
@@ -66,7 +66,7 @@ def test_torch_fallback(monkeypatch):
     assert isinstance(ln, torch.nn.LayerNorm)
 
 
-@import_or_fail(["transformer_engine"])
+@requires_module(["transformer_engine"])
 @pytest.mark.parametrize(
     "force_val,expected_type",
     [

@@ -18,4 +18,5 @@ from .capture import (
     StaticCaptureEvaluateNoGrad,
     StaticCaptureTraining,
 )
+from .checkpoint import get_checkpoint_dir, load_checkpoint, save_checkpoint
 from .profiling import Profiler

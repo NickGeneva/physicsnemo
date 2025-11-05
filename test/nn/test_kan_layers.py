@@ -21,7 +21,7 @@ Unit tests for the Kolmogorov–Arnold Network (KAN) layer.
 import pytest
 import torch
 
-from physicsnemo.models.layers.kan_layers import KolmogorovArnoldNetwork
+from physicsnemo.nn.kan_layers import KolmogorovArnoldNetwork
 
 
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])

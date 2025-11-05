@@ -13,5 +13,3 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-from .checkpoint import get_checkpoint_dir, load_checkpoint, save_checkpoint
