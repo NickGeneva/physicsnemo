@@ -21,8 +21,7 @@ import torch
 
 from physicsnemo.models.rnn.rnn_one2many import One2ManyRNN
 from physicsnemo.models.rnn.rnn_seq2seq import Seq2SeqRNN
-
-from . import common
+from test import common
 
 
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
@@ -51,7 +50,7 @@ def test_conv_rnn_one2many_forward(device, dimension):
     assert common.validate_forward_accuracy(
         model,
         (invar,),
-        file_name=f"conv_rnn_one2many_{dimension}d_output.pth",
+        file_name=f"models/rnn/data/conv_rnn_one2many_{dimension}d_output.pth",
         atol=1e-4,
     )
 
@@ -197,7 +196,7 @@ def test_conv_rnn_seq2seq_forward(device, dimension):
     assert common.validate_forward_accuracy(
         model,
         (invar,),
-        file_name=f"conv_rnn_seq2seq_{dimension}d_output.pth",
+        file_name=f"models/rnn/data/conv_rnn_seq2seq_{dimension}d_output.pth",
         atol=1e-4,
     )
 

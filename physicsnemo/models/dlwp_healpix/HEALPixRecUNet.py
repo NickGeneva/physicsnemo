@@ -23,9 +23,9 @@ import torch as th
 from hydra.utils import instantiate
 from omegaconf import DictConfig
 
+from physicsnemo.core.meta import ModelMetaData
+from physicsnemo.core.module import Module
 from physicsnemo.models.dlwp_healpix_layers import HEALPixFoldFaces, HEALPixUnfoldFaces
-from physicsnemo.models.meta import ModelMetaData
-from physicsnemo.models.module import Module
 
 logger = logging.getLogger(__name__)
 

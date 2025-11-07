@@ -27,8 +27,8 @@ try:
 except ImportError:
     te = None
 
-from physicsnemo.models.meta import ModelMetaData
-from physicsnemo.models.module import Module
+from physicsnemo.core.meta import ModelMetaData
+from physicsnemo.core.module import Module
 
 
 class ReshapedLayerNorm(te.LayerNorm if te else nn.LayerNorm):

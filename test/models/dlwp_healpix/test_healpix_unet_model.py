@@ -14,19 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ruff: noqa: E402
-import os
-import sys
 
-script_path = os.path.abspath(__file__)
-sys.path.append(os.path.join(os.path.dirname(script_path), ".."))
-
-import common
 import pytest
 import torch
-from graphcast.utils import fix_random_seeds
-from pytest_utils import import_or_fail
 
 from physicsnemo.models.dlwp_healpix import HEALPixUNet
+from test import common
+from test.conftest import requires_module
+from test.models.graphcast.utils import fix_random_seeds
 
 omegaconf = pytest.importorskip("omegaconf")
 
@@ -157,7 +152,7 @@ def unet_decoder_dict(
     return omegaconf.DictConfig(decoder)
 
 
-@import_or_fail("omegaconf")
+@requires_module("omegaconf")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_HEALPixUNet_initialize(
     device, unet_encoder_dict, unet_decoder_dict, pytestconfig
@@ -234,7 +229,7 @@ def test_HEALPixUNet_initialize(
     torch.cuda.empty_cache()
 
 
-@import_or_fail("omegaconf")
+@requires_module("omegaconf")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_HEALPixUNet_integration_steps(
     device, unet_encoder_dict, unet_decoder_dict, pytestconfig
@@ -262,7 +257,7 @@ def test_HEALPixUNet_integration_steps(
     torch.cuda.empty_cache()
 
 
-@import_or_fail("omegaconf")
+@requires_module("omegaconf")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_HEALPixUNet_forward(
     device,

@@ -20,10 +20,10 @@ from typing import Sequence
 
 import pytest
 import torch
-from pytest_utils import import_or_fail
 
-from ..common.fwdaccuracy import save_output
-from ..common.utils import compare_output
+from test.common.fwdaccuracy import save_output
+from test.common.utils import compare_output
+from test.conftest import requires_module
 
 
 def validate_domino(
@@ -151,7 +151,7 @@ class model_params:
     geometry_local = geometry_local
 
 
-@import_or_fail("warp")
+@requires_module("warp")
 @pytest.mark.parametrize("device", ["cuda:0"])
 @pytest.mark.parametrize("processor_type", ["unet", "conv"])
 def test_domino_forward(device, processor_type, pytestconfig):

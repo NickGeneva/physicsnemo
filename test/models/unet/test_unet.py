@@ -18,12 +18,12 @@ import random
 
 import pytest
 import torch
-from pytest_utils import import_or_fail
 
-from . import common
+from test import common
+from test.conftest import requires_module
 
 
-@import_or_fail(["transformer_engine"])
+@requires_module(["transformer_engine"])
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_unet_forward(device, pytestconfig):
     """Test unet forward pass"""
@@ -41,10 +41,12 @@ def test_unet_forward(device, pytestconfig):
 
     bsize = 2
     invar = torch.randn(bsize, 1, 16, 16, 16).to(device)
-    assert common.validate_forward_accuracy(model, (invar,))
+    assert common.validate_forward_accuracy(
+        model, (invar,), file_name="models/unet/data/unet_output.pth"
+    )
 
 
-@import_or_fail(["transformer_engine"])
+@requires_module(["transformer_engine"])
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_unet_constructor(device, pytestconfig):
     """Test unet constructor options"""

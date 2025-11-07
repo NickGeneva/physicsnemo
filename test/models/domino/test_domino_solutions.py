@@ -31,7 +31,7 @@ def test_solution_calculator_volume(
     """Test SolutionCalculatorVolume with various configurations"""
     from physicsnemo.models.domino.mlps import AggregationModel
     from physicsnemo.models.domino.solutions import SolutionCalculatorVolume
-    from physicsnemo.models.layers import FourierMLP, get_activation
+    from physicsnemo.nn import FourierMLP, get_activation
 
     torch.manual_seed(0)
 
@@ -116,7 +116,7 @@ def test_solution_calculator_surface(
     """Test SolutionCalculatorSurface with various configurations"""
     from physicsnemo.models.domino.mlps import AggregationModel
     from physicsnemo.models.domino.solutions import SolutionCalculatorSurface
-    from physicsnemo.models.layers import FourierMLP, get_activation
+    from physicsnemo.nn import FourierMLP, get_activation
 
     torch.manual_seed(0)
 
