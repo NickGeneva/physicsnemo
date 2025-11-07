@@ -20,7 +20,7 @@ import warnings
 from importlib.metadata import EntryPoint, entry_points
 from typing import List, Union
 
-from physicsnemo.core.module import Module
+from .base import RegisterableModule
 
 # NOTE: This is for backport compatibility, some entry points seem to be using this old class
 # Exact cause of this is unknown but it seems to be related to multiple versions
@@ -74,7 +74,9 @@ class ModelRegistry:
 
         return registry
 
-    def register(self, model: type[Module], name: Union[str, None] = None) -> None:
+    def register(
+        self, model: type[RegisterableModule], name: Union[str, None] = None
+    ) -> None:
         """
         Registers a physicsnemo model class in the model registry under the provided name. If no name
         is provided, the model's name (from its `__name__` attribute) is used. If the
@@ -93,8 +95,8 @@ class ModelRegistry:
             If the provided name is already in use in the registry.
         """
 
-        # Check if model is a physicsnemo model
-        if not issubclass(model, Module):
+        # Check if model is a physicsnemo module
+        if not issubclass(model, RegisterableModule):
             raise ValueError(
                 f"Only subclasses of physicsnemo.core.Module can be registered. "
                 f"Provided model is of type {type(model)}"
@@ -111,7 +113,7 @@ class ModelRegistry:
         # Add this class to the dict of model registry
         self._model_registry[name] = model
 
-    def factory(self, name: str) -> Module:
+    def factory(self, name: str) -> RegisterableModule:
         """
         Returns a registered model given its name.
 

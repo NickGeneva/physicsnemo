@@ -17,7 +17,7 @@
 import torch
 import torch.nn as nn
 
-import physicsnemo  # noqa: F401 for docs
+# import physicsnemo  # noqa: F401 for docs
 
 Tensor = torch.Tensor
 

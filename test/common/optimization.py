@@ -31,7 +31,7 @@ logger = logging.getLogger("__name__")
 
 @torch.no_grad()
 def validate_jit(
-    model: physicsnemo.Module,
+    model: physicsnemo.core.Module,
     in_args: Tuple[Tensor] = (),
     rtol: float = 1e-5,
     atol: float = 1e-5,
@@ -44,7 +44,7 @@ def validate_jit(
 
     Parameters
     ----------
-    model : physicsnemo.Module
+    model : physicsnemo.core.Module
         PhysicsNeMo module
     in_args : Tuple[Tensor], optional
         Input arguments, by default ()
@@ -74,7 +74,7 @@ def validate_jit(
 
 
 def validate_cuda_graphs(
-    model: physicsnemo.Module,
+    model: physicsnemo.core.Module,
     in_args: Tuple[Tensor] = (),
     rtol: float = 1e-5,
     atol: float = 1e-5,
@@ -88,7 +88,7 @@ def validate_cuda_graphs(
 
     Parameters
     ----------
-    model : physicsnemo.Module
+    model : physicsnemo.core.Module
         PhysicsNeMo module
     in_args : Tuple[Tensor], optional
         Input arguments, keywords not supported, by default ()
@@ -134,7 +134,7 @@ def validate_cuda_graphs(
 
 
 def validate_amp(
-    model: physicsnemo.Module,
+    model: physicsnemo.core.Module,
     in_args: Tuple[Tensor] = (),
     iterations: int = 3,
 ) -> bool:
@@ -144,7 +144,7 @@ def validate_amp(
 
     Parameters
     ----------
-    model : physicsnemo.Module
+    model : physicsnemo.core.Module
         PhysicsNeMo module
     in_args : Tuple[Tensor], optional
         Input arguments, keywords not supported, by default ()
@@ -205,8 +205,10 @@ def nop_backend(gm, inputs):
 
 
 def torch_compile_model(
-    model: physicsnemo.Module, fullgraph: bool = True, error_on_recompile: bool = False
-) -> physicsnemo.Module:
+    model: physicsnemo.core.Module,
+    fullgraph: bool = True,
+    error_on_recompile: bool = False,
+) -> physicsnemo.core.Module:
     backend = (
         nop_backend  # for fast compilation for fx graph capture, use a nop backend
     )
@@ -217,7 +219,7 @@ def torch_compile_model(
 
 
 def validate_torch_compile(
-    model: physicsnemo.Module,
+    model: physicsnemo.core.Module,
     in_args: Tuple[Tensor] = (),
     fullgraph: bool = True,
     error_on_recompile: bool = False,
@@ -227,7 +229,7 @@ def validate_torch_compile(
 
     Parameters
     ----------
-    model : physicsnemo.Module
+    model : physicsnemo.core.Module
         PhysicsNeMo module
     in_args : Tuple[Tensor], optional
         Input arguments, keywords not supported, by default ()
@@ -261,7 +263,7 @@ def validate_torch_compile(
 
 
 def validate_combo_optims(
-    model: physicsnemo.Module,
+    model: physicsnemo.core.Module,
     in_args: Tuple[Tensor] = (),
     iterations: int = 2,
     warmup_length: int = 11,
@@ -274,7 +276,7 @@ def validate_combo_optims(
 
     Parameters
      ----------
-     model : physicsnemo.Module
+     model : physicsnemo.core.Module
          PhysicsNeMo module
      in_args : Tuple[Tensor], optional
          Input arguments, keywords not supported, by default ()

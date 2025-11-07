@@ -56,7 +56,7 @@ def check_ort_version():
 
 @torch.no_grad()
 def validate_onnx_export(
-    model: physicsnemo.Module,
+    model: physicsnemo.core.Module,
     in_args: Tuple[Tensor] = (),
 ) -> bool:
     """Check network's ONNX export works
@@ -65,7 +65,7 @@ def validate_onnx_export(
 
     Parameters
     ----------
-    model_1 : physicsnemo.Module
+    model_1 : physicsnemo.core.Module
         PhysicsNeMo model to save checkpoint from
     in_args : Tuple[Tensor], optional
         Input arguments, by default ()
@@ -117,7 +117,7 @@ def validate_onnx_export(
 
 @torch.no_grad()
 def validate_onnx_runtime(
-    model: physicsnemo.Module,
+    model: physicsnemo.core.Module,
     in_args: Tuple[Tensor, ...] = (),
     rtol: float = 1e-3,
     atol: float = 1e-3,
@@ -131,7 +131,7 @@ def validate_onnx_runtime(
 
     Parameters
     ----------
-    model_1 : physicsnemo.Module
+    model_1 : physicsnemo.core.Module
         PhysicsNeMo model to save checkpoint from
     in_args : Tuple[Tensor], optional
         Input arguments, by default ()

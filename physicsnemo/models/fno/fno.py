@@ -23,11 +23,10 @@ import torch.nn.functional as F
 from torch import Tensor
 
 import physicsnemo  # noqa: F401 for docs
-import physicsnemo.models.layers as layers
-
-from ..meta import ModelMetaData
-from ..mlp import FullyConnected
-from ..module import Module
+import physicsnemo.nn as layers
+from physicsnemo.core.meta import ModelMetaData
+from physicsnemo.core.module import Module
+from physicsnemo.models.mlp import FullyConnected
 
 # ===================================================================
 # ===================================================================
@@ -901,6 +900,9 @@ class FNO(Module):
         )
 
     def getFNOEncoder(self):
+        """
+        Return the correct FNO encoder based on the dimension
+        """
         if self.dimension == 1:
             return FNO1DEncoder
         elif self.dimension == 2:

@@ -42,7 +42,7 @@ class MMetaData(ModelMetaData):
     auto_grad: bool = True
 
 
-class M(physicsnemo.Module):
+class M(physicsnemo.core.Module):
     """Fake model"""
 
     _overridable_args = {"a"}
@@ -73,7 +73,7 @@ class M1MetaData(ModelMetaData):
     auto_grad: bool = True
 
 
-class M1(physicsnemo.Module):
+class M1(physicsnemo.core.Module):
     """Fake model"""
 
     _overridable_args = {"b"}
@@ -114,7 +114,7 @@ class TorchModel(torch.nn.Module):
 
 
 def make_model():
-    Mt = physicsnemo.Module.from_torch(TorchModel, meta=TorchModelMetaData())
+    Mt = physicsnemo.core.Module.from_torch(TorchModel, meta=TorchModelMetaData())
     m21 = Mt(21.0)
     m22 = M1(22.0)
     m11 = M1(11.0)
@@ -130,9 +130,9 @@ def test_save_load(device, override):
     m_orig = m_orig.to(device)
     m_orig.save("checkpoint.mdlus")
     if not override:
-        m_loaded = physicsnemo.Module.from_checkpoint("checkpoint.mdlus")
+        m_loaded = physicsnemo.core.Module.from_checkpoint("checkpoint.mdlus")
     else:
-        m_loaded = physicsnemo.Module.from_checkpoint(
+        m_loaded = physicsnemo.core.Module.from_checkpoint(
             "checkpoint.mdlus", override_args={"a": -0.1, "m2.a": -0.2, "m2.m2.b": -0.3}
         )
     assert isinstance(m_loaded, M)
@@ -151,7 +151,7 @@ def test_save_load(device, override):
 
     if override:
         with pytest.raises(ValueError):
-            physicsnemo.Module.from_checkpoint(
+            physicsnemo.core.Module.from_checkpoint(
                 "checkpoint.mdlus", override_args={"m2.m1.c": -0.4}
             )
 
@@ -172,9 +172,9 @@ def test_load_from_checkpoint(device, override):
     m_orig, Mt = make_model()
     m_orig = m_orig.to(device)
     if not override:
-        m_loaded = physicsnemo.Module.from_checkpoint(file_name).to(device)
+        m_loaded = physicsnemo.core.Module.from_checkpoint(file_name).to(device)
     else:
-        m_loaded = physicsnemo.Module.from_checkpoint(
+        m_loaded = physicsnemo.core.Module.from_checkpoint(
             file_name, override_args={"a": -0.1, "m2.a": -0.2, "m2.m2.b": -0.3}
         ).to(device)
     assert isinstance(m_loaded, M)
@@ -193,7 +193,7 @@ def test_load_from_checkpoint(device, override):
 
     if override:
         with pytest.raises(ValueError):
-            physicsnemo.Module.from_checkpoint(
+            physicsnemo.core.Module.from_checkpoint(
                 file_name, override_args={"m2.m1.c": -0.4}
             )
     registry.__clear_registry__()

@@ -10,8 +10,9 @@ containers=
 layers = 
     experimental
     models  : registry : datapipes : metrics : domain_parallel
+    nn
     utils
-    distributed |  nn
+    distributed 
     core
 
 [importlinter:contract:physicsnemo-core]
@@ -56,7 +57,7 @@ containers=
     physicsnemo.nn
 layers = 
     fourier_layers | transformer_layers
-    dgm_layers | mlp_layers | fully_connected_layers
+    dgm_layers | mlp_layers | fully_connected_layers | gnn_layers
     activations | attention_layers | ball_query | conv_layers  | drop | fft  | fused_silu | interpolation | kan_layers | patching | resample_layers | sdf | siren_layers | spectral_layers | transformer_decoder  | weight_fact | weight_norm
     neighbors 
     utils
@@ -70,6 +71,6 @@ containers=
 layers = 
     mesh_reduced
     afno | dlwp | dlwp_healpix | domino | dpot | fengwu | figconvnet | fno | graphcast | meshgraphnet | pangu | pix2pix | rnn |  srrn | swinvrnn | topodiff | transolver  | vfgn 
-    unet | diffusion | gnn_layers | dlwp_healpix_layers 
+    unet | diffusion  | dlwp_healpix_layers 
     utils
 

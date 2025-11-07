@@ -30,8 +30,8 @@ logger = logging.getLogger("__name__")
 
 @torch.no_grad()
 def validate_checkpoint(
-    model_1: physicsnemo.Module,
-    model_2: physicsnemo.Module,
+    model_1: physicsnemo.core.Module,
+    model_2: physicsnemo.core.Module,
     in_args: Tuple[Tensor] = (),
     rtol: float = 1e-5,
     atol: float = 1e-5,
@@ -45,9 +45,9 @@ def validate_checkpoint(
 
     Parameters
     ----------
-    model_1 : physicsnemo.Module
+    model_1 : physicsnemo.core.Module
         PhysicsNeMo model to save checkpoint from
-    model_2 : physicsnemo.Module
+    model_2 : physicsnemo.core.Module
         PhysicsNeMo model to load checkpoint to
     in_args : Tuple[Tensor], optional
         Input arguments, by default ()
@@ -95,7 +95,9 @@ def validate_checkpoint(
     loaded_checkpoint = compare_output(output_1, output_2, rtol, atol)
 
     # Restore checkpoint with from_checkpoint, checks initialization of model directly from checkpoint
-    model_2 = physicsnemo.Module.from_checkpoint("checkpoint.mdlus").to(model_1.device)
+    model_2 = physicsnemo.core.Module.from_checkpoint("checkpoint.mdlus").to(
+        model_1.device
+    )
     with torch.autocast("cuda", enabled=enable_autocast):
         output_2 = model_2.forward(*in_args)
     restored_checkpoint = compare_output(output_1, output_2, rtol, atol)
