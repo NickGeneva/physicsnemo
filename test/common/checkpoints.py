@@ -20,7 +20,7 @@ from typing import Tuple
 
 import torch
 
-import physicsnemo
+import physicsnemo.core
 
 from .utils import compare_output
 
