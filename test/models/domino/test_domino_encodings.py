@@ -27,7 +27,7 @@ from .utils import validate_output_shape_and_values
 @pytest.mark.parametrize("num_modes", [3, 5, 10])
 def test_fourier_mlp(device, fourier_features, num_modes):
     """Test FourierMLP with various configurations"""
-    from physicsnemo.models.layers import FourierMLP
+    from physicsnemo.nn import FourierMLP
 
     torch.manual_seed(0)
 
@@ -48,7 +48,7 @@ def test_fourier_mlp(device, fourier_features, num_modes):
 @pytest.mark.parametrize("device", ["cuda:0"])
 def test_fourier_encode_vectorized(device):
     """Test fourier encoding function"""
-    from physicsnemo.models.layers import fourier_encode
+    from physicsnemo.nn import fourier_encode
 
     torch.manual_seed(0)
 
@@ -65,7 +65,7 @@ def test_fourier_encode_vectorized(device):
 def test_local_geometry_encoding(device):
     """Test LocalGeometryEncoding"""
     from physicsnemo.models.domino.encodings import LocalGeometryEncoding
-    from physicsnemo.models.domino.model import get_activation
+    from physicsnemo.nn import get_activation
 
     BATCH_SIZE = 1
 

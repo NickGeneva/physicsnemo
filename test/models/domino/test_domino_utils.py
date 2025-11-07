@@ -26,7 +26,7 @@ import math
 import pytest
 import torch
 
-from physicsnemo.utils.domino.utils import (
+from physicsnemo.models.domino.utils import (
     area_weighted_shuffle_array,
     calculate_center_of_mass,
     calculate_normal_positional_encoding,
