@@ -14,19 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ruff: noqa: E402
-import os
-import sys
 
-script_path = os.path.abspath(__file__)
-sys.path.append(os.path.join(os.path.dirname(script_path), ".."))
-
-import common
 import pytest
 import torch
-from graphcast.utils import fix_random_seeds
-from pytest_utils import import_or_fail
 
 from physicsnemo.models.dlwp_healpix import HEALPixRecUNet
+from test import common
+from test.conftest import requires_module
+from test.models.graphcast.utils import fix_random_seeds
 
 omegaconf = pytest.importorskip("omegaconf")
 
@@ -169,7 +164,7 @@ def insolation_data():
     return generate_insolation_data
 
 
-@import_or_fail("omegaconf")
+@requires_module("omegaconf")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_HEALPixRecUNet_initialize(device, encoder_dict, decoder_dict, pytestconfig):
     in_channels = 3
@@ -274,7 +269,7 @@ def test_HEALPixRecUNet_initialize(device, encoder_dict, decoder_dict, pytestcon
     torch.cuda.empty_cache()
 
 
-@import_or_fail("omegaconf")
+@requires_module("omegaconf")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_HEALPixRecUNet_integration_steps(
     device, encoder_dict, decoder_dict, pytestconfig
@@ -302,7 +297,7 @@ def test_HEALPixRecUNet_integration_steps(
     torch.cuda.empty_cache()
 
 
-@import_or_fail("omegaconf")
+@requires_module("omegaconf")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 @torch.no_grad()
 def test_HEALPixRecUNet_reset(
@@ -355,7 +350,7 @@ def test_HEALPixRecUNet_reset(
     torch.cuda.empty_cache()
 
 
-@import_or_fail("omegaconf")
+@requires_module("omegaconf")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 @torch.no_grad()
 def test_HEALPixRecUNet_forward(

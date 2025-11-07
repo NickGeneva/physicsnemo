@@ -20,10 +20,11 @@ import sys
 script_path = os.path.abspath(__file__)
 sys.path.append(os.path.join(os.path.dirname(script_path), ".."))
 
-import common
 import pytest
 import torch
-from pytest_utils import import_or_fail
+
+from test import common
+from test.conftest import requires_module
 
 
 @pytest.fixture
@@ -39,7 +40,7 @@ def test_data():
     return generate_test_data
 
 
-@import_or_fail("hydra")
+@requires_module("hydra")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_ConvGRUBlock_initialization(device, test_data, pytestconfig):
     from physicsnemo.models.dlwp_healpix_layers import (
@@ -51,7 +52,7 @@ def test_ConvGRUBlock_initialization(device, test_data, pytestconfig):
     assert isinstance(conv_gru_func, ConvGRUBlock)
 
 
-@import_or_fail("hydra")
+@requires_module("hydra")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_ConvGRUBlock_forward(device, test_data, pytestconfig):
     from physicsnemo.models.dlwp_healpix_layers import (
@@ -74,7 +75,7 @@ def test_ConvGRUBlock_forward(device, test_data, pytestconfig):
     assert not common.compare_output(outvar_hist, outvar)
 
 
-@import_or_fail("hydra")
+@requires_module("hydra")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_ConvNeXtBlock_initialization(device, pytestconfig):
     from physicsnemo.models.dlwp_healpix_layers import (
@@ -95,7 +96,7 @@ def test_ConvNeXtBlock_initialization(device, pytestconfig):
     assert isinstance(convnext_block, ConvNeXtBlock)
 
 
-@import_or_fail("hydra")
+@requires_module("hydra")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_ConvNeXtBlock_forward(device, test_data, pytestconfig):
     from physicsnemo.models.dlwp_healpix_layers import (
@@ -123,7 +124,7 @@ def test_ConvNeXtBlock_forward(device, test_data, pytestconfig):
     assert outvar.shape == out_shape
 
 
-@import_or_fail("hydra")
+@requires_module("hydra")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_DoubleConvNeXtBlock_initialization(device, pytestconfig):
     from physicsnemo.models.dlwp_healpix_layers import (
@@ -150,7 +151,7 @@ def test_DoubleConvNeXtBlock_initialization(device, pytestconfig):
     assert isinstance(doubleconvnextblock, DoubleConvNeXtBlock)
 
 
-@import_or_fail("hydra")
+@requires_module("hydra")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_DoubleConvNeXtBlock_forward(device, test_data, pytestconfig):
     from physicsnemo.models.dlwp_healpix_layers import (
@@ -185,7 +186,7 @@ def test_DoubleConvNeXtBlock_forward(device, test_data, pytestconfig):
     assert outvar.shape == out_shape
 
 
-@import_or_fail("hydra")
+@requires_module("hydra")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_SymmetricConvNeXtBlock_initialization(device, pytestconfig):
     from physicsnemo.models.dlwp_healpix_layers import (
@@ -209,7 +210,7 @@ def test_SymmetricConvNeXtBlock_initialization(device, pytestconfig):
     assert isinstance(symmetric_convnextblock, SymmetricConvNeXtBlock)
 
 
-@import_or_fail("hydra")
+@requires_module("hydra")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_SymmetricConvNeXtBlock_forward(device, test_data, pytestconfig):
     from physicsnemo.models.dlwp_healpix_layers import (
@@ -232,7 +233,7 @@ def test_SymmetricConvNeXtBlock_forward(device, test_data, pytestconfig):
     assert outvar.shape == out_shape
 
 
-@import_or_fail("hydra")
+@requires_module("hydra")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_Multi_SymmetricConvNeXtBlock_initialization(device, pytestconfig):
     from physicsnemo.models.dlwp_healpix_layers import (
@@ -249,7 +250,7 @@ def test_Multi_SymmetricConvNeXtBlock_initialization(device, pytestconfig):
     assert isinstance(multi_symmetric_convnextblock, Multi_SymmetricConvNeXtBlock)
 
 
-@import_or_fail("hydra")
+@requires_module("hydra")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_Multi_SymmetricConvNeXtBlock_forward(device, test_data, pytestconfig):
     from physicsnemo.models.dlwp_healpix_layers import (
@@ -274,7 +275,7 @@ def test_Multi_SymmetricConvNeXtBlock_forward(device, test_data, pytestconfig):
     assert outvar.shape == out_shape
 
 
-@import_or_fail("hydra")
+@requires_module("hydra")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_BasicConvBlock_initialization(device, pytestconfig):
     from physicsnemo.models.dlwp_healpix_layers import (
@@ -300,7 +301,7 @@ def test_BasicConvBlock_initialization(device, pytestconfig):
     assert isinstance(conv_block, BasicConvBlock)
 
 
-@import_or_fail("hydra")
+@requires_module("hydra")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_BasicConvBlock_forward(device, test_data, pytestconfig):
     from physicsnemo.models.dlwp_healpix_layers import (
@@ -325,7 +326,7 @@ def test_BasicConvBlock_forward(device, test_data, pytestconfig):
     assert outvar.shape == out_shape
 
 
-@import_or_fail("hydra")
+@requires_module("hydra")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_MaxPool_initialization(device, pytestconfig):
     from physicsnemo.models.dlwp_healpix_layers import (
@@ -337,7 +338,7 @@ def test_MaxPool_initialization(device, pytestconfig):
     assert isinstance(maxpool_block, MaxPool)
 
 
-@import_or_fail("hydra")
+@requires_module("hydra")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_MaxPool_forward(device, test_data, pytestconfig):
     from physicsnemo.models.dlwp_healpix_layers import (
@@ -357,7 +358,7 @@ def test_MaxPool_forward(device, test_data, pytestconfig):
     assert common.compare_output(outvar, maxpool_block(invar))
 
 
-@import_or_fail("hydra")
+@requires_module("hydra")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_AvgPool_initialization(device, pytestconfig):
     from physicsnemo.models.dlwp_healpix_layers import (
@@ -369,7 +370,7 @@ def test_AvgPool_initialization(device, pytestconfig):
     assert isinstance(avgpool_block, AvgPool)
 
 
-@import_or_fail("hydra")
+@requires_module("hydra")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_AvgPool_forward(device, test_data, pytestconfig):
     from physicsnemo.models.dlwp_healpix_layers import (
@@ -392,7 +393,7 @@ def test_AvgPool_forward(device, test_data, pytestconfig):
     assert common.compare_output(outvar, avgpool_block(invar))
 
 
-@import_or_fail("hydra")
+@requires_module("hydra")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_TransposedConvUpsample_initialization(device, pytestconfig):
     from physicsnemo.models.dlwp_healpix_layers import (
@@ -408,7 +409,7 @@ def test_TransposedConvUpsample_initialization(device, pytestconfig):
     assert isinstance(transposed_conv_upsample_block, TransposedConvUpsample)
 
 
-@import_or_fail("hydra")
+@requires_module("hydra")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_TransposedConvUpsample_forward(device, test_data, pytestconfig):
     from physicsnemo.models.dlwp_healpix_layers import (
@@ -439,7 +440,7 @@ def test_TransposedConvUpsample_forward(device, test_data, pytestconfig):
     assert outvar.shape == outsize
 
 
-@import_or_fail("hydra")
+@requires_module("hydra")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_Interpolate_initialization(device, pytestconfig):
     from physicsnemo.models.dlwp_healpix_layers import (
@@ -452,7 +453,7 @@ def test_Interpolate_initialization(device, pytestconfig):
     assert isinstance(interpolation_block, Interpolate)
 
 
-@import_or_fail("hydra")
+@requires_module("hydra")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_Interpolate_forward(device, pytestconfig):
     from physicsnemo.models.dlwp_healpix_layers import (
