@@ -15,12 +15,11 @@
 # limitations under the License.
 
 import torch
-from pytest_utils import import_or_fail
 from torch.testing import assert_close
 
 import physicsnemo
-
-from . import common
+from test import common
+from test.conftest import requires_module
 
 IN_C = 3
 OUT_C = 1
@@ -29,7 +28,7 @@ HIDDEN_C = [IN_C, 4, 4, 4]
 MLP_C = [8, 8]
 
 
-def _create_model() -> physicsnemo.Module:
+def _create_model() -> physicsnemo.core.Module:
     from physicsnemo.models.figconvnet.figconvunet import FIGConvUNet
 
     return FIGConvUNet(
@@ -41,7 +40,7 @@ def _create_model() -> physicsnemo.Module:
     )
 
 
-@import_or_fail("webdataset")
+@requires_module("webdataset")
 def test_figconvunet_eval(pytestconfig):
     # FIGConvUNet works only on GPUs due to Warp.
     device = torch.device("cuda:0")
@@ -67,7 +66,7 @@ def test_figconvunet_eval(pytestconfig):
     assert_close(c_d_pred, c_d_pred2)
 
 
-@import_or_fail("webdataset")
+@requires_module("webdataset")
 def test_figconvunet_forward(pytestconfig):
     # FIGConvUNet works only on GPUs due to Warp.
     device = torch.device("cuda:0")
@@ -81,4 +80,6 @@ def test_figconvunet_forward(pytestconfig):
     num_vertices = 100
     vertices = torch.randn((batch_size, num_vertices, 3), device=device)
 
-    assert common.validate_forward_accuracy(model, (vertices,))
+    assert common.validate_forward_accuracy(
+        model, (vertices,), file_name="models/figconvnet/data/figconvunet_output.pth"
+    )

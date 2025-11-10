@@ -20,8 +20,7 @@ import pytest
 import torch
 
 from physicsnemo.models.srrn import SRResNet
-
-from . import common
+from test import common
 
 
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
@@ -36,7 +35,12 @@ def test_super_res_net_forward(device):
 
     bsize = 8
     invar = torch.randn(bsize, 1, 4, 4, 4).to(device)
-    assert common.validate_forward_accuracy(model_3d, (invar,), atol=1e-3)
+    assert common.validate_forward_accuracy(
+        model_3d,
+        (invar,),
+        atol=1e-3,
+        file_name="models/super_res_net/data/superresolution_output.pth",
+    )
 
 
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])

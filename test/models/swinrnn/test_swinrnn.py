@@ -20,8 +20,7 @@ import pytest
 import torch
 
 from physicsnemo.models.swinvrnn import SwinRNN
-
-from . import common
+from test import common
 
 
 # Skip CPU tests because too slow
@@ -44,7 +43,13 @@ def test_swinrnn_forward(device):
     invar = torch.randn(bsize, 13, 6, 32, 64).to(device)
     # Check output size
     with torch.no_grad():
-        assert common.validate_forward_accuracy(model, (invar,), atol=5e-3, rtol=1e-3)
+        assert common.validate_forward_accuracy(
+            model,
+            (invar,),
+            atol=5e-3,
+            rtol=1e-3,
+            file_name="models/swinrnn/data/swinrnn_output.pth",
+        )
     del invar, model
     torch.cuda.empty_cache()
 
