@@ -20,8 +20,7 @@ import pytest
 import torch
 
 from physicsnemo.models.mlp import FullyConnected
-
-from . import common
+from test import common
 
 
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
@@ -38,7 +37,9 @@ def test_fully_connected_forward(device):
 
     bsize = 8
     invar = torch.randn(bsize, 32).to(device)
-    assert common.validate_forward_accuracy(model, (invar,))
+    assert common.validate_forward_accuracy(
+        model, (invar,), file_name="models/mlp/data/fullyconnected_output.pth"
+    )
 
 
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])

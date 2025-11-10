@@ -19,10 +19,10 @@ from pathlib import Path
 import pytest
 import torch
 
-import physicsnemo
+from physicsnemo.core import Module
 
 
-class MockModel(physicsnemo.Module):
+class MockModel(Module):
     """Fake model"""
 
     def __init__(self, input_size=16, output_size=16, **other_kwargs):
