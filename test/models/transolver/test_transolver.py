@@ -18,7 +18,9 @@ import random
 
 import pytest
 import torch
-from common import (
+
+from physicsnemo.models.transolver import Transolver
+from test.common import (
     check_ort_version,
     validate_amp,
     validate_checkpoint,
@@ -29,9 +31,7 @@ from common import (
     validate_onnx_export,
     validate_onnx_runtime,
 )
-from pytest_utils import import_or_fail
-
-from physicsnemo.models.transolver import Transolver
+from test.conftest import requires_module
 
 
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
@@ -182,7 +182,7 @@ def test_transolver_optims(device):
     )
 
 
-@import_or_fail("transformer_engine")
+@requires_module("transformer_engine")
 def test_transolver_te(pytestconfig):
     if not torch.cuda.is_available():
         pytest.skip("CUDA is not available")

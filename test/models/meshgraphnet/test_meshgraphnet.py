@@ -25,13 +25,13 @@ import torch
 script_path = os.path.abspath(__file__)
 sys.path.append(os.path.join(os.path.dirname(script_path), ".."))
 
-import common
-from pytest_utils import import_or_fail
+from test import common
+from test.conftest import requires_module
 
 dgl = pytest.importorskip("dgl")
 
 
-@import_or_fail("dgl")
+@requires_module("dgl")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_meshgraphnet_forward(device, pytestconfig, set_physicsnemo_force_te):
     """Test mehsgraphnet forward pass"""
@@ -61,11 +61,13 @@ def test_meshgraphnet_forward(device, pytestconfig, set_physicsnemo_force_te):
     node_features = torch.randn(graph.num_nodes(), 4).to(device)
     edge_features = torch.randn(graph.num_edges(), 3).to(device)
     assert common.validate_forward_accuracy(
-        model, (node_features, edge_features, graph)
+        model,
+        (node_features, edge_features, graph),
+        file_name="models/data/meshgraphnet_output.pth",
     )
 
 
-@import_or_fail("dgl")
+@requires_module("dgl")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_mehsgraphnet_constructor(device, pytestconfig, set_physicsnemo_force_te):
     """Test mehsgraphnet constructor options"""
@@ -123,7 +125,7 @@ def test_mehsgraphnet_constructor(device, pytestconfig, set_physicsnemo_force_te
         assert outvar.shape == (bsize * num_nodes, kw_args["output_dim"])
 
 
-@import_or_fail("dgl")
+@requires_module("dgl")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_meshgraphnet_optims(device, pytestconfig, set_physicsnemo_force_te):
     """Test meshgraphnet optimizations"""
@@ -162,7 +164,7 @@ def test_meshgraphnet_optims(device, pytestconfig, set_physicsnemo_force_te):
     assert common.validate_combo_optims(model, (*invar,))
 
 
-@import_or_fail("dgl")
+@requires_module("dgl")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_meshgraphnet_checkpoint(device, pytestconfig, set_physicsnemo_force_te):
     """Test meshgraphnet checkpoint save/load"""
@@ -200,7 +202,7 @@ def test_meshgraphnet_checkpoint(device, pytestconfig, set_physicsnemo_force_te)
     )
 
 
-@import_or_fail("dgl")
+@requires_module("dgl")
 @common.check_ort_version()
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_meshgraphnet_deploy(device, pytestconfig, set_physicsnemo_force_te):

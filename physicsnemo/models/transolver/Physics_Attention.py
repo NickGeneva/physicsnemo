@@ -39,7 +39,7 @@ from einops import rearrange
 from torch.autograd.profiler import record_function
 from torch.distributed.tensor.placement_types import Replicate
 
-from physicsnemo.distributed import ShardTensor
+from physicsnemo.domain_parallel import ShardTensor
 
 
 class PhysicsAttentionBase(nn.Module, ABC):

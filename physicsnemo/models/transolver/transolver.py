@@ -44,9 +44,9 @@ except ImportError:
     TE_AVAILABLE = False
 
 import physicsnemo  # noqa: F401 for docs
+from physicsnemo.core.meta import ModelMetaData
+from physicsnemo.core.module import Module
 
-from ..meta import ModelMetaData
-from ..module import Module
 from .Embedding import timestep_embedding
 
 # from .Physics_Attention import Physics_Attention_Structured_Mesh_2D

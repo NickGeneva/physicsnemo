@@ -21,7 +21,6 @@ import pytest
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from pytest_utils import import_or_fail
 
 from physicsnemo.experimental.models.dit import DiT
 from physicsnemo.experimental.models.dit.layers import (
@@ -29,6 +28,7 @@ from physicsnemo.experimental.models.dit.layers import (
     DiTBlock,
     TokenizerModuleBase,
 )
+from test.conftest import requires_module
 
 from . import common
 
@@ -307,7 +307,7 @@ def test_ditblock_forward_accuracy_timm(device):
     )
 
 
-@import_or_fail(["natten"])
+@requires_module(["natten"])
 @pytest.mark.parametrize("device", ["cuda:0"])
 def test_ditblock_forward_accuracy_natten(device, pytestconfig):
     torch.manual_seed(0)
@@ -346,7 +346,7 @@ def test_ditblock_forward_accuracy_natten(device, pytestconfig):
     )
 
 
-@import_or_fail(["transformer_engine"])  # TE dependency
+@requires_module(["transformer_engine"])  # TE dependency
 @pytest.mark.parametrize("device", ["cuda:0"])
 def test_ditblock_forward_accuracy_transformer_engine(device, pytestconfig):
     torch.manual_seed(0)

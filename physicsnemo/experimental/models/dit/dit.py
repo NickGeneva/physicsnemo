@@ -20,8 +20,8 @@ import torch.nn as nn
 
 from physicsnemo.models.diffusion import PositionalEmbedding, Linear
 from dataclasses import dataclass
-from physicsnemo.models.meta import ModelMetaData
-from physicsnemo.models.module import Module
+from physicsnemo.core.meta import ModelMetaData
+from physicsnemo.core.module import Module
 from physicsnemo.experimental.models.dit import DiTBlock
 from physicsnemo.experimental.models.dit.layers import get_tokenizer, get_detokenizer, TokenizerModuleBase, DetokenizerModuleBase
 
