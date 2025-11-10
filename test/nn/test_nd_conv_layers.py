@@ -20,7 +20,7 @@ import pytest
 import torch
 import torch.nn as nn
 
-import physicsnemo.models.layers as layers
+import physicsnemo.nn as layers
 
 
 class SpectralConv4d(nn.Module):
