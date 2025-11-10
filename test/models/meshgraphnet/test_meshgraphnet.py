@@ -63,7 +63,7 @@ def test_meshgraphnet_forward(device, pytestconfig, set_physicsnemo_force_te):
     assert common.validate_forward_accuracy(
         model,
         (node_features, edge_features, graph),
-        file_name="models/data/meshgraphnet_output.pth",
+        file_name="models/meshgraphnet/data/meshgraphnet_output.pth",
     )
 
 

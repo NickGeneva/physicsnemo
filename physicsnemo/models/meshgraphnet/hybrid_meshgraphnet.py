@@ -49,12 +49,12 @@ except ImportError:
 from itertools import chain
 
 import physicsnemo  # noqa: F401 for docs
-from physicsnemo.models.gnn_layers.mesh_edge_block import HybridMeshEdgeBlock
-from physicsnemo.models.gnn_layers.mesh_graph_mlp import MeshGraphMLP
-from physicsnemo.models.gnn_layers.mesh_node_block import HybridMeshNodeBlock
-from physicsnemo.models.gnn_layers.utils import GraphType
-from physicsnemo.models.layers import get_activation
-from physicsnemo.models.meta import ModelMetaData
+from physicsnemo.core.meta import ModelMetaData
+from physicsnemo.nn import get_activation
+from physicsnemo.nn.gnn_layers.mesh_edge_block import HybridMeshEdgeBlock
+from physicsnemo.nn.gnn_layers.mesh_graph_mlp import MeshGraphMLP
+from physicsnemo.nn.gnn_layers.mesh_node_block import HybridMeshNodeBlock
+from physicsnemo.nn.gnn_layers.utils import GraphType
 from physicsnemo.utils.profiling import profile
 
 # Import the MeshGraphNet

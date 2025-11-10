@@ -19,10 +19,10 @@ from typing import Iterable, List, Optional
 
 from torch import Tensor
 
-from physicsnemo.models.gnn_layers.bsms import BistrideGraphMessagePassing
-from physicsnemo.models.gnn_layers.utils import DGLGraph, GraphType, PyGData
+from physicsnemo.core.meta import ModelMetaData
 from physicsnemo.models.meshgraphnet import MeshGraphNet
-from physicsnemo.models.meta import ModelMetaData
+from physicsnemo.nn.gnn_layers.bsms import BistrideGraphMessagePassing
+from physicsnemo.nn.gnn_layers.utils import DGLGraph, GraphType, PyGData
 
 
 @dataclass

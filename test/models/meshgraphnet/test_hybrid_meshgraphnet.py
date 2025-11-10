@@ -69,6 +69,7 @@ def test_hybrid_meshgraphnet_forward(device, pytestconfig, set_physicsnemo_force
         (node_features, mesh_edge_features, world_edge_features, graph),
         rtol=1e-2,
         atol=1e-2,
+        file_name="models/meshgraphnet/data/hybridmeshgraphnet_output.pth",
     )
 
 

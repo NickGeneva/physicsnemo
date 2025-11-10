@@ -59,7 +59,11 @@ def test_meshgraphkan_forward(device, pytestconfig, set_physicsnemo_force_te):
     node_f = torch.randn(graph.num_nodes(), 4).to(device)
     edge_f = torch.randn(graph.num_edges(), 3).to(device)
 
-    assert common.validate_forward_accuracy(model, (node_f, edge_f, graph))
+    assert common.validate_forward_accuracy(
+        model,
+        (node_f, edge_f, graph),
+        file_name="models/meshgraphnet/data/meshgraphkan_output.pth",
+    )
 
 
 @requires_module("dgl")

@@ -35,7 +35,7 @@ def test_mesh_node_block_dgl_pyg_equivalence(
     import dgl
     from torch_geometric.data import Data as PyGData
 
-    from physicsnemo.models.gnn_layers.mesh_node_block import MeshNodeBlock
+    from physicsnemo.nn.gnn_layers.mesh_node_block import MeshNodeBlock
 
     # Set seeds for reproducibility.
     torch.manual_seed(42)
@@ -114,7 +114,7 @@ def test_mesh_node_block_gradient_equivalence(
     import dgl
     from torch_geometric.data import Data as PyGData
 
-    from physicsnemo.models.gnn_layers.mesh_node_block import MeshNodeBlock
+    from physicsnemo.nn.gnn_layers.mesh_node_block import MeshNodeBlock
 
     # Set seeds for reproducibility.
     torch.manual_seed(123)
@@ -229,7 +229,7 @@ def test_mesh_node_block_batched_equivalence(
     from torch_geometric.data import Batch
     from torch_geometric.data import Data as PyGData
 
-    from physicsnemo.models.gnn_layers.mesh_node_block import MeshNodeBlock
+    from physicsnemo.nn.gnn_layers.mesh_node_block import MeshNodeBlock
 
     # Set seeds for reproducibility.
     torch.manual_seed(456)
@@ -319,7 +319,7 @@ def test_mesh_edge_block_dgl_pyg_equivalence(
     import dgl
     from torch_geometric.data import Data as PyGData
 
-    from physicsnemo.models.gnn_layers.mesh_edge_block import MeshEdgeBlock
+    from physicsnemo.nn.gnn_layers.mesh_edge_block import MeshEdgeBlock
 
     # Test parameters.
     num_nodes = 10
@@ -378,7 +378,7 @@ def test_mesh_edge_block_gradient_equivalence(
     import dgl
     from torch_geometric.data import Data as PyGData
 
-    from physicsnemo.models.gnn_layers.mesh_edge_block import MeshEdgeBlock
+    from physicsnemo.nn.gnn_layers.mesh_edge_block import MeshEdgeBlock
 
     # Test parameters.
     num_nodes = 8
@@ -473,7 +473,7 @@ def test_mesh_edge_block_concat_trick_equivalence(
     import dgl
     from torch_geometric.data import Data as PyGData
 
-    from physicsnemo.models.gnn_layers.mesh_edge_block import MeshEdgeBlock
+    from physicsnemo.nn.gnn_layers.mesh_edge_block import MeshEdgeBlock
 
     # Test parameters.
     num_nodes = 8
@@ -532,7 +532,7 @@ def test_mesh_edge_block_batched_equivalence(
     from torch_geometric.data import Batch
     from torch_geometric.data import Data as PyGData
 
-    from physicsnemo.models.gnn_layers.mesh_edge_block import MeshEdgeBlock
+    from physicsnemo.nn.gnn_layers.mesh_edge_block import MeshEdgeBlock
 
     # Test parameters.
     batch_size = 2

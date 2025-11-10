@@ -39,7 +39,7 @@ except ImportError:
     from typing_extensions import Self
 
 from physicsnemo.distributed import DistributedManager
-from physicsnemo.models.gnn_layers import (
+from physicsnemo.nn.gnn_layers import (
     DistributedGraph,
     GraphPartition,
     partition_graph_by_coordinate_bbox,
