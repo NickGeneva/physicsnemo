@@ -23,10 +23,10 @@ sys.path.append(os.path.join(os.path.dirname(script_path), ".."))
 import pytest
 import torch
 from graphcast.utils import create_random_input, fix_random_seeds
-from pytest_utils import import_or_fail
 
 from physicsnemo.distributed import DistributedManager, mark_module_as_shared
 from physicsnemo.models.graphcast.graph_cast_net import GraphCastNet
+from test.conftest import requires_module
 
 torch.backends.cuda.matmul.allow_tf32 = False
 
@@ -166,7 +166,7 @@ def run_test_distributed_graphcast(
     del os.environ["LOCAL_RANK"]
 
 
-@import_or_fail("dgl")
+@requires_module("dgl")
 @pytest.mark.multigpu_dynamic
 @pytest.mark.parametrize("dtype", [torch.float32, torch.float16])
 @pytest.mark.parametrize("do_concat_trick", [False, True])

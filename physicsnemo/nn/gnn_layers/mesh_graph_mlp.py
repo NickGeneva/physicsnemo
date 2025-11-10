@@ -59,7 +59,7 @@ class CustomSiLuLinearAutogradFunction(torch.autograd.Function):
 
         from nvfuser import FusionDefinition
 
-        from physicsnemo.models.layers.fused_silu import silu_backward_for
+        from physicsnemo.nn.fused_silu import silu_backward_for
 
         (
             need_dgrad,

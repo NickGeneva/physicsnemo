@@ -40,13 +40,13 @@ except ImportError:
     PYG_AVAILABLE = False
     PyGData: TypeAlias = NoneType
 
-from physicsnemo.models.gnn_layers.utils import GraphType
 from physicsnemo.models.graphcast.utils.graph_utils import (
     azimuthal_angle,
     geospatial_rotation,
     polar_angle,
     xyz2latlon,
 )
+from physicsnemo.nn.gnn_layers.utils import GraphType
 
 
 class DglGraphBackend:
@@ -63,7 +63,7 @@ class DglGraphBackend:
         dtype: torch.dtype,
     ) -> DGLGraph:
         """Create DGL graph."""
-        from physicsnemo.utils.graphcast.graph_utils_dgl import create_graph
+        from physicsnemo.models.graphcast.utils.graph_utils_dgl import create_graph
 
         return create_graph(src, dst, to_bidirected, add_self_loop, dtype)
 
@@ -76,7 +76,9 @@ class DglGraphBackend:
         num_nodes_dict: Optional[dict] = None,
     ) -> DGLGraph:
         """Create heterogeneous graph using DGL."""
-        from physicsnemo.utils.graphcast.graph_utils_dgl import create_heterograph
+        from physicsnemo.models.graphcast.utils.graph_utils_dgl import (
+            create_heterograph,
+        )
 
         return create_heterograph(src, dst, labels, dtype, num_nodes_dict)
 
@@ -85,14 +87,14 @@ class DglGraphBackend:
         graph: DGLGraph, pos: Tensor, normalize: bool = True
     ) -> DGLGraph:
         """Add edge features to DGL graph."""
-        from physicsnemo.utils.graphcast.graph_utils_dgl import add_edge_features
+        from physicsnemo.models.graphcast.utils.graph_utils_dgl import add_edge_features
 
         return add_edge_features(graph, pos, normalize)
 
     @staticmethod
     def add_node_features(graph: DGLGraph, pos: Tensor) -> DGLGraph:
         """Add node features to DGL graph."""
-        from physicsnemo.utils.graphcast.graph_utils_dgl import add_node_features
+        from physicsnemo.models.graphcast.utils.graph_utils_dgl import add_node_features
 
         return add_node_features(graph, pos)
 

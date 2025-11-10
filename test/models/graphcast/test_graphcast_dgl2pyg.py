@@ -21,28 +21,26 @@ These tests ensure that GraphCast components produce equivalent outputs
 when using DGL and PyG backends.
 """
 
-import os
-import sys
-
 import pytest
 import torch
 from torch.testing import assert_close
+from utils import compare_quantiles, create_random_input, fix_random_seeds
 
-script_path = os.path.abspath(__file__)
-sys.path.append(os.path.join(os.path.dirname(script_path), ".."))
-
-from graphcast.utils import compare_quantiles, create_random_input, fix_random_seeds
-from pytest_utils import import_or_fail
+from test.conftest import requires_module
 
 # Disable flash attention for consistent behavior.
-os.environ["NVTE_FLASH_ATTN"] = "0"
 
 
-@import_or_fail(["dgl", "torch_geometric"])
+@pytest.fixture
+def disable_flash_attention(monkeypatch):
+    monkeypatch.setenv("NVTE_FLASH_ATTN", "0")
+
+
+@requires_module(["dgl", "torch_geometric"])
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 @torch.no_grad()
 def test_graphcast_net_dgl_pyg_equivalence(
-    device, pytestconfig, set_physicsnemo_force_te
+    device, pytestconfig, set_physicsnemo_force_te, disable_flash_attention
 ):
     """Test that GraphCastNet produces equivalent outputs for DGL and PyG backends."""
     # (DGL2PYG): remove this once DGL is removed.
@@ -95,10 +93,10 @@ def test_graphcast_net_dgl_pyg_equivalence(
     assert output_dgl.shape == expected_shape
 
 
-@import_or_fail(["dgl", "torch_geometric"])
+@requires_module(["dgl", "torch_geometric"])
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_graphcast_net_gradient_equivalence(
-    device, pytestconfig, set_physicsnemo_force_te
+    device, pytestconfig, set_physicsnemo_force_te, disable_flash_attention
 ):
     """Test that GraphCastNet produces equivalent gradients for DGL and PyG backends."""
     # (DGL2PYG): remove this once DGL is removed.
@@ -160,12 +158,16 @@ def test_graphcast_net_gradient_equivalence(
             assert_close(param_dgl.grad, param_pyg.grad, rtol=1e-4, atol=1e-5)
 
 
-@import_or_fail(["dgl", "torch_geometric", "torch_sparse"])
+@requires_module(["dgl", "torch_geometric", "torch_sparse"])
 @pytest.mark.parametrize("device", ["cuda:0"])
 @pytest.mark.parametrize("processor_type", ["MessagePassing", "GraphTransformer"])
 @torch.no_grad()
 def test_graphcast_processor_dgl_pyg_equivalence(
-    device, processor_type, pytestconfig, set_physicsnemo_force_te
+    device,
+    processor_type,
+    pytestconfig,
+    set_physicsnemo_force_te,
+    disable_flash_attention,
 ):
     """Test that GraphCast processors produce equivalent outputs for DGL and PyG backends."""
     # (DGL2PYG): remove this once DGL is removed.
@@ -218,12 +220,16 @@ def test_graphcast_processor_dgl_pyg_equivalence(
     )
 
 
-@import_or_fail(["dgl", "torch_geometric"])
+@requires_module(["dgl", "torch_geometric"])
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 @pytest.mark.parametrize("do_concat_trick", [False, True])
 @torch.no_grad()
 def test_graphcast_concat_trick_dgl_pyg_equivalence(
-    device, do_concat_trick, pytestconfig, set_physicsnemo_force_te
+    device,
+    do_concat_trick,
+    pytestconfig,
+    set_physicsnemo_force_te,
+    disable_flash_attention,
 ):
     """Test that GraphCast concat trick produces equivalent outputs for DGL and PyG backends."""
     # (DGL2PYG): remove this once DGL is removed.
@@ -267,15 +273,15 @@ def test_graphcast_concat_trick_dgl_pyg_equivalence(
     assert_close(output_dgl, output_pyg, rtol=1e-4, atol=1e-5)
 
 
-@import_or_fail(["dgl", "torch_geometric"])
+@requires_module(["dgl", "torch_geometric"])
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_graphcast_graph_creation_equivalence(
-    device, pytestconfig, set_physicsnemo_force_te
+    device, pytestconfig, set_physicsnemo_force_te, disable_flash_attention
 ):
     """Test that Graph class creates equivalent graphs for DGL and PyG backends."""
     # (DGL2PYG): remove this once DGL is removed.
 
-    from physicsnemo.utils.graphcast.graph import Graph
+    from physicsnemo.models.graphcast.utils.graph import Graph
 
     # Set seeds for reproducibility
     fix_random_seeds()
@@ -350,19 +356,19 @@ def test_graphcast_graph_creation_equivalence(
     assert m2g_edge_features_dgl.shape == m2g_edge_features_pyg.shape
 
 
-@import_or_fail(["dgl", "torch_geometric"])
+@requires_module(["dgl", "torch_geometric"])
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 @pytest.mark.parametrize("aggregation", ["sum", "mean"])
 @torch.no_grad()
 def test_graphcast_encoder_decoder_dgl_pyg_equivalence(
-    device, aggregation, pytestconfig, set_physicsnemo_force_te
+    device, aggregation, pytestconfig, set_physicsnemo_force_te, disable_flash_attention
 ):
     """Test that GraphCast encoder/decoder produce equivalent outputs for DGL and PyG backends."""
     # (DGL2PYG): remove this once DGL is removed.
 
-    from physicsnemo.models.gnn_layers.mesh_graph_decoder import MeshGraphDecoder
-    from physicsnemo.models.gnn_layers.mesh_graph_encoder import MeshGraphEncoder
-    from physicsnemo.utils.graphcast.graph import Graph
+    from physicsnemo.models.graphcast.utils.graph import Graph
+    from physicsnemo.nn.gnn_layers.mesh_graph_decoder import MeshGraphDecoder
+    from physicsnemo.nn.gnn_layers.mesh_graph_encoder import MeshGraphEncoder
 
     # Set seeds for reproducibility.
     fix_random_seeds()
@@ -460,11 +466,11 @@ def test_graphcast_encoder_decoder_dgl_pyg_equivalence(
     assert_close(grid_decoded_dgl, grid_decoded_pyg, rtol=1e-3, atol=1e-4)
 
 
-@import_or_fail(["dgl", "torch_geometric"])
+@requires_module(["dgl", "torch_geometric"])
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 @torch.no_grad()
 def test_graphcast_multimesh_dgl_pyg_equivalence(
-    device, pytestconfig, set_physicsnemo_force_te
+    device, pytestconfig, set_physicsnemo_force_te, disable_flash_attention
 ):
     """Test that GraphCast with multimesh produces equivalent outputs for DGL and PyG backends."""
     # (DGL2PYG): remove this once DGL is removed.
@@ -512,11 +518,11 @@ def test_graphcast_multimesh_dgl_pyg_equivalence(
     assert output_dgl.shape == output_pyg.shape
 
 
-@import_or_fail(["dgl", "torch_geometric"])
+@requires_module(["dgl", "torch_geometric"])
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 @torch.no_grad()
 def test_graphcast_different_resolutions_dgl_pyg_equivalence(
-    device, pytestconfig, set_physicsnemo_force_te
+    device, pytestconfig, set_physicsnemo_force_te, disable_flash_attention
 ):
     """Test that GraphCast with different input resolutions produces equivalent outputs for DGL and PyG backends."""
     # (DGL2PYG): remove this once DGL is removed.
