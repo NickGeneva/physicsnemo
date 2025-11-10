@@ -20,8 +20,7 @@ import pytest
 import torch
 
 from physicsnemo.models.pangu import Pangu
-
-from . import common
+from test import common
 
 
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
@@ -44,7 +43,9 @@ def test_pangu_forward(device):
     invar = model.prepare_input(invar_surface, invar_surface_mask, invar_upper_air)
     # Check output size
     with torch.no_grad():
-        assert common.validate_forward_accuracy(model, (invar,), atol=5e-3)
+        assert common.validate_forward_accuracy(
+            model, (invar,), atol=5e-3, file_name="models/pangu/data/pangu_output.pth"
+        )
 
     del model, invar
     torch.cuda.empty_cache()

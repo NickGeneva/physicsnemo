@@ -20,13 +20,13 @@ from dataclasses import dataclass
 import numpy as np
 import torch
 
-from ..layers import (
+from physicsnemo.core.meta import ModelMetaData
+from physicsnemo.core.module import Module
+from physicsnemo.nn import (
     DecoderLayer,
     EncoderLayer,
     FuserLayer,
 )
-from ..meta import ModelMetaData
-from ..module import Module
 
 
 @dataclass

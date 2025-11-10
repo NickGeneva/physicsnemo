@@ -20,8 +20,7 @@ import pytest
 import torch
 
 from physicsnemo.models.fengwu import Fengwu
-
-from . import common
+from test import common
 
 
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
@@ -50,7 +49,9 @@ def test_fengwu_forward(device):
     )
     # Check output size
     with torch.no_grad():
-        assert common.validate_forward_accuracy(model, (invar,), atol=5e-3)
+        assert common.validate_forward_accuracy(
+            model, (invar,), atol=5e-3, file_name="models/fengwu/data/fengwu_output.pth"
+        )
 
     del invar, model
     torch.cuda.empty_cache()

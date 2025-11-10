@@ -72,5 +72,4 @@ layers =
     mesh_reduced
     afno | dlwp | dlwp_healpix | domino | dpot | fengwu | figconvnet | fno | graphcast | meshgraphnet | pangu | pix2pix | rnn |  srrn | swinvrnn | topodiff | transolver  | vfgn 
     unet | diffusion  | dlwp_healpix_layers 
-    utils
 
