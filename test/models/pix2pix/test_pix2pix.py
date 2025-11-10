@@ -20,8 +20,7 @@ import pytest
 import torch
 
 from physicsnemo.models.pix2pix import Pix2Pix
-
-from . import common
+from test import common
 
 
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
@@ -41,7 +40,9 @@ def test_pix2pix_forward(device):
 
     bsize = 8
     invar = torch.randn(bsize, 1, 16, 16, 16).to(device)
-    assert common.validate_forward_accuracy(model_3d, (invar,))
+    assert common.validate_forward_accuracy(
+        model_3d, (invar,), file_name="models/pix2pix/data/pix2pix_output.pth"
+    )
 
 
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])

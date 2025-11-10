@@ -17,18 +17,17 @@
 
 import pytest
 import torch
-from pytest_utils import import_or_fail
 
 import physicsnemo
-from physicsnemo.registry import ModelRegistry
-
-from . import common
+from physicsnemo.core.registry import ModelRegistry
+from test import common
+from test.conftest import requires_module
 
 IN_OUT_SHAPE = [32, 32]
 INP_CHANS = 2
 
 
-def _create_model() -> physicsnemo.Module:
+def _create_model() -> physicsnemo.core.Module:
     registry = ModelRegistry()
     sfno_type = registry.factory("SFNO")
 
@@ -41,7 +40,7 @@ def _create_model() -> physicsnemo.Module:
     )
 
 
-@import_or_fail("makani")
+@requires_module("makani")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_sfno_forward(pytestconfig, device):
     """Test SFNO forward pass."""
@@ -59,13 +58,13 @@ def test_sfno_forward(pytestconfig, device):
     # Check output size.
     # Use different checkpoints for different device types due to
     # SFNO implementation differences CPU vs GPU.
-    model_file_name = f"{model.meta.name}_{device.type}_output.pth"
+    model_file_name = f"models/sfno/data/{model.meta.name}_{device.type}_output.pth"
     assert common.validate_forward_accuracy(
         model, (invar,), file_name=model_file_name, atol=0.01
     )
 
 
-@import_or_fail("makani")
+@requires_module("makani")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_sfno_checkpoint(pytestconfig, device):
     """Test SFNO checkpoint save/load."""
