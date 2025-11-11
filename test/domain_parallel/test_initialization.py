@@ -22,26 +22,23 @@ These tests are testing the different supported ways to initialize a ShardTensor
 import random
 
 import pytest
-
-from physicsnemo.utils.version_check import check_module_requirements
-
-try:
-    check_module_requirements("physicsnemo.distributed.shard_tensor")
-    from torch.distributed.tensor import distribute_tensor
-    from torch.distributed.tensor.placement_types import Shard
-
-    from physicsnemo.distributed.shard_tensor import ShardTensor, scatter_tensor
-
-except ImportError:
-    pytest.skip(
-        "Skipping test because physicsnemo.distributed.shard_tensor is not available",
-        allow_module_level=True,
-    )
-
 import torch
 import torch.distributed as dist
 
+# from physicsnemo.core.version_check import check_module_requirements
+# ST_AVAILABLE = check_module_requirements(
+#     "physicsnemo.distributed.shard_tensor", hard_fail=False
+# )
+# if not ST_AVAILABLE:
+#     pytest.skip(
+#         "Skipping test because physicsnemo.distributed.shard_tensor is not available",
+#         allow_module_level=True,
+#     )
+from torch.distributed.tensor import distribute_tensor
+from torch.distributed.tensor.placement_types import Shard
+
 from physicsnemo.distributed import DistributedManager
+from physicsnemo.domain_parallel.shard_tensor import ShardTensor, scatter_tensor
 
 
 def init_global_shape_and_placements(domain_mesh):

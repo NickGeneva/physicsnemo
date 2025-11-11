@@ -17,7 +17,7 @@
 
 import torch
 
-from physicsnemo.utils.version_check import check_module_requirements
+from physicsnemo.core.version_check import check_module_requirements
 
 check_module_requirements("physicsnemo.distributed.shard_tensor")
 
@@ -38,7 +38,7 @@ from torch.distributed.tensor.placement_types import (  # noqa: E402
 )
 
 # noqa: E402
-from physicsnemo.distributed._shard_tensor_spec import (  # noqa: E402
+from physicsnemo.domain_parallel._shard_tensor_spec import (  # noqa: E402
     _stride_from_contiguous_shape_C_style,
 )
 

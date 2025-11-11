@@ -30,7 +30,7 @@ complex resharding requirements.  In all cases, the input tensors are sharded:
 
 import pytest
 
-from physicsnemo.utils.version_check import check_module_requirements
+from physicsnemo.core.version_check import check_module_requirements
 
 try:
     check_module_requirements("physicsnemo.distributed.shard_tensor")
@@ -47,7 +47,8 @@ import torch
 import torch.distributed as dist
 from torch.distributed.tensor.placement_types import Replicate, Shard
 
-from physicsnemo.distributed import DistributedManager, ShardTensor
+from physicsnemo.distributed import DistributedManager
+from physicsnemo.domain_parallel import ShardTensor
 
 
 def shard_tensor_factory(mesh, requires_grad=False, uneven=True):

@@ -21,8 +21,8 @@ import torch
 import torch.distributed as dist
 from torch.distributed.device_mesh import DeviceMesh
 
+from physicsnemo.core.version_check import check_module_requirements
 from physicsnemo.distributed.utils import compute_split_shapes
-from physicsnemo.utils.version_check import check_module_requirements
 
 check_module_requirements("physicsnemo.distributed.shard_tensor")
 

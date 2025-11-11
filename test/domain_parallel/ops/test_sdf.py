@@ -20,8 +20,9 @@ import torch
 from scipy.spatial import ConvexHull
 from torch.distributed.tensor.placement_types import Replicate, Shard
 
-from physicsnemo.distributed import DistributedManager, scatter_tensor
-from physicsnemo.utils.sdf import signed_distance_field
+from physicsnemo.distributed import DistributedManager
+from physicsnemo.domain_parallel import scatter_tensor
+from physicsnemo.nn.sdf import signed_distance_field
 
 from .utils import numerical_shard_tensor_check
 

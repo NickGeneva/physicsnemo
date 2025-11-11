@@ -78,7 +78,7 @@ def check_min_version(
     return True
 
 
-def check_module_requirements(module_path: str) -> None:
+def check_module_requirements(module_path: str, hard_fail: bool = True) -> bool:
     """
     Check all version requirements for a specific module.
 
@@ -91,8 +91,13 @@ def check_module_requirements(module_path: str) -> None:
     if module_path not in VERSION_REQUIREMENTS:
         return
 
+    requirements_pass = True
+
     for package, min_version in VERSION_REQUIREMENTS[module_path].items():
-        check_min_version(package, min_version)
+        result = check_min_version(package, min_version, hard_fail=hard_fail)
+        requirements_pass = requirements_pass and result
+
+    return requirements_pass
 
 
 def require_version(package_name: str, min_version: str):

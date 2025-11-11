@@ -14,14 +14,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from physicsnemo.utils.version_check import check_module_requirements
+from physicsnemo.core.version_check import check_module_requirements
 
 # Prevent importing this module if the minimum version of pytorch is not met.
 try:
     check_module_requirements("physicsnemo.distributed.shard_tensor")
-
-    from ._reductions import mean_wrapper, sum_wrapper
-    from ._tensor_ops import unbind_rules
+    SHARD_TENSOR_AVAILABLE = True
 
 except ImportError:
-    pass
+    SHARD_TENSOR_AVAILABLE = False
+
+if SHARD_TENSOR_AVAILABLE:
+    from ._reductions import mean_wrapper, sum_wrapper
+    from ._tensor_ops import unbind_rules

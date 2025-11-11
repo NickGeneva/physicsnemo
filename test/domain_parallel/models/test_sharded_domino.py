@@ -22,7 +22,8 @@ import torch
 from torch.distributed.tensor import distribute_module
 from torch.distributed.tensor.placement_types import Replicate, Shard
 
-from physicsnemo.distributed import DistributedManager, scatter_tensor
+from physicsnemo.distributed import DistributedManager
+from physicsnemo.domain_parallel import scatter_tensor
 from physicsnemo.models.domino import DoMINO
 
 

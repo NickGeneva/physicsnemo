@@ -31,7 +31,7 @@ ShardTensor addresses both of these, and these tests are meant to trigger it.
 
 import pytest
 
-from physicsnemo.utils.version_check import check_module_requirements
+from physicsnemo.core.version_check import check_module_requirements
 
 try:
     check_module_requirements("physicsnemo.distributed.shard_tensor")
@@ -46,7 +46,7 @@ except ImportError:
 if ST_AVAILABLE:
     from torch.distributed.tensor.placement_types import Shard
 
-    from physicsnemo.distributed import scatter_tensor
+    from physicsnemo.domain_parallel import scatter_tensor
 
 
 import torch

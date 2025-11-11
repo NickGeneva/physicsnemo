@@ -22,7 +22,7 @@ import torch.distributed as dist
 from torch.distributed.tensor import DTensor, distribute_module
 from torch.distributed.tensor.device_mesh import DeviceMesh
 
-from physicsnemo.distributed import ShardTensor
+from physicsnemo.domain_parallel import ShardTensor
 
 
 def unparallelize_module(module):

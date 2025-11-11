@@ -20,8 +20,7 @@ import pytest
 import torch
 
 from physicsnemo.models.afno import ModAFNO
-
-from . import common
+from test import common
 
 
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
@@ -42,7 +41,9 @@ def test_modafno_forward(device):
     invar = torch.randn(bsize, 2, 32, 32).to(device)
     time = torch.full((bsize, 1), 0.5).to(device)
     # Check output size
-    assert common.validate_forward_accuracy(model, (invar, time))
+    assert common.validate_forward_accuracy(
+        model, (invar, time), file_name="models/afno/data/modafno_output.pth"
+    )
 
 
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])

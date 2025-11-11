@@ -30,8 +30,8 @@ available.  Second, the points are sorted before making a comparison.
 import pytest
 import torch
 
+from physicsnemo.core.version_check import check_module_requirements
 from physicsnemo.distributed import DistributedManager
-from physicsnemo.utils.version_check import check_module_requirements
 
 try:
     check_module_requirements("physicsnemo.distributed.shard_tensor")
@@ -49,7 +49,7 @@ from torch.distributed.tensor.placement_types import (  # noqa: E402
     Shard,
 )
 
-from physicsnemo.distributed import (
+from physicsnemo.domain_parallel import (
     scatter_tensor,
 )
 
@@ -137,7 +137,7 @@ def run_radius_search_module(model, data_dict, reverse_mapping):
 def test_sharded_radius_search_layer_forward(
     distributed_mesh, shard_points, shard_grid, reverse_mapping
 ):
-    from physicsnemo.models.layers.ball_query import BQWarp
+    from physicsnemo.nn.ball_query import BQWarp
 
     dm = DistributedManager()
 

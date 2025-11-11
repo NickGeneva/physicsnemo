@@ -20,8 +20,8 @@ import torch
 import torch.distributed as dist
 import warp as wp
 
-from physicsnemo.utils.neighbors.radius_search._warp_impl import radius_search_impl
-from physicsnemo.utils.version_check import check_module_requirements
+from physicsnemo.core.version_check import check_module_requirements
+from physicsnemo.nn.neighbors._radius_search._warp_impl import radius_search_impl
 
 check_module_requirements("physicsnemo.distributed.shard_tensor")
 
@@ -30,11 +30,11 @@ from torch.distributed.tensor.placement_types import (  # noqa: E402
     Shard,
 )
 
-from physicsnemo.distributed import ShardTensor, ShardTensorSpec  # noqa: E402
-from physicsnemo.distributed.shard_utils.patch_core import (  # noqa: E402
+from physicsnemo.domain_parallel import ShardTensor, ShardTensorSpec  # noqa: E402
+from physicsnemo.domain_parallel.shard_utils.patch_core import (  # noqa: E402
     MissingShardPatch,
 )
-from physicsnemo.distributed.shard_utils.ring import (  # noqa: E402
+from physicsnemo.domain_parallel.shard_utils.ring import (  # noqa: E402
     RingPassingConfig,
     perform_ring_iteration,
 )

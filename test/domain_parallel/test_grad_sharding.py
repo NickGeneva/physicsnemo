@@ -24,20 +24,15 @@ should agree with the local computations.
 import pytest
 import torch
 
-from physicsnemo.utils.version_check import check_module_requirements
-
-try:
-    check_module_requirements("physicsnemo.distributed.shard_tensor")
-
-except ImportError:
-    pytest.skip(
-        "Skipping test because physicsnemo.distributed.shard_tensor is not available",
-        allow_module_level=True,
-    )
-
-from physicsnemo.distributed import ShardTensor
-
-from .test_redistribute import shard_tensor_factory
+# from physicsnemo.core.version_check import check_module_requirements
+# ST_AVAILABLE = check_module_requirements("physicsnemo.distributed.shard_tensor")
+# if not ST_AVAILABLE:
+#     pytest.skip(
+#         "Skipping test because physicsnemo.distributed.shard_tensor is not available",
+#         allow_module_level=True,
+#     )
+from physicsnemo.domain_parallel import ShardTensor
+from test.domain_parallel.test_redistribute import shard_tensor_factory
 
 
 def run_shard_tensor_detach(mesh, uneven, verbose):

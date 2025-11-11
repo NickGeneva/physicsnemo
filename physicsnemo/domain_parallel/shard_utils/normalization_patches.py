@@ -20,8 +20,8 @@ import torch
 import torch.distributed as dist
 from torch.distributed.tensor import DTensor
 
-from physicsnemo.distributed import ShardTensor, ShardTensorSpec
 from physicsnemo.distributed.manager import DistributedManager
+from physicsnemo.domain_parallel import ShardTensor, ShardTensorSpec
 
 __all__ = [
     "group_norm_wrapper",

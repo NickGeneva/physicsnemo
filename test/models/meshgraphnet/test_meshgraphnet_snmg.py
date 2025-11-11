@@ -32,13 +32,13 @@ torch.backends.cuda.matmul.allow_tf32 = False
 
 
 def run_test_distributed_meshgraphnet(rank, world_size, dtype, partition_scheme):
-    from physicsnemo.models.gnn_layers import (
+    from physicsnemo.models.meshgraphnet.meshgraphnet import MeshGraphNet
+    from physicsnemo.nn.gnn_layers import (
         partition_graph_by_coordinate_bbox,
         partition_graph_nodewise,
         partition_graph_with_id_mapping,
     )
-    from physicsnemo.models.gnn_layers.utils import CuGraphCSC
-    from physicsnemo.models.meshgraphnet.meshgraphnet import MeshGraphNet
+    from physicsnemo.nn.gnn_layers.utils import CuGraphCSC
 
     os.environ["RANK"] = f"{rank}"
     os.environ["WORLD_SIZE"] = f"{world_size}"

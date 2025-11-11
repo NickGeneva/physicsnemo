@@ -29,7 +29,7 @@ from typing import (
 
 import torch
 
-from physicsnemo.utils.version_check import check_module_requirements
+from physicsnemo.core.version_check import check_module_requirements
 
 check_module_requirements("physicsnemo.distributed.shard_tensor")
 
@@ -39,7 +39,7 @@ from torch.distributed.tensor.placement_types import (  # noqa: E402
 )
 
 # noqa: E402
-from physicsnemo.distributed.shard_tensor import ShardTensor  # noqa: E402
+from physicsnemo.domain_parallel.shard_tensor import ShardTensor  # noqa: E402
 
 aten = torch.ops.aten
 

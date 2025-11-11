@@ -24,22 +24,19 @@ connect correctly.
 import pytest
 import torch
 
-from physicsnemo.distributed import DistributedManager
-from physicsnemo.utils.version_check import check_module_requirements
-
-try:
-    check_module_requirements("physicsnemo.distributed.shard_tensor")
-except ImportError:
-    pytest.skip(
-        "Skipping test because physicsnemo.distributed.shard_tensor is not available",
-        allow_module_level=True,
-    )
-
-from pytest_utils import modify_environment
+# ST_AVAILABLE = check_module_requirements(
+#     "physicsnemo.distributed.shard_tensor", hard_fail=False
+# )
+# if not ST_AVAILABLE:
+#     pytest.skip(
+#         "Skipping test because physicsnemo.distributed.shard_tensor is not available",
+#         allow_module_level=True,
+#     )
 from torch.distributed.device_mesh import DeviceMesh
 from torch.distributed.tensor.placement_types import Replicate
 
-from physicsnemo.distributed.shard_tensor import ShardTensor
+from physicsnemo.distributed import DistributedManager
+from physicsnemo.domain_parallel.shard_tensor import ShardTensor
 
 # Global to track execution paths
 torch_function_paths = []
@@ -107,24 +104,23 @@ def setup_registry():
     ShardTensor._function_registry = original_function_registry
 
 
-@pytest.fixture(scope="module")
-def device_mesh():
-    with modify_environment(
-        RANK="0",
-        WORLD_SIZE="1",
-        MASTER_ADDR="localhost",
-        MASTER_PORT=str(13245),
-        LOCAL_RANK="0",
-    ):
-        DistributedManager.initialize()
+@pytest.fixture
+def device_mesh(monkeypatch):
+    monkeypatch.setenv("RANK", "0")
+    monkeypatch.setenv("WORLD_SIZE", "1")
+    monkeypatch.setenv("MASTER_ADDR", "localhost")
+    monkeypatch.setenv("MASTER_PORT", "13245")
+    monkeypatch.setenv("LOCAL_RANK", "0")
 
-        yield DeviceMesh(
-            DistributedManager().device.type,
-            mesh=[
-                0,
-            ],
-        )
-        DistributedManager.cleanup()
+    DistributedManager.initialize()
+
+    yield DeviceMesh(
+        DistributedManager().device.type,
+        mesh=[
+            0,
+        ],
+    )
+    DistributedManager.cleanup()
 
 
 def test_function_registration_with_tensors(setup_registry):

@@ -28,7 +28,7 @@ import torch
 from torch.distributed.tensor.placement_types import Shard
 
 from physicsnemo.distributed import DistributedManager
-from physicsnemo.distributed.shard_tensor import scatter_tensor
+from physicsnemo.domain_parallel import scatter_tensor
 
 from .utils import numerical_shard_tensor_check
 

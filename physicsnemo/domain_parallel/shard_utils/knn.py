@@ -20,16 +20,16 @@ import numpy as np
 import torch
 import torch.distributed as dist
 
-from physicsnemo.utils.neighbors.knn._cuml_impl import knn_impl
-from physicsnemo.utils.version_check import check_module_requirements
+from physicsnemo.core.version_check import check_module_requirements
+from physicsnemo.nn.neighbors._knn._cuml_impl import knn_impl
 
 check_module_requirements("physicsnemo.distributed.shard_tensor")
 
-from physicsnemo.distributed import ShardTensor  # noqa: E402
-from physicsnemo.distributed.shard_utils.patch_core import (  # noqa: E402
+from physicsnemo.domain_parallel import ShardTensor  # noqa: E402
+from physicsnemo.domain_parallel.shard_utils.patch_core import (  # noqa: E402
     MissingShardPatch,
 )
-from physicsnemo.distributed.shard_utils.ring import (  # noqa: E402
+from physicsnemo.domain_parallel.shard_utils.ring import (  # noqa: E402
     RingPassingConfig,
     perform_ring_iteration,
 )
