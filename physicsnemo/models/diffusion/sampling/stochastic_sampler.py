@@ -21,7 +21,7 @@ import torch
 from torch import Tensor
 
 from physicsnemo.models.diffusion import EDMPrecond
-from physicsnemo.utils.patching import GridPatching2D
+from physicsnemo.models.diffusion.patching import GridPatching2D
 
 
 # NOTE: use two wrappers for apply, to avoid recompilation when input shape changes

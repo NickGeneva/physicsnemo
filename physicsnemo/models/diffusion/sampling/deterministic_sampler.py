@@ -21,7 +21,7 @@ import nvtx
 import torch
 
 from physicsnemo.models.diffusion import EDMPrecond
-from physicsnemo.utils.patching import GridPatching2D
+from physicsnemo.models.diffusion.patching import GridPatching2D
 
 # ruff: noqa: E731
 

@@ -18,11 +18,10 @@ import datetime
 
 import pytest
 import yaml
-from pytest_utils import import_or_fail
+
+from test.conftest import requires_module
 
 cftime = pytest.importorskip("cftime")
-
-# ruff: noqa: S101  # TODo remove exception
 
 
 def test_datetime_yaml():
@@ -33,11 +32,11 @@ def test_datetime_yaml():
     assert dt == loaded
 
 
-@import_or_fail("cftime")
+@requires_module("cftime")
 def test_convert_to_cftime(pytestconfig):
     """test parse time"""
 
-    from physicsnemo.utils.diffusion import convert_datetime_to_cftime
+    from physicsnemo.models.diffusion.training_utils import convert_datetime_to_cftime
 
     dt = datetime.datetime(2011, 1, 1)
     expected = cftime.DatetimeGregorian(2011, 1, 1)

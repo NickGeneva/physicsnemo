@@ -14,8 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import sys
 from pathlib import Path
 from typing import Dict
 
@@ -24,11 +22,6 @@ import torch
 
 import physicsnemo
 from physicsnemo.models.diffusion.layers import Attention
-
-script_path: str = os.path.abspath(__file__)
-sys.path.append(os.path.join(os.path.dirname(script_path), ".."))
-
-# import common  # noqa: E402
 
 
 def _err(x: torch.Tensor, y: torch.Tensor) -> str:
@@ -41,7 +34,7 @@ def _instantiate_model(cls, seed: int = 0, **kwargs):
     """
     Helper function to instantiate a model with reproducible random parameters.
     """
-    model: physicsnemo.Module = cls(**kwargs)
+    model: physicsnemo.core.Module = cls(**kwargs)
     gen: torch.Generator = torch.Generator(device="cpu")
     gen.manual_seed(seed)
     with torch.no_grad():
@@ -56,7 +49,7 @@ def _instantiate_model(cls, seed: int = 0, **kwargs):
     return model
 
 
-class AttentionModule(physicsnemo.Module):
+class AttentionModule(physicsnemo.core.Module):
     """
     A wrapper around Attention that has a factory method to
     create a model with reproducible random parameters.
@@ -187,7 +180,7 @@ def test_attention_non_regression_from_checkpoint(
         / Path(f"checkpoint_diffusion_{arch_type}.mdlus")
     )
 
-    model: physicsnemo.Module = physicsnemo.Module.from_checkpoint(
+    model: physicsnemo.core.Module = physicsnemo.core.Module.from_checkpoint(
         file_name=file_name,
         override_args={
             "use_apex_gn": use_apex_gn,

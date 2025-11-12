@@ -19,9 +19,6 @@ import pytest
 import torch
 
 from physicsnemo.models.diffusion import DhariwalUNet as UNet
-
-# script_path = os.path.abspath(__file__)
-# sys.path.append(os.path.join(os.path.dirname(script_path), ".."))
 from test import common
 
 
@@ -36,7 +33,7 @@ def test_dhariwal_unet_forward(device):
     assert common.validate_forward_accuracy(
         model,
         (input_image, noise_labels, class_labels),
-        file_name="dhariwal_unet_output.pth",
+        file_name="models/diffusion/data/dhariwal_unet_output.pth",
         atol=1e-3,
     )
 

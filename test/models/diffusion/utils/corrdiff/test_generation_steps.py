@@ -19,7 +19,8 @@ from typing import Callable, Optional
 
 import pytest
 import torch
-from pytest_utils import import_or_fail
+
+from test.conftest import requires_module
 
 
 # Mock network class
@@ -44,11 +45,11 @@ class MockNet:
         return x * 0.9
 
 
-@import_or_fail("cftime")
+@requires_module("cftime")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_regression_step(device, pytestconfig):
     from physicsnemo.models.diffusion import UNet
-    from physicsnemo.utils.corrdiff import regression_step
+    from physicsnemo.models.diffusion.corrdiff_utils import regression_step
 
     # define the net
     mock_unet = UNet(
@@ -70,12 +71,15 @@ def test_regression_step(device, pytestconfig):
     assert output.shape == (2, 2, 16, 16), "Output shape mismatch"
 
 
-@import_or_fail("cftime")
+@requires_module("cftime")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_diffusion_step(device, pytestconfig):
     from physicsnemo.models.diffusion import EDMPrecondSuperResolution
-    from physicsnemo.utils.corrdiff import diffusion_step
-    from physicsnemo.utils.diffusion import deterministic_sampler, stochastic_sampler
+    from physicsnemo.models.diffusion.corrdiff_utils import diffusion_step
+    from physicsnemo.models.diffusion.sampling import (
+        deterministic_sampler,
+        stochastic_sampler,
+    )
 
     torch._dynamo.reset()
 
@@ -130,12 +134,12 @@ def test_diffusion_step(device, pytestconfig):
     assert output.shape == (1, 2, 16, 16), "Output shape mismatch"
 
 
-@import_or_fail("cftime")
+@requires_module("cftime")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_diffusion_step_rectangle(device, pytestconfig):
-    from physicsnemo.utils.corrdiff import diffusion_step
-    from physicsnemo.utils.diffusion import stochastic_sampler
-    from physicsnemo.utils.patching import GridPatching2D
+    from physicsnemo.models.diffusion.corrdiff_utils import diffusion_step
+    from physicsnemo.models.diffusion.patching import GridPatching2D
+    from physicsnemo.models.diffusion.sampling import stochastic_sampler
 
     torch._dynamo.reset()
 
@@ -150,6 +154,8 @@ def test_diffusion_step_rectangle(device, pytestconfig):
         .expand(seed_batch_size, -1, -1, -1)
         .to(device)
     )
+
+    print(stochastic_sampler)
 
     # Stochastic sampler without patching
     sampler_fn = partial(

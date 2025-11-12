@@ -14,8 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import sys
 from pathlib import Path
 
 import pytest
@@ -25,18 +23,14 @@ import physicsnemo
 from physicsnemo.models.diffusion.layers import get_group_norm
 
 # from physicsnemo.models.diffusion.layers import GroupNorm
-
-script_path: str = os.path.abspath(__file__)
-sys.path.append(os.path.join(os.path.dirname(script_path), ".."))
-
-import common  # noqa: E402
+from test import common  # noqa: E402
 
 
 def _instantiate_model(cls, seed: int = 0, **kwargs):
     """
     Helper function to instantiate a model with reproducible random parameters.
     """
-    model: physicsnemo.Module = cls(**kwargs)
+    model: physicsnemo.core.Module = cls(**kwargs)
     gen: torch.Generator = torch.Generator(device="cpu")
     gen.manual_seed(seed)
     with torch.no_grad():
@@ -51,7 +45,7 @@ def _instantiate_model(cls, seed: int = 0, **kwargs):
     return model
 
 
-class GroupNormModule(physicsnemo.Module):
+class GroupNormModule(physicsnemo.core.Module):
     """
     A wrapper around get_group_norm that has a factory method to create a model with
     reproducible random parameters.
@@ -150,7 +144,7 @@ def test_group_norm_non_regression(device, arch_type, use_apex_gn):
 
     assert common.validate_accuracy(
         out,
-        file_name=f"output_diffusion_{arch_type}-v1.0.1.pth",
+        file_name=f"data/output_diffusion_{arch_type}-v1.0.1.pth",
     )
 
 
@@ -180,13 +174,9 @@ def test_group_norm_non_regression_from_checkpoint(
     use Apex-based group norm when loading the checkpoint.
     """
 
-    file_name: str = str(
-        Path(__file__).parents[1].resolve()
-        / Path("data")
-        / Path(f"checkpoint_diffusion_{arch_type}-v1.0.1.mdlus")
-    )
+    file_name: str = str(Path(f"data/checkpoint_diffusion_{arch_type}-v1.0.1.mdlus"))
 
-    model: physicsnemo.Module = physicsnemo.Module.from_checkpoint(
+    model: physicsnemo.core.Module = physicsnemo.core.Module.from_checkpoint(
         file_name=file_name,
         override_args={"use_apex_gn": use_apex_gn},
     ).to(device)
@@ -213,7 +203,7 @@ def test_group_norm_non_regression_from_checkpoint(
 
     assert common.validate_accuracy(
         out,
-        file_name=f"output_diffusion_{arch_type}-v1.0.1.pth",
+        file_name=f"models/diffusion/data/output_diffusion_{arch_type}-v1.0.1.pth",
     )
 
     # ---------------------------------------------------------------------------

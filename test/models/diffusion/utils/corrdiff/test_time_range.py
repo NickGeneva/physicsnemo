@@ -14,12 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pytest_utils import import_or_fail
+from test.conftest import requires_module
 
 
-@import_or_fail("cftime")
+@requires_module("cftime")
 def test_default_interval(pytestconfig):
-    from physicsnemo.utils.corrdiff import get_time_from_range
+    from physicsnemo.models.diffusion.corrdiff_utils import get_time_from_range
 
     times_range = ["2024-01-01T00:00:00", "2024-01-01T01:00:00"]
     expected = ["2024-01-01T00:00:00", "2024-01-01T01:00:00"]
@@ -27,9 +27,9 @@ def test_default_interval(pytestconfig):
     assert result == expected
 
 
-@import_or_fail("cftime")
+@requires_module("cftime")
 def test_hourly_interval(pytestconfig):
-    from physicsnemo.utils.corrdiff import get_time_from_range
+    from physicsnemo.models.diffusion.corrdiff_utils import get_time_from_range
 
     times_range = ["2024-01-01T00:00:00", "2024-01-01T03:00:00", 1]
     expected = [
@@ -42,9 +42,9 @@ def test_hourly_interval(pytestconfig):
     assert result == expected
 
 
-@import_or_fail("cftime")
+@requires_module("cftime")
 def test_custom_interval(pytestconfig):
-    from physicsnemo.utils.corrdiff import get_time_from_range
+    from physicsnemo.models.diffusion.corrdiff_utils import get_time_from_range
 
     times_range = ["2024-01-01T00:00:00", "2024-01-01T03:00:00", 2]
     expected = ["2024-01-01T00:00:00", "2024-01-01T02:00:00"]
@@ -52,9 +52,9 @@ def test_custom_interval(pytestconfig):
     assert result == expected
 
 
-@import_or_fail("cftime")
+@requires_module("cftime")
 def test_no_interval_provided(pytestconfig):
-    from physicsnemo.utils.corrdiff import get_time_from_range
+    from physicsnemo.models.diffusion.corrdiff_utils import get_time_from_range
 
     times_range = ["2024-01-01T00:00:00", "2024-01-01T02:00:00"]
     expected = ["2024-01-01T00:00:00", "2024-01-01T01:00:00", "2024-01-01T02:00:00"]
@@ -62,9 +62,9 @@ def test_no_interval_provided(pytestconfig):
     assert result == expected
 
 
-@import_or_fail("cftime")
+@requires_module("cftime")
 def test_same_start_end_time(pytestconfig):
-    from physicsnemo.utils.corrdiff import get_time_from_range
+    from physicsnemo.models.diffusion.corrdiff_utils import get_time_from_range
 
     times_range = ["2024-01-01T00:00:00", "2024-01-01T00:00:00"]
     expected = ["2024-01-01T00:00:00"]

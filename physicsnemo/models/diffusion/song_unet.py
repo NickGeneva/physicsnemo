@@ -25,7 +25,9 @@ import torch
 from torch.nn.functional import silu
 from torch.utils.checkpoint import checkpoint
 
-from physicsnemo.models.diffusion import (
+from physicsnemo.core.meta import ModelMetaData
+from physicsnemo.core.module import Module
+from physicsnemo.models.diffusion.layers import (
     Conv2d,
     FourierEmbedding,
     Linear,
@@ -34,8 +36,6 @@ from physicsnemo.models.diffusion import (
     get_group_norm,
 )
 from physicsnemo.models.diffusion.utils import _recursive_property
-from physicsnemo.models.meta import ModelMetaData
-from physicsnemo.models.module import Module
 
 # ------------------------------------------------------------------------------
 # Backbone architectures

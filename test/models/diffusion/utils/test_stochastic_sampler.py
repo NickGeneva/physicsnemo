@@ -18,8 +18,9 @@ from typing import Callable, Optional
 
 import pytest
 import torch
-from pytest_utils import import_or_fail
 from torch import Tensor
+
+from test.conftest import requires_module
 
 
 # Mock network class
@@ -47,10 +48,10 @@ class MockNet(torch.nn.Module):
 
 
 # The test function for edm_sampler
-@import_or_fail("cftime")
+@requires_module("cftime")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_stochastic_sampler(device, pytestconfig):
-    from physicsnemo.utils.diffusion import stochastic_sampler
+    from physicsnemo.models.diffusion.sampling import stochastic_sampler
 
     torch._dynamo.reset()
 
@@ -122,11 +123,11 @@ def test_stochastic_sampler(device, pytestconfig):
 
 
 # The test function for edm_sampler with rectangular domain and patching
-@import_or_fail("cftime")
+@requires_module("cftime")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_stochastic_sampler_rectangle_patching(device, pytestconfig):
-    from physicsnemo.utils.diffusion import stochastic_sampler
-    from physicsnemo.utils.patching import GridPatching2D
+    from physicsnemo.models.diffusion.patching import GridPatching2D
+    from physicsnemo.models.diffusion.sampling import stochastic_sampler
 
     torch._dynamo.reset()
 
@@ -173,11 +174,11 @@ def test_stochastic_sampler_rectangle_patching(device, pytestconfig):
 
 # Test that the stochastic sampler is differentiable with rectangular patching
 # (tests differentiation through the patching and fusing)
-@import_or_fail("cftime")
+@requires_module("cftime")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_stochastic_sampler_patching_differentiable(device, pytestconfig):
-    from physicsnemo.utils.diffusion import stochastic_sampler
-    from physicsnemo.utils.patching import GridPatching2D
+    from physicsnemo.models.diffusion.patching import GridPatching2D
+    from physicsnemo.models.diffusion.sampling import stochastic_sampler
 
     torch._dynamo.reset()
 
@@ -287,9 +288,9 @@ class MockNet_lead_time_embedding:
 
 
 # The test function for patch-based stochastic sampler with lead_time_embedding
-@import_or_fail("cftime")
+@requires_module("cftime")
 def test_stochastic_sampler_with_lead_time_args(pytestconfig):
-    from physicsnemo.utils.diffusion import stochastic_sampler
+    from physicsnemo.models.diffusion.sampling import stochastic_sampler
 
     net = MockNet_lead_time_embedding()
     latents = torch.randn(2, 3, 32, 32)  # Mock latents
