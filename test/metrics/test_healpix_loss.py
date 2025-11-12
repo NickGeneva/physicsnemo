@@ -21,7 +21,6 @@ from typing import Sequence
 import numpy as np
 import pytest
 import torch
-from pytest_utils import import_or_fail
 
 from physicsnemo.metrics.climate.healpix_loss import (
     BaseMSE,
@@ -29,6 +28,7 @@ from physicsnemo.metrics.climate.healpix_loss import (
     WeightedMSE,
     WeightedOceanMSE,
 )
+from test.conftest import requires_module
 
 xr = pytest.importorskip("xarray")
 
@@ -236,7 +236,7 @@ def dataset_name():
     return name
 
 
-@import_or_fail("xarray")
+@requires_module("xarray")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_OceanMSE(
     data_dir,
@@ -315,7 +315,7 @@ def test_OceanMSE(
     )
 
 
-@import_or_fail("xarray")
+@requires_module("xarray")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_WeightedOceanMSE(
     data_dir,
