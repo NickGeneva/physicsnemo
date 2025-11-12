@@ -218,7 +218,7 @@ from typing import Optional
 import torch
 import torch.nn as nn
 
-from physicsnemo.models.gnn_layers.mesh_graph_mlp import MeshGraphMLP
+from physicsnemo.nn.gnn_layers.mesh_graph_mlp import MeshGraphMLP
 
 
 class BistrideGraphMessagePassing(nn.Module):

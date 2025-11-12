@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+
 import pytest
 import torch
 
@@ -246,12 +248,10 @@ def test_manager_single_process_subgroups(monkeypatch):
     DistributedManager.cleanup()
 
 
-def run_process_groups(rank, model_parallel_size, verbose, monkeypatch):
-    monkeypatch.setenv("RANK", f"{rank}")
-    monkeypatch.setenv("WORLD_SIZE", f"{model_parallel_size}")
-    monkeypatch.setenv("MASTER_ADDR", "localhost")
-    monkeypatch.setenv("MASTER_PORT", str(12365))
-    monkeypatch.setenv("LOCAL_RANK", f"{rank % torch.cuda.device_count()}")
+def run_process_groups(rank, model_parallel_size, verbose):
+    os.environ["RANK"] = f"{rank}"
+
+    os.environ["LOCAL_RANK"] = f"{rank % torch.cuda.device_count()}"
 
     DistributedManager.initialize()
 
@@ -273,11 +273,15 @@ def run_process_groups(rank, model_parallel_size, verbose, monkeypatch):
 
 
 @pytest.mark.multigpu_dynamic
-def test_process_groups():
+def test_process_groups(monkeypatch):
     num_gpus = torch.cuda.device_count()
     assert num_gpus >= 2, "Not enough GPUs available for test"
     model_parallel_size = num_gpus
     verbose = False  # Change to True for debug
+
+    monkeypatch.setenv("WORLD_SIZE", f"{model_parallel_size}")
+    monkeypatch.setenv("MASTER_ADDR", "localhost")
+    monkeypatch.setenv("MASTER_PORT", str(12365))
 
     torch.multiprocessing.set_start_method("spawn", force=True)
 
@@ -290,12 +294,10 @@ def test_process_groups():
     )
 
 
-def run_process_groups_from_config(rank, model_parallel_size, verbose, monkeypatch):
-    monkeypatch.setenv("RANK", f"{rank}")
-    monkeypatch.setenv("LOCAL_RANK", f"{rank % torch.cuda.device_count()}")
-    monkeypatch.setenv("WORLD_SIZE", f"{model_parallel_size}")
-    monkeypatch.setenv("MASTER_ADDR", "localhost")
-    monkeypatch.setenv("MASTER_PORT", "13246")
+def run_process_groups_from_config(rank, model_parallel_size, verbose):
+    os.environ["RANK"] = f"{rank}"
+
+    os.environ["LOCAL_RANK"] = f"{rank % torch.cuda.device_count()}"
 
     DistributedManager.initialize()
     dm = DistributedManager()
@@ -354,11 +356,15 @@ def run_process_groups_from_config(rank, model_parallel_size, verbose, monkeypat
 
 
 @pytest.mark.multigpu_dynamic
-def test_process_groups_from_config():
+def test_process_groups_from_config(monkeypatch):
     num_gpus = torch.cuda.device_count()
     assert num_gpus >= 2, "Not enough GPUs available for test"
     model_parallel_size = num_gpus
     verbose = False  # Change to True for debug
+
+    monkeypatch.setenv("MASTER_PORT", "13246")
+    monkeypatch.setenv("WORLD_SIZE", f"{model_parallel_size}")
+    monkeypatch.setenv("MASTER_ADDR", "localhost")
 
     torch.multiprocessing.set_start_method("spawn", force=True)
 

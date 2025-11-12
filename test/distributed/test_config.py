@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+
 import pytest
 import torch
 
@@ -81,18 +83,14 @@ class MockDistributedModel(torch.nn.Module):
         return config
 
 
-def run_distributed_model_config(rank, model_parallel_size, verbose, monkeypatch):
-    print(f"Entered function with rank {rank}")
-    monkeypatch.setenv("RANK", f"{rank}")
-    monkeypatch.setenv("WORLD_SIZE", f"{model_parallel_size}")
-    monkeypatch.setenv("MASTER_ADDR", "localhost")
-    monkeypatch.setenv("MASTER_PORT", str(12355))
-    monkeypatch.setenv("LOCAL_RANK", f"{rank % torch.cuda.device_count()}")
+def run_distributed_model_config(rank, model_parallel_size, verbose):
+    os.environ["RANK"] = f"{rank}"
+
+    os.environ["LOCAL_RANK"] = f"{rank % torch.cuda.device_count()}"
 
     DistributedManager._shared_state = {}
 
     DistributedManager.initialize()
-    print(f"Initialized DistributedManager with rank {DistributedManager().rank}")
 
     # Query model for the process group config
     config = MockDistributedModel.get_process_group_config()
@@ -141,12 +139,14 @@ def run_distributed_model_config(rank, model_parallel_size, verbose, monkeypatch
 
 
 @pytest.mark.multigpu_dynamic
-def test_distributed_model_config():
+def test_distributed_model_config(monkeypatch):
     num_gpus = torch.cuda.device_count()
     assert num_gpus >= 2, "Not enough GPUs available for test"
     model_parallel_size = 2
     verbose = False  # Change to True for debug
-
+    monkeypatch.setenv("WORLD_SIZE", f"{model_parallel_size}")
+    monkeypatch.setenv("MASTER_ADDR", "localhost")
+    monkeypatch.setenv("MASTER_PORT", str(12355))
     torch.multiprocessing.set_start_method("spawn", force=True)
 
     torch.multiprocessing.spawn(

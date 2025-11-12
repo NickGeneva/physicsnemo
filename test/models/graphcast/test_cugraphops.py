@@ -19,15 +19,16 @@ import sys
 script_path = os.path.abspath(__file__)
 sys.path.append(os.path.join(os.path.dirname(script_path), ".."))
 
-import common  # noqa: E402
 import numpy as np  # noqa: E402
 import pytest  # noqa: E402
 import torch  # noqa: E402
-from pytest_utils import import_or_fail  # noqa: E402
 from utils import fix_random_seeds  # noqa: E402
 
+from test import common  # noqa: E402
+from test.conftest import requires_module  # noqa: E402
 
-@import_or_fail("dgl")
+
+@requires_module("dgl")
 @pytest.mark.parametrize("recomp_act", [False, True])
 @pytest.mark.parametrize("concat_trick", [False, True])
 @pytest.mark.parametrize("backend", ["dgl"])

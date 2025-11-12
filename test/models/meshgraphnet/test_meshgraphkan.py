@@ -31,13 +31,13 @@ import torch
 script_path = os.path.abspath(__file__)
 sys.path.append(os.path.join(os.path.dirname(script_path), ".."))
 
-import common  # noqa: E402
-from pytest_utils import import_or_fail  # noqa: E402
+from test import common  # noqa: E402
+from test.conftest import requires_module  # noqa: E402
 
 dgl = pytest.importorskip("dgl")
 
 
-@import_or_fail("dgl")
+@requires_module("dgl")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_meshgraphkan_forward(device, pytestconfig, set_physicsnemo_force_te):
     from physicsnemo.models.meshgraphnet import MeshGraphKAN
@@ -59,10 +59,14 @@ def test_meshgraphkan_forward(device, pytestconfig, set_physicsnemo_force_te):
     node_f = torch.randn(graph.num_nodes(), 4).to(device)
     edge_f = torch.randn(graph.num_edges(), 3).to(device)
 
-    assert common.validate_forward_accuracy(model, (node_f, edge_f, graph))
+    assert common.validate_forward_accuracy(
+        model,
+        (node_f, edge_f, graph),
+        file_name="models/meshgraphnet/data/meshgraphkan_output.pth",
+    )
 
 
-@import_or_fail("dgl")
+@requires_module("dgl")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_meshgraphkan_constructor(device, pytestconfig, set_physicsnemo_force_te):
     arg_sets = [
@@ -107,7 +111,7 @@ def test_meshgraphkan_constructor(device, pytestconfig, set_physicsnemo_force_te
         assert out.shape == (graph.num_nodes(), kw["output_dim"])
 
 
-@import_or_fail("dgl")
+@requires_module("dgl")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_meshgraphkan_optims(device, pytestconfig, set_physicsnemo_force_te):
     from physicsnemo.models.meshgraphnet import MeshGraphKAN
@@ -133,7 +137,7 @@ def test_meshgraphkan_optims(device, pytestconfig, set_physicsnemo_force_te):
     assert common.validate_combo_optims(m, (*inp,))
 
 
-@import_or_fail("dgl")
+@requires_module("dgl")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_meshgraphkan_checkpoint(device, pytestconfig, set_physicsnemo_force_te):
     from physicsnemo.models.meshgraphnet import MeshGraphKAN
@@ -148,7 +152,7 @@ def test_meshgraphkan_checkpoint(device, pytestconfig, set_physicsnemo_force_te)
     assert common.validate_checkpoint(m1, m2, (node_f, edge_f, graph))
 
 
-@import_or_fail("dgl")
+@requires_module("dgl")
 @common.check_ort_version()
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_meshgraphkan_deploy(device, pytestconfig, set_physicsnemo_force_te):

@@ -18,11 +18,12 @@
 import numpy as np
 import pytest
 import torch
-from pytest_utils import import_or_fail
 from torch.testing import assert_close
 
+from test.conftest import requires_module
 
-@import_or_fail(["dgl", "torch_geometric"])
+
+@requires_module(["dgl", "torch_geometric"])
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 @pytest.mark.parametrize("aggregation", ["sum", "mean"])
 def test_mesh_node_block_dgl_pyg_equivalence(
@@ -34,7 +35,7 @@ def test_mesh_node_block_dgl_pyg_equivalence(
     import dgl
     from torch_geometric.data import Data as PyGData
 
-    from physicsnemo.models.gnn_layers.mesh_node_block import MeshNodeBlock
+    from physicsnemo.nn.gnn_layers.mesh_node_block import MeshNodeBlock
 
     # Set seeds for reproducibility.
     torch.manual_seed(42)
@@ -102,7 +103,7 @@ def test_mesh_node_block_dgl_pyg_equivalence(
     assert nfeat_pyg.shape == (num_nodes, output_dim)
 
 
-@import_or_fail(["dgl", "torch_geometric"])
+@requires_module(["dgl", "torch_geometric"])
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_mesh_node_block_gradient_equivalence(
     device, pytestconfig, set_physicsnemo_force_te
@@ -113,7 +114,7 @@ def test_mesh_node_block_gradient_equivalence(
     import dgl
     from torch_geometric.data import Data as PyGData
 
-    from physicsnemo.models.gnn_layers.mesh_node_block import MeshNodeBlock
+    from physicsnemo.nn.gnn_layers.mesh_node_block import MeshNodeBlock
 
     # Set seeds for reproducibility.
     torch.manual_seed(123)
@@ -216,7 +217,7 @@ def test_mesh_node_block_gradient_equivalence(
         )
 
 
-@import_or_fail(["dgl", "torch_geometric"])
+@requires_module(["dgl", "torch_geometric"])
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_mesh_node_block_batched_equivalence(
     device, pytestconfig, set_physicsnemo_force_te
@@ -228,7 +229,7 @@ def test_mesh_node_block_batched_equivalence(
     from torch_geometric.data import Batch
     from torch_geometric.data import Data as PyGData
 
-    from physicsnemo.models.gnn_layers.mesh_node_block import MeshNodeBlock
+    from physicsnemo.nn.gnn_layers.mesh_node_block import MeshNodeBlock
 
     # Set seeds for reproducibility.
     torch.manual_seed(456)
@@ -307,7 +308,7 @@ def test_mesh_node_block_batched_equivalence(
     assert nfeat_pyg.shape == (total_nodes, output_dim)
 
 
-@import_or_fail(["dgl", "torch_geometric"])
+@requires_module(["dgl", "torch_geometric"])
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_mesh_edge_block_dgl_pyg_equivalence(
     device, pytestconfig, set_physicsnemo_force_te
@@ -318,7 +319,7 @@ def test_mesh_edge_block_dgl_pyg_equivalence(
     import dgl
     from torch_geometric.data import Data as PyGData
 
-    from physicsnemo.models.gnn_layers.mesh_edge_block import MeshEdgeBlock
+    from physicsnemo.nn.gnn_layers.mesh_edge_block import MeshEdgeBlock
 
     # Test parameters.
     num_nodes = 10
@@ -366,7 +367,7 @@ def test_mesh_edge_block_dgl_pyg_equivalence(
     assert nfeat_dgl.shape == (num_nodes, input_dim_nodes)
 
 
-@import_or_fail(["dgl", "torch_geometric"])
+@requires_module(["dgl", "torch_geometric"])
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_mesh_edge_block_gradient_equivalence(
     device, pytestconfig, set_physicsnemo_force_te
@@ -377,7 +378,7 @@ def test_mesh_edge_block_gradient_equivalence(
     import dgl
     from torch_geometric.data import Data as PyGData
 
-    from physicsnemo.models.gnn_layers.mesh_edge_block import MeshEdgeBlock
+    from physicsnemo.nn.gnn_layers.mesh_edge_block import MeshEdgeBlock
 
     # Test parameters.
     num_nodes = 8
@@ -460,7 +461,7 @@ def test_mesh_edge_block_gradient_equivalence(
         )
 
 
-@import_or_fail(["dgl", "torch_geometric"])
+@requires_module(["dgl", "torch_geometric"])
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 @pytest.mark.parametrize("do_concat_trick", [False, True])
 def test_mesh_edge_block_concat_trick_equivalence(
@@ -472,7 +473,7 @@ def test_mesh_edge_block_concat_trick_equivalence(
     import dgl
     from torch_geometric.data import Data as PyGData
 
-    from physicsnemo.models.gnn_layers.mesh_edge_block import MeshEdgeBlock
+    from physicsnemo.nn.gnn_layers.mesh_edge_block import MeshEdgeBlock
 
     # Test parameters.
     num_nodes = 8
@@ -519,7 +520,7 @@ def test_mesh_edge_block_concat_trick_equivalence(
     assert nfeat_dgl.shape == (num_nodes, input_dim_nodes)
 
 
-@import_or_fail(["dgl", "torch_geometric"])
+@requires_module(["dgl", "torch_geometric"])
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_mesh_edge_block_batched_equivalence(
     device, pytestconfig, set_physicsnemo_force_te
@@ -531,7 +532,7 @@ def test_mesh_edge_block_batched_equivalence(
     from torch_geometric.data import Batch
     from torch_geometric.data import Data as PyGData
 
-    from physicsnemo.models.gnn_layers.mesh_edge_block import MeshEdgeBlock
+    from physicsnemo.nn.gnn_layers.mesh_edge_block import MeshEdgeBlock
 
     # Test parameters.
     batch_size = 2
@@ -606,7 +607,7 @@ def test_mesh_edge_block_batched_equivalence(
     assert nfeat_dgl.shape == (expected_num_nodes, input_dim_nodes)
 
 
-@import_or_fail(["dgl", "torch_geometric"])
+@requires_module(["dgl", "torch_geometric"])
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_meshgraphnet_dgl_pyg_equivalence(
     device, pytestconfig, set_physicsnemo_force_te
@@ -677,7 +678,7 @@ def test_meshgraphnet_dgl_pyg_equivalence(
     assert output_pyg.shape == (num_nodes, output_dim)
 
 
-@import_or_fail(["dgl", "torch_geometric"])
+@requires_module(["dgl", "torch_geometric"])
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_meshgraphnet_gradient_equivalence(
     device, pytestconfig, set_physicsnemo_force_te
@@ -788,7 +789,7 @@ def test_meshgraphnet_gradient_equivalence(
         assert_close(param_dgl.grad, param_pyg.grad)
 
 
-@import_or_fail(["dgl", "torch_geometric"])
+@requires_module(["dgl", "torch_geometric"])
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_meshgraphnet_batched_equivalence(
     device, pytestconfig, set_physicsnemo_force_te

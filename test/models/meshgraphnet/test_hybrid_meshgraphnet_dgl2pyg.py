@@ -18,11 +18,12 @@
 import numpy as np
 import pytest
 import torch
-from pytest_utils import import_or_fail
 from torch.testing import assert_close
 
+from test.conftest import requires_module
 
-@import_or_fail(["dgl", "torch_geometric"])
+
+@requires_module(["dgl", "torch_geometric"])
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_hybrid_meshgraphnet_dgl_pyg_equivalence(
     device, pytestconfig, set_physicsnemo_force_te
@@ -107,7 +108,7 @@ def test_hybrid_meshgraphnet_dgl_pyg_equivalence(
     assert output_pyg.shape == (num_nodes, output_dim)
 
 
-@import_or_fail(["dgl", "torch_geometric"])
+@requires_module(["dgl", "torch_geometric"])
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_hybrid_meshgraphnet_gradient_equivalence(
     device, pytestconfig, set_physicsnemo_force_te
@@ -249,7 +250,7 @@ def test_hybrid_meshgraphnet_gradient_equivalence(
         )
 
 
-@import_or_fail(["dgl", "torch_geometric"])
+@requires_module(["dgl", "torch_geometric"])
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_hybrid_meshgraphnet_hetero_edge_processing(
     device, pytestconfig, set_physicsnemo_force_te

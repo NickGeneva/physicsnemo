@@ -20,8 +20,8 @@ import torch
 from torch.autograd.profiler import record_function
 from torch.distributed.tensor.placement_types import Shard
 
-from physicsnemo.distributed import ShardTensor
-from physicsnemo.distributed.shard_utils.halo import (
+from physicsnemo.domain_parallel import ShardTensor
+from physicsnemo.domain_parallel.shard_utils.halo import (
     HaloConfig,
     halo_padding,
     unhalo_padding,

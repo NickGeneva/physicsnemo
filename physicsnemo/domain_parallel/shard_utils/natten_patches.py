@@ -20,19 +20,19 @@ from typing import Any, Callable, List, Tuple, Union
 import torch
 import wrapt
 
-from physicsnemo.utils.version_check import check_module_requirements
+from physicsnemo.core.version_check import check_module_requirements
 
 check_module_requirements("physicsnemo.distributed.shard_tensor")
 
 from torch.distributed.tensor.placement_types import Shard  # noqa: E402
 
-from physicsnemo.distributed import ShardTensor  # noqa: E402
-from physicsnemo.distributed.shard_utils.halo import (  # noqa: E402
+from physicsnemo.domain_parallel import ShardTensor  # noqa: E402
+from physicsnemo.domain_parallel.shard_utils.halo import (  # noqa: E402
     HaloConfig,
     halo_padding,
     unhalo_padding,
 )
-from physicsnemo.distributed.shard_utils.patch_core import (  # noqa: E402
+from physicsnemo.domain_parallel.shard_utils.patch_core import (  # noqa: E402
     MissingShardPatch,
     UndeterminedShardingError,
 )

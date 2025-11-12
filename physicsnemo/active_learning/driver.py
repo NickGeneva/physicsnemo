@@ -35,7 +35,6 @@ from torch import distributed as dist
 from torch.nn.parallel import DistributedDataParallel
 from torch.utils.data import DataLoader, DistributedSampler
 
-from physicsnemo import Module
 from physicsnemo import __version__ as physicsnemo_version
 from physicsnemo.active_learning import protocols as p
 from physicsnemo.active_learning.config import (
@@ -47,6 +46,7 @@ from physicsnemo.active_learning.logger import (
     ActiveLearningLoggerAdapter,
     setup_active_learning_logger,
 )
+from physicsnemo.core import Module
 from physicsnemo.distributed import DistributedManager
 
 

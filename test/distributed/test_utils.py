@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+
 import pytest
 import torch
 import torch.nn as nn
@@ -27,36 +29,10 @@ from physicsnemo.distributed import (
 )
 from physicsnemo.distributed.utils import _reduce
 
-# def test_modify_environment():
-#     keys = ["RANK", "WORLD_SIZE", "MASTER_ADDR", "MASTER_PORT", "LOCAL_RANK"]
-#     # Set the values to nonsense for testing:
-#     values = [f"{i}" for i in range(len(keys))]
 
-#     key_values = {k: v for k, v in zip(keys, values)}
-#     print(key_values)
-
-#     current_val = {key: os.environ.get(key, "NOT_SET") for key in keys}
-
-#     with modify_environment(**key_values):
-#         for key, value in zip(keys, values):
-#             assert os.environ[key] == value
-
-#     # Make sure the values are restored:
-#     for key, value in current_val.items():
-#         if current_val[key] == "NOT_SET":
-#             assert key not in os.environ
-#         else:
-#             assert os.environ[key] == value
-
-#     # assert False
-
-
-def run_test_reduce_loss(rank, world_size, monkeypatch):
-    monkeypatch.setenv("RANK", f"{rank}")
-    monkeypatch.setenv("WORLD_SIZE", f"{world_size}")
-    monkeypatch.setenv("MASTER_ADDR", "localhost")
-    monkeypatch.setenv("MASTER_PORT", str(12355))
-    monkeypatch.setenv("LOCAL_RANK", f"{rank % torch.cuda.device_count()}")
+def run_test_reduce_loss(rank, world_size):
+    os.environ["RANK"] = f"{rank}"
+    os.environ["LOCAL_RANK"] = f"{rank % torch.cuda.device_count()}"
 
     # Reset class state
     DistributedManager._shared_state = {}
@@ -74,7 +50,7 @@ def run_test_reduce_loss(rank, world_size, monkeypatch):
     DistributedManager.cleanup()
 
 
-def run_test_mark_shared(rank, world_size, monkeypatch):
+def run_test_mark_shared(rank, world_size):
     class TestModule(nn.Module):
         def __init__(self):
             super().__init__()
@@ -84,11 +60,8 @@ def run_test_mark_shared(rank, world_size, monkeypatch):
         def forward(self, x):
             return torch.sigmoid(self.lin_2(torch.tanh(self.lin_1(x))))
 
-    monkeypatch.setenv("RANK", f"{rank}")
-    monkeypatch.setenv("WORLD_SIZE", f"{world_size}")
-    monkeypatch.setenv("MASTER_ADDR", "localhost")
-    monkeypatch.setenv("MASTER_PORT", str(12355))
-    monkeypatch.setenv("LOCAL_RANK", f"{rank % torch.cuda.device_count()}")
+    os.environ["RANK"] = f"{rank}"
+    os.environ["LOCAL_RANK"] = f"{rank % torch.cuda.device_count()}"
 
     DistributedManager._shared_state = {}
     DistributedManager.initialize()
@@ -208,10 +181,14 @@ def run_test_mark_shared(rank, world_size, monkeypatch):
 
 
 @pytest.mark.multigpu_dynamic
-def test_reduce_loss():
+def test_reduce_loss(monkeypatch):
     num_gpus = torch.cuda.device_count()
     assert num_gpus > 1
     world_size = num_gpus
+
+    monkeypatch.setenv("WORLD_SIZE", f"{world_size}")
+    monkeypatch.setenv("MASTER_ADDR", "localhost")
+    monkeypatch.setenv("MASTER_PORT", str(12355))
 
     torch.multiprocessing.set_start_method("spawn", force=True)
 
@@ -225,10 +202,14 @@ def test_reduce_loss():
 
 
 @pytest.mark.multigpu_dynamic
-def test_mark_shared():
+def test_mark_shared(monkeypatch):
     num_gpus = torch.cuda.device_count()
     assert num_gpus > 1
     world_size = num_gpus
+
+    monkeypatch.setenv("WORLD_SIZE", f"{world_size}")
+    monkeypatch.setenv("MASTER_ADDR", "localhost")
+    monkeypatch.setenv("MASTER_PORT", str(12355))
 
     torch.multiprocessing.set_start_method("spawn", force=True)
 

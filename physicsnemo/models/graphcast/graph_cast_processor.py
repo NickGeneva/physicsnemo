@@ -19,9 +19,9 @@ import torch.nn as nn
 import transformer_engine as te
 from torch import Tensor
 
-from physicsnemo.models.gnn_layers.mesh_edge_block import MeshEdgeBlock
-from physicsnemo.models.gnn_layers.mesh_node_block import MeshNodeBlock
-from physicsnemo.models.gnn_layers.utils import GraphType, set_checkpoint_fn
+from physicsnemo.nn.gnn_layers.mesh_edge_block import MeshEdgeBlock
+from physicsnemo.nn.gnn_layers.mesh_node_block import MeshNodeBlock
+from physicsnemo.nn.gnn_layers.utils import GraphType, set_checkpoint_fn
 
 
 class GraphCastProcessor(nn.Module):

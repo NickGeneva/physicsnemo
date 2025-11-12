@@ -22,9 +22,9 @@ from unittest.mock import MagicMock
 import pytest
 import torch
 
-from physicsnemo import Module
 from physicsnemo.active_learning import protocols as p
 from physicsnemo.active_learning._registry import registry
+from physicsnemo.core import Module
 
 
 # Mock classes for testing serialization

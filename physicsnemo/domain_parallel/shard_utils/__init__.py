@@ -16,7 +16,7 @@
 
 import torch
 
-from physicsnemo.utils.version_check import check_module_requirements
+from physicsnemo.core.version_check import check_module_requirements
 
 # Prevent importing this module if the minimum version of pytorch is not met.
 try:
@@ -27,7 +27,7 @@ except ImportError:
     pass
 
 if SHARD_TENSOR_AVAILABLE:
-    from physicsnemo.distributed.shard_tensor import ShardTensor
+    from physicsnemo.domain_parallel.shard_tensor import ShardTensor
 
     def register_shard_wrappers():
         from .attention_patches import sdpa_wrapper

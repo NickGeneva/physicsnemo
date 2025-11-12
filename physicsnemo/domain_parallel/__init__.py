@@ -21,11 +21,14 @@
 
 import torch
 
-from physicsnemo.utils.version_check import check_module_requirements
+from physicsnemo.core.version_check import check_module_requirements
 
-try:
-    check_module_requirements("physicsnemo.distributed.shard_tensor")
+ST_AVAILABLE = check_module_requirements(
+    "physicsnemo.distributed.shard_tensor", hard_fail=False
+)
 
+
+if ST_AVAILABLE:
     # In minumum versions are met, we can import the shard tensor and spec.
 
     from ._shard_tensor_spec import ShardTensorSpec
@@ -46,6 +49,3 @@ try:
     # Protect the automatic imports by checking cuda is available.
     if torch.cuda.is_available():
         register_custom_ops()
-
-except ImportError:
-    pass

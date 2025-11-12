@@ -97,8 +97,14 @@ def pytest_configure(config):
         DistributedManager.initialize()
         # Only load the plugin when running distributed tests
         config.pluginmanager.register(
-            __import__("plugins.distributed_print", fromlist=[""]),
+            __import__("test.plugins.distributed_print", fromlist=[""]),
             name="distributed_print",
+        )
+
+        # And this one sets up distributed fixtures for static parallel tests.
+        config.pluginmanager.register(
+            __import__("test.plugins.distributed_fixtures", fromlist=[""]),
+            name="distributed_fixtures",
         )
 
 

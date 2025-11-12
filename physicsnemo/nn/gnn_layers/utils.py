@@ -47,7 +47,7 @@ except ImportError:
         "https://github.com/rusty1s/pytorch_scatter\n"
     )
 
-from physicsnemo.models.gnn_layers import CuGraphCSC
+from physicsnemo.nn.gnn_layers import CuGraphCSC
 
 GraphType: TypeAlias = PyGData | PyGHeteroData | DGLGraph | CuGraphCSC
 

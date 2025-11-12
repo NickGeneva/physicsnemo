@@ -45,17 +45,17 @@ except ImportError:
     DGLGraph: TypeAlias = NoneType
 
 import physicsnemo  # noqa: F401 for docs
-from physicsnemo.models.gnn_layers.mesh_edge_block import MeshEdgeBlock
-from physicsnemo.models.gnn_layers.mesh_graph_mlp import MeshGraphMLP
-from physicsnemo.models.gnn_layers.mesh_node_block import MeshNodeBlock
-from physicsnemo.models.gnn_layers.utils import CuGraphCSC, set_checkpoint_fn
-from physicsnemo.models.layers import get_activation
+from physicsnemo.core.meta import ModelMetaData
+from physicsnemo.core.module import Module
+from physicsnemo.nn import get_activation
+from physicsnemo.nn.gnn_layers.mesh_edge_block import MeshEdgeBlock
+from physicsnemo.nn.gnn_layers.mesh_graph_mlp import MeshGraphMLP
+from physicsnemo.nn.gnn_layers.mesh_node_block import MeshNodeBlock
+from physicsnemo.nn.gnn_layers.utils import CuGraphCSC, set_checkpoint_fn
 
 # Import the Kolmogorov–Arnold Network layer.
 # Ensure that the file defining KolmogorovArnoldNetwork is accessible (e.g. physicsnemo/models/gnn_layers/kan_layer.py)
-from physicsnemo.models.layers.kan_layers import KolmogorovArnoldNetwork
-from physicsnemo.models.meta import ModelMetaData
-from physicsnemo.models.module import Module
+from physicsnemo.nn.kan_layers import KolmogorovArnoldNetwork
 
 
 @dataclass

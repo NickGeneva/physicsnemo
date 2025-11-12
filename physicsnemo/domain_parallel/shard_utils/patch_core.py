@@ -17,7 +17,7 @@
 # File for common tools in shard patching
 from collections.abc import Iterable
 
-from physicsnemo.utils.version_check import check_module_requirements
+from physicsnemo.core.version_check import check_module_requirements
 
 check_module_requirements("physicsnemo.distributed.shard_tensor")
 

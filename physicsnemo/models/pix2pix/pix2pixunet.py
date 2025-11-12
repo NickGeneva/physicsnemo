@@ -63,9 +63,8 @@ import torch.nn as nn
 from torch.nn import init
 
 import physicsnemo  # noqa: F401 for docs
-
-from ..meta import ModelMetaData
-from ..module import Module
+from physicsnemo.core.meta import ModelMetaData
+from physicsnemo.core.module import Module
 
 Tensor = torch.Tensor
 

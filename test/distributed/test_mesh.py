@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 
 import pytest
 import torch
@@ -37,12 +38,9 @@ distributed_test = pytest.mark.skipif(
 )
 
 
-def run_mesh_creation(rank, num_gpus, mesh_names, mesh_sizes, verbose, monkeypatch):
-    monkeypatch.setenv("RANK", f"{rank}")
-    monkeypatch.setenv("WORLD_SIZE", f"{num_gpus}")
-    monkeypatch.setenv("MASTER_ADDR", "localhost")
-    monkeypatch.setenv("MASTER_PORT", str(12355))
-    monkeypatch.setenv("LOCAL_RANK", f"{rank % torch.cuda.device_count()}")
+def run_mesh_creation(rank, num_gpus, mesh_names, mesh_sizes, verbose):
+    os.environ["RANK"] = f"{rank}"
+    os.environ["LOCAL_RANK"] = f"{rank % torch.cuda.device_count()}"
 
     DistributedManager.initialize()
     dm = DistributedManager()
@@ -82,9 +80,15 @@ def run_mesh_creation(rank, num_gpus, mesh_names, mesh_sizes, verbose, monkeypat
 @pytest.mark.parametrize("data_parallel_size", [-1])
 @pytest.mark.parametrize("domain_parallel_size", [2, 1])
 @pytest.mark.parametrize("model_parallel_size", [4, 2])
-def test_mesh_creation(data_parallel_size, domain_parallel_size, model_parallel_size):
+def test_mesh_creation(
+    data_parallel_size, domain_parallel_size, model_parallel_size, monkeypatch
+):
     num_gpus = torch.cuda.device_count()
     assert num_gpus >= 2, "Not enough GPUs available for test"
+
+    monkeypatch.setenv("WORLD_SIZE", f"{num_gpus}")
+    monkeypatch.setenv("MASTER_ADDR", "localhost")
+    monkeypatch.setenv("MASTER_PORT", str(12355))
 
     remaining_gpus = num_gpus
     mesh_names = ["data_parallel"]

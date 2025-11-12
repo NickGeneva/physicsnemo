@@ -20,17 +20,24 @@ import sys
 script_path = os.path.abspath(__file__)
 sys.path.append(os.path.join(os.path.dirname(script_path), ".."))
 
-import common
 import pytest
 from graphcast.utils import create_random_input, fix_random_seeds
-from pytest_utils import import_or_fail
+
+from test import common
+from test.conftest import requires_module
+
 
 # Disable flash attention, specify minimum te version
-os.environ["NVTE_FLASH_ATTN"] = "0"
-te_version = "2.0.6"
+@pytest.fixture
+def disable_flash_attention(monkeypatch):
+    monkeypatch.setenv("NVTE_FLASH_ATTN", "0")
 
 
-@import_or_fail("dgl")
+# TE is now on version 2.8.0 +
+# te_version = "2.0.6"
+
+
+@requires_module("dgl")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 @pytest.mark.parametrize("backend", ["dgl", "pyg"])
 def test_graphcast_forward(
@@ -38,6 +45,7 @@ def test_graphcast_forward(
     backend,
     pytestconfig,
     set_physicsnemo_force_te,
+    disable_flash_attention,
     num_channels=2,
     res_h=10,
     res_w=20,
@@ -66,10 +74,15 @@ def test_graphcast_forward(
     # Construct graphcast model
     model = GraphCastNet(**model_kwds).to(device)
 
-    assert common.validate_forward_accuracy(model, (x,), rtol=1e-2)
+    assert common.validate_forward_accuracy(
+        model,
+        (x,),
+        rtol=1e-2,
+        file_name="models/graphcast/data/graphcastnet_output.pth",
+    )
 
 
-@import_or_fail("dgl")
+@requires_module("dgl")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 @pytest.mark.parametrize("backend", ["dgl", "pyg"])
 def test_graphcast_constructor(
@@ -77,6 +90,7 @@ def test_graphcast_constructor(
     backend,
     pytestconfig,
     set_physicsnemo_force_te,
+    disable_flash_attention,
     num_channels_1=2,
     num_channels_2=3,
     res_h=10,
@@ -128,10 +142,16 @@ def test_graphcast_constructor(
         )
 
 
-@import_or_fail(["dgl", "transformer_engine"], [None, te_version])
+@requires_module(["dgl", "transformer_engine"])
 @pytest.mark.parametrize("backend", ["dgl", "pyg"])
 def test_graphcast_te_constructor(
-    backend, pytestconfig, num_channels_1=2, num_channels_2=3, res_h=10, res_w=20
+    backend,
+    pytestconfig,
+    disable_flash_attention,
+    num_channels_1=2,
+    num_channels_2=3,
+    res_h=10,
+    res_w=20,
 ):
     """Test graphcast constructor options with graph transformer processor"""
 
@@ -185,11 +205,15 @@ def test_graphcast_te_constructor(
         )
 
 
-@import_or_fail("dgl")
+@requires_module("dgl")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 @pytest.mark.parametrize("backend", ["dgl", "pyg"])
 def test_graphcast_constructor_backward_compatibility(
-    device, backend, pytestconfig, set_physicsnemo_force_te
+    device,
+    backend,
+    pytestconfig,
+    set_physicsnemo_force_te,
+    disable_flash_attention,
 ):
     """Test graphcast constructor for backward compatibility for multimesh_level -> mesh_level"""
 
@@ -215,7 +239,7 @@ def test_graphcast_constructor_backward_compatibility(
     assert model_1_params == model_2_params
 
 
-@import_or_fail("dgl")
+@requires_module("dgl")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 @pytest.mark.parametrize("backend", ["dgl", "pyg"])
 def test_GraphCast_optims(
@@ -223,6 +247,7 @@ def test_GraphCast_optims(
     backend,
     pytestconfig,
     set_physicsnemo_force_te,
+    disable_flash_attention,
     num_channels=2,
     res_h=10,
     res_w=20,
@@ -269,9 +294,16 @@ def test_GraphCast_optims(
     assert common.validate_combo_optims(model, (*invar,))
 
 
-@import_or_fail(["dgl", "transformer_engine"], [None, te_version])
+@requires_module(["dgl", "transformer_engine"])
 @pytest.mark.parametrize("backend", ["dgl", "pyg"])
-def test_GraphCast_te_optims(backend, pytestconfig, num_channels=2, res_h=10, res_w=20):
+def test_GraphCast_te_optims(
+    backend,
+    pytestconfig,
+    disable_flash_attention,
+    num_channels=2,
+    res_h=10,
+    res_w=20,
+):
     """Test GraphCast optimizations with graph transformer processor"""
 
     from physicsnemo.models.graphcast.graph_cast_net import GraphCastNet
@@ -320,7 +352,7 @@ def test_GraphCast_te_optims(backend, pytestconfig, num_channels=2, res_h=10, re
     assert common.validate_combo_optims(model, (*invar,))
 
 
-@import_or_fail("dgl")
+@requires_module("dgl")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 @pytest.mark.parametrize("backend", ["dgl", "pyg"])
 def test_graphcast_checkpoint(
@@ -328,6 +360,7 @@ def test_graphcast_checkpoint(
     backend,
     pytestconfig,
     set_physicsnemo_force_te,
+    disable_flash_attention,
     num_channels=2,
     res_h=10,
     res_w=20,
@@ -363,10 +396,15 @@ def test_graphcast_checkpoint(
     )
 
 
-@import_or_fail(["dgl", "transformer_engine"], [None, te_version])
+@requires_module(["dgl", "transformer_engine"])
 @pytest.mark.parametrize("backend", ["dgl", "pyg"])
 def test_graphcast_checkpoint_te(
-    backend, pytestconfig, num_channels=2, res_h=10, res_w=20
+    backend,
+    pytestconfig,
+    disable_flash_attention,
+    num_channels=2,
+    res_h=10,
+    res_w=20,
 ):
     """Test GraphCast checkpoint save/load with graph transformer processor"""
 
@@ -405,7 +443,7 @@ def test_graphcast_checkpoint_te(
     )
 
 
-@import_or_fail("dgl")
+@requires_module("dgl")
 @common.check_ort_version()
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 @pytest.mark.parametrize("backend", ["dgl", "pyg"])
@@ -414,6 +452,7 @@ def test_GraphCast_deploy(
     backend,
     pytestconfig,
     set_physicsnemo_force_te,
+    disable_flash_attention,
     num_channels=2,
     res_h=10,
     res_w=20,
@@ -445,10 +484,17 @@ def test_GraphCast_deploy(
     assert common.validate_onnx_runtime(model, x)
 
 
-@import_or_fail(["dgl", "transformer_engine"], [None, te_version])
+@requires_module(["dgl", "transformer_engine"])
 @common.check_ort_version()
 @pytest.mark.parametrize("backend", ["dgl", "pyg"])
-def test_GraphCast_deploy_te(backend, pytestconfig, num_channels=2, res_h=10, res_w=20):
+def test_GraphCast_deploy_te(
+    backend,
+    pytestconfig,
+    disable_flash_attention,
+    num_channels=2,
+    res_h=10,
+    res_w=20,
+):
     """Test GraphCast deployment support with graph transformer processor"""
 
     from physicsnemo.models.graphcast.graph_cast_net import GraphCastNet

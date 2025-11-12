@@ -24,13 +24,13 @@ import torch
 script_path = os.path.abspath(__file__)
 sys.path.append(os.path.join(os.path.dirname(script_path), ".."))
 
-import common
-from pytest_utils import import_or_fail
+from test import common
+from test.conftest import requires_module
 
 dgl = pytest.importorskip("dgl")
 
 
-@import_or_fail("dgl")
+@requires_module("dgl")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_hybrid_meshgraphnet_forward(device, pytestconfig, set_physicsnemo_force_te):
     """Test hybrid meshgraphnet forward pass"""
@@ -69,10 +69,11 @@ def test_hybrid_meshgraphnet_forward(device, pytestconfig, set_physicsnemo_force
         (node_features, mesh_edge_features, world_edge_features, graph),
         rtol=1e-2,
         atol=1e-2,
+        file_name="models/meshgraphnet/data/hybridmeshgraphnet_output.pth",
     )
 
 
-@import_or_fail("dgl")
+@requires_module("dgl")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_hybrid_meshgraphnet_constructor(
     device, pytestconfig, set_physicsnemo_force_te
@@ -134,7 +135,7 @@ def test_hybrid_meshgraphnet_constructor(
         assert outvar.shape == (num_nodes, kw_args["output_dim"])
 
 
-@import_or_fail("dgl")
+@requires_module("dgl")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_hybrid_meshgraphnet_optims(device, pytestconfig, set_physicsnemo_force_te):
     """Test hybrid meshgraphnet optimizations"""
@@ -185,7 +186,7 @@ def test_hybrid_meshgraphnet_optims(device, pytestconfig, set_physicsnemo_force_
     assert common.validate_combo_optims(model, (*invar,))
 
 
-@import_or_fail("dgl")
+@requires_module("dgl")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_hybrid_meshgraphnet_checkpoint(device, pytestconfig, set_physicsnemo_force_te):
     """Test hybrid meshgraphnet checkpoint save/load"""
@@ -231,7 +232,7 @@ def test_hybrid_meshgraphnet_checkpoint(device, pytestconfig, set_physicsnemo_fo
     )
 
 
-@import_or_fail("dgl")
+@requires_module("dgl")
 @common.check_ort_version()
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_hybrid_meshgraphnet_deploy(device, pytestconfig, set_physicsnemo_force_te):

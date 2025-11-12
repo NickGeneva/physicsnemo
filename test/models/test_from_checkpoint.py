@@ -19,10 +19,10 @@ from pathlib import Path
 import pytest
 import torch
 
-import physicsnemo
+import physicsnemo.core
 
 
-class MockModel(physicsnemo.Module):
+class MockModel(physicsnemo.core.Module):
     """Fake model"""
 
     def __init__(self, layer_size=16):
@@ -31,7 +31,7 @@ class MockModel(physicsnemo.Module):
         self.layer = torch.nn.Linear(layer_size, layer_size)
 
 
-class NewMockModel(physicsnemo.Module):
+class NewMockModel(physicsnemo.core.Module):
     """Fake model"""
 
     def __init__(self, layer_size=16):
@@ -40,7 +40,7 @@ class NewMockModel(physicsnemo.Module):
         self.layer = torch.nn.Linear(layer_size, layer_size)
 
 
-class MockModelNoOverride(physicsnemo.Module):
+class MockModelNoOverride(physicsnemo.core.Module):
     """Fake model"""
 
     def __init__(self, value1, value2, x):
@@ -50,7 +50,7 @@ class MockModelNoOverride(physicsnemo.Module):
         self.x = x
 
 
-class MockModelWithOverride(physicsnemo.Module):
+class MockModelWithOverride(physicsnemo.core.Module):
     """Fake model"""
 
     _overridable_args = {"value2", "x"}
