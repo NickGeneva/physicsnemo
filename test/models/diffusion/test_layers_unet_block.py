@@ -215,7 +215,7 @@ def test_unet_block_non_regression_from_checkpoint(
     and ``fused_conv_bias`` when loading the checkpoint.
     """
 
-    file_name: str = str(Path(f"data/checkpoint_diffusion_{arch_type}-v1.0.1.mdlus"))
+    file_name: str = str(Path(f"./data/checkpoint_diffusion_{arch_type}-v1.0.1.mdlus"))
 
     model: physicsnemo.core.Module = physicsnemo.core.Module.from_checkpoint(
         file_name=file_name,

@@ -28,9 +28,8 @@ from physicsnemo.experimental.models.dit.layers import (
     DiTBlock,
     TokenizerModuleBase,
 )
+from test import common
 from test.conftest import requires_module
-
-from . import common
 
 # --- Tests ---
 
@@ -57,7 +56,7 @@ def test_dit_forward_accuracy(device):
     assert common.validate_forward_accuracy(
         model,
         (x, t, None),  # Inputs tuple for an unconditional model
-        file_name="dit_unconditional_output.pth",
+        file_name="models/dit/data/dit_unconditional_output.pth",
         atol=1e-3,
     )
 
@@ -86,7 +85,7 @@ def test_dit_conditional_forward_accuracy(device):
     assert common.validate_forward_accuracy(
         model,
         (x, t, condition),
-        file_name="dit_conditional_output.pth",
+        file_name="models/dit/data/dit_conditional_output.pth",
         atol=1e-3,
     )
 
@@ -303,7 +302,7 @@ def test_ditblock_forward_accuracy_timm(device):
     assert common.validate_forward_accuracy(
         model,
         (x, c),
-        file_name="ditblock_timm_output.pth",
+        file_name="models/dit/data/ditblock_timm_output.pth",
     )
 
 
@@ -342,7 +341,7 @@ def test_ditblock_forward_accuracy_natten(device, pytestconfig):
     assert common.validate_forward_accuracy(
         model,
         (x, c),
-        file_name="ditblock_natten_output.pth",
+        file_name="models/dit/data/ditblock_natten_output.pth",
     )
 
 
@@ -377,7 +376,7 @@ def test_ditblock_forward_accuracy_transformer_engine(device, pytestconfig):
     assert common.validate_forward_accuracy(
         model,
         (x, c),
-        file_name="ditblock_te_output.pth",
+        file_name="models/dit/data/ditblock_te_output.pth",
     )
 
 
