@@ -39,8 +39,8 @@ try:
 except ImportError:
     PV_AVAILABLE = False
 
-from physicsnemo.distributed import ShardTensor, ShardTensorSpec
 from physicsnemo.distributed.utils import compute_split_shapes
+from physicsnemo.domain_parallel import ShardTensor, ShardTensorSpec
 
 # Abstractions:
 # - want to read npy/npz/.zarr/.stl/.vtp files

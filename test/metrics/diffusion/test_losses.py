@@ -29,7 +29,7 @@ from physicsnemo.metrics.diffusion import (
     VPLoss,
 )
 from physicsnemo.models.diffusion import EDMPrecondSuperResolution, UNet
-from physicsnemo.utils.patching import RandomPatching2D
+from physicsnemo.models.diffusion.patching import RandomPatching2D
 
 # VPLoss tests
 

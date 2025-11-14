@@ -16,10 +16,11 @@
 
 
 import pytest
-from pytest_utils import import_or_fail
+
+from test.conftest import requires_module
 
 
-@import_or_fail("h5py")
+@requires_module("h5py")
 @pytest.mark.parametrize("device", ["cuda", "cpu"])
 def test_dataloader_setup(device, pytestconfig):
     from physicsnemo.datapipes.climate import (
@@ -43,7 +44,7 @@ def test_dataloader_setup(device, pytestconfig):
     assert isinstance(dataloader.dataset, SyntheticWeatherDataset)
 
 
-@import_or_fail("h5py")
+@requires_module("h5py")
 @pytest.mark.parametrize("device", ["cuda", "cpu"])
 def test_dataloader_iteration(device, pytestconfig):
     """Test the iteration over batches in the DataLoader."""
@@ -74,7 +75,7 @@ def test_dataloader_iteration(device, pytestconfig):
         break  # Only test one batch for quick testing
 
 
-@import_or_fail("h5py")
+@requires_module("h5py")
 @pytest.mark.parametrize("device", ["cuda", "cpu"])
 def test_dataloader_length(device, pytestconfig):
     """Test the length of the DataLoader to ensure it is correct based on the dataset and batch size."""

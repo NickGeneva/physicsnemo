@@ -17,7 +17,8 @@
 import numpy as np
 import pytest
 import torch
-from pytest_utils import import_or_fail
+
+from test.conftest import requires_module
 
 from . import common
 
@@ -27,7 +28,7 @@ def data_dir(nfs_data_dir):
     return nfs_data_dir.joinpath("datasets/vortex_shedding/cylinder_flow")
 
 
-@import_or_fail(["tensorflow"])
+@requires_module(["tensorflow"])
 @pytest.mark.parametrize(
     "split, num_nodes, num_edges",
     [("train", 1876, 10788), ("valid", 1896, 10908), ("test", 1923, 11070)],
@@ -62,7 +63,7 @@ def test_vortex_shedding_constructor(
         assert x0.mesh_pos.shape == (num_nodes, 2)
 
 
-@import_or_fail(["tensorflow", "dgl", "torch_geometric", "torch_scatter"])
+@requires_module(["tensorflow", "dgl", "torch_geometric", "torch_scatter"])
 @pytest.mark.parametrize("split", ["train", "valid", "test"])
 def test_vortex_shedding_dgl_pyg_equivalence(data_dir, split, pytestconfig):
     """Test that PyG and DGL versions of VortexSheddingDataset produce equivalent outputs."""

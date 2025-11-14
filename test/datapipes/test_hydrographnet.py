@@ -24,8 +24,9 @@ from pathlib import Path
 import numpy as np
 import pytest
 import torch
-from pytest_utils import import_or_fail
 from torch.testing import assert_close
+
+from test.conftest import requires_module
 
 from . import common
 
@@ -44,7 +45,7 @@ def hydrograph_data_dir(nfs_data_dir, tmp_path_factory):
     return Path(dst)
 
 
-@import_or_fail(["torch_geometric", "torch_scatter", "scipy", "tqdm"])
+@requires_module(["torch_geometric", "torch_scatter", "scipy", "tqdm"])
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_hydrograph_constructor(hydrograph_data_dir, device, pytestconfig):
     """Constructor & basic iteration checks."""
@@ -96,7 +97,7 @@ def test_hydrograph_constructor(hydrograph_data_dir, device, pytestconfig):
     assert g_test.num_nodes > 0
 
 
-@import_or_fail(["torch_geometric", "torch_scatter", "scipy", "tqdm", "dgl"])
+@requires_module(["torch_geometric", "torch_scatter", "scipy", "tqdm", "dgl"])
 @pytest.mark.parametrize("split", ["train", "test"])
 def test_hydrographnet_dgl_pyg_equivalence(hydrograph_data_dir, split, pytestconfig):
     """Test that PyG and DGL versions of HydroGraphDataset produce equivalent outputs."""

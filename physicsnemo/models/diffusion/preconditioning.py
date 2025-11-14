@@ -27,9 +27,9 @@ from typing import Any, List, Literal, Tuple, Union
 import numpy as np
 import torch
 
+from physicsnemo.core.meta import ModelMetaData
+from physicsnemo.core.module import Module
 from physicsnemo.models.diffusion.utils import _wrapped_property
-from physicsnemo.models.meta import ModelMetaData
-from physicsnemo.models.module import Module
 
 network_module = importlib.import_module("physicsnemo.models.diffusion")
 

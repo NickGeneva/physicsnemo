@@ -9,7 +9,7 @@ containers=
     physicsnemo
 layers = 
     experimental
-    diffusion | active_learning
+    active_learning
     models  : registry : datapipes : metrics : domain_parallel
     nn
     utils
@@ -62,14 +62,6 @@ layers =
     activations | attention_layers | ball_query | conv_layers  | drop | fft  | fused_silu | interpolation | kan_layers  | resample_layers | sdf | siren_layers | spectral_layers | transformer_decoder  | weight_fact | weight_norm
     neighbors 
     utils
-
-[importlinter:contract:physicsnemo-diffusion]
-name = Control Dependencies in PhysicsNeMo diffusion
-type = layers
-containers=
-    physicsnemo.diffusion
-layers = 
-    patching
 
 [importlinter:contract:physicsnemo-models]
 name = Prevent Imports between physicsnemo models

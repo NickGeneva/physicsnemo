@@ -18,17 +18,21 @@ from functools import partial
 
 import pytest
 import torch
-from pytest_utils import import_or_fail
+
+from test.conftest import requires_module
 
 
-@import_or_fail("cftime")
+@requires_module("cftime")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_diffusion_step(device, pytestconfig):
     from physicsnemo.experimental.models.diffusion.preconditioning import (
         tEDMPrecondSuperRes,
     )
-    from physicsnemo.utils.corrdiff import diffusion_step
-    from physicsnemo.utils.diffusion import deterministic_sampler, stochastic_sampler
+    from physicsnemo.models.diffusion.corrdiff_utils import diffusion_step
+    from physicsnemo.models.diffusion.sampling import (
+        deterministic_sampler,
+        stochastic_sampler,
+    )
 
     torch._dynamo.reset()
 

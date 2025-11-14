@@ -22,7 +22,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch import Tensor
 
-import physicsnemo  # noqa: F401 for docs
+# import physicsnemo  # noqa: F401 for docs
 import physicsnemo.nn as layers
 from physicsnemo.core.meta import ModelMetaData
 from physicsnemo.core.module import Module

@@ -22,11 +22,7 @@ import pytest
 import torch
 
 import physicsnemo
-
-script_path: str = os.path.abspath(__file__)
-sys.path.append(os.path.join(os.path.dirname(script_path), ".."))
-
-import common  # noqa: E402
+from test import common  # noqa: E402
 
 
 def _create_diffusion_fwi_net(arch_type: str = "fwi_small", **kwargs):
@@ -200,7 +196,7 @@ def test_diffusion_fwi_net_non_regression_from_checkpoint(device, arch_type):
         / Path(f"checkpoint_diffusion_fwi_net_{run_id}-v1.2.0.mdlus")
     )
 
-    model: physicsnemo.Module = physicsnemo.Module.from_checkpoint(
+    model: physicsnemo.core.Module = physicsnemo.core.Module.from_checkpoint(
         file_name=file_name,
     ).to(device)
 

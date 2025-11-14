@@ -14,12 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pytest_utils import import_or_fail
+from test.conftest import requires_module
 
 
-@import_or_fail("cftime")
+@requires_module("cftime")
 def test_parse_int_list(pytestconfig):
-    from physicsnemo.utils.diffusion import parse_int_list
+    from physicsnemo.models.diffusion.training_utils import parse_int_list
 
     # Test parsing a simple comma-separated list
     input_str = "1,2,5,7,10"
