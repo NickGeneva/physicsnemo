@@ -133,9 +133,7 @@ def test_attention_non_regression(arch_type, device, use_apex_gn, fused_conv_bia
 
     # Load reference data
     file_name: str = str(
-        Path(__file__).parents[1].resolve()
-        / Path("data")
-        / Path(f"output_diffusion_{arch_type}.pth")
+        Path(__file__).parent / Path(f"data/output_diffusion_{arch_type}.pth")
     )
     loaded_data: Dict[str, torch.Tensor] = torch.load(file_name)
     x, out_ref = loaded_data["x"].to(device), loaded_data["out"].to(device)
@@ -175,9 +173,7 @@ def test_attention_non_regression_from_checkpoint(
     """
 
     file_name: str = str(
-        Path(__file__).parents[1].resolve()
-        / Path("data")
-        / Path(f"checkpoint_diffusion_{arch_type}.mdlus")
+        Path(__file__).parent / Path(f"data/checkpoint_diffusion_{arch_type}.mdlus")
     )
 
     model: physicsnemo.core.Module = physicsnemo.core.Module.from_checkpoint(
@@ -196,9 +192,7 @@ def test_attention_non_regression_from_checkpoint(
 
     # Load reference data
     file_name: str = str(
-        Path(__file__).parents[1].resolve()
-        / Path("data")
-        / Path(f"output_diffusion_{arch_type}.pth")
+        Path(__file__).parent / Path(f"data/output_diffusion_{arch_type}.pth")
     )
     loaded_data: Dict[str, torch.Tensor] = torch.load(file_name)
     x, out_ref = loaded_data["x"].to(device), loaded_data["out"].to(device)

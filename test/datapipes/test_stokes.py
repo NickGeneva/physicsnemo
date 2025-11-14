@@ -17,7 +17,8 @@
 import numpy as np
 import pytest
 import torch
-from pytest_utils import import_or_fail
+
+from test.conftest import requires_module
 
 from . import common
 
@@ -29,7 +30,7 @@ def data_dir(nfs_data_dir):
     return nfs_data_dir.joinpath("datasets/stokes")
 
 
-@import_or_fail(["vtk", "pyvista", "dgl"])
+@requires_module(["vtk", "pyvista", "dgl"])
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_stokes_constructor(data_dir, device, pytestconfig):
     from physicsnemo.datapipes.gnn.stokes_dataset import StokesDataset
@@ -74,7 +75,7 @@ def test_stokes_constructor(data_dir, device, pytestconfig):
         pass
 
 
-@import_or_fail(["vtk", "pyvista", "dgl", "torch_geometric", "torch_scatter"])
+@requires_module(["vtk", "pyvista", "dgl", "torch_geometric", "torch_scatter"])
 @pytest.mark.parametrize("split", ["train"])
 def test_stokes_dgl_pyg_equivalence(data_dir, split, pytestconfig):
     """Test that PyG and DGL versions of StokesDataset produce equivalent outputs."""

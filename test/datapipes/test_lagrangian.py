@@ -17,7 +17,8 @@
 import numpy as np
 import pytest
 import torch
-from pytest_utils import import_or_fail
+
+from test.conftest import requires_module
 
 from . import common
 
@@ -32,7 +33,7 @@ def data_dir(nfs_data_dir):
     return nfs_data_dir.joinpath("datasets/water")
 
 
-@import_or_fail(["tensorflow", "torch_geometric", "torch_scatter"])
+@requires_module(["tensorflow", "torch_geometric", "torch_scatter"])
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_lagrangian_dataset_constructor(data_dir, device, pytestconfig):
     from torch_geometric.data import Data as PyGData
@@ -59,7 +60,7 @@ def test_lagrangian_dataset_constructor(data_dir, device, pytestconfig):
     assert graph.y.shape[-1] > 0  # node targets
 
 
-@import_or_fail(["tensorflow", "dgl"])
+@requires_module(["tensorflow", "dgl"])
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_lagrangian_dataset_constructor_dgl(data_dir, device, pytestconfig):
     from physicsnemo.datapipes.gnn.lagrangian_dataset_dgl import LagrangianDataset
@@ -89,7 +90,7 @@ def test_lagrangian_dataset_constructor_dgl(data_dir, device, pytestconfig):
     assert graph.ndata["y"].shape[-1] > 0  # node targets
 
 
-@import_or_fail(["tensorflow", "torch_geometric", "torch_scatter"])
+@requires_module(["tensorflow", "torch_geometric", "torch_scatter"])
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_graph_construction(device, pytestconfig):
     from physicsnemo.datapipes.gnn.lagrangian_dataset import compute_edge_index
@@ -105,7 +106,7 @@ def test_graph_construction(device, pytestconfig):
     assert not any((edge_index[0] == 0) & (edge_index[1] == 2))
 
 
-@import_or_fail(["tensorflow", "dgl", "torch_geometric", "torch_scatter"])
+@requires_module(["tensorflow", "dgl", "torch_geometric", "torch_scatter"])
 @pytest.mark.parametrize("split", ["train", "valid", "test"])
 def test_lagrangian_dgl_pyg_equivalence(data_dir, split, pytestconfig):
     """Test that PyG and DGL versions of LagrangianDataset produce equivalent outputs."""

@@ -144,7 +144,7 @@ def test_group_norm_non_regression(device, arch_type, use_apex_gn):
 
     assert common.validate_accuracy(
         out,
-        file_name=f"data/output_diffusion_{arch_type}-v1.0.1.pth",
+        file_name=f"models/diffusion/data/output_diffusion_{arch_type}-v1.0.1.pth",
     )
 
 
@@ -174,7 +174,10 @@ def test_group_norm_non_regression_from_checkpoint(
     use Apex-based group norm when loading the checkpoint.
     """
 
-    file_name: str = str(Path(f"data/checkpoint_diffusion_{arch_type}-v1.0.1.mdlus"))
+    script_dir = Path(__file__).parent
+    file_name: str = str(
+        script_dir / Path(f"data/checkpoint_diffusion_{arch_type}-v1.0.1.mdlus")
+    )
 
     model: physicsnemo.core.Module = physicsnemo.core.Module.from_checkpoint(
         file_name=file_name,

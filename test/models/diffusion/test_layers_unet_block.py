@@ -173,7 +173,10 @@ def test_unet_block_non_regression(arch_type, device, use_apex_gn, fused_conv_bi
         assert model.unet_block.skip_scale == 0.5
 
     # Load reference data
-    file_name: str = str(Path(f"data/output_diffusion_{arch_type}-v1.0.1.pth"))
+    script_dir = Path(__file__).parent
+    file_name: str = str(
+        script_dir / Path(f"data/output_diffusion_{arch_type}-v1.0.1.pth")
+    )
     loaded_data: Dict[str, torch.Tensor] = torch.load(file_name)
     x, emb = loaded_data["x"].to(device), loaded_data["emb"].to(device)
     out_ref = loaded_data["out"].to(device)
@@ -215,8 +218,10 @@ def test_unet_block_non_regression_from_checkpoint(
     and ``fused_conv_bias`` when loading the checkpoint.
     """
 
-    file_name: str = str(Path(f"./data/checkpoint_diffusion_{arch_type}-v1.0.1.mdlus"))
-
+    script_dir = Path(__file__).parent
+    file_name: str = str(
+        script_dir / Path(f"data/checkpoint_diffusion_{arch_type}-v1.0.1.mdlus")
+    )
     model: physicsnemo.core.Module = physicsnemo.core.Module.from_checkpoint(
         file_name=file_name,
         override_args={
@@ -252,7 +257,9 @@ def test_unet_block_non_regression_from_checkpoint(
         assert model.unet_block.skip_scale == 0.5
 
     # Load reference data
-    file_name: str = str(Path(f"data/output_diffusion_{arch_type}-v1.0.1.pth"))
+    file_name: str = str(
+        script_dir / Path(f"data/output_diffusion_{arch_type}-v1.0.1.pth")
+    )
     loaded_data: Dict[str, torch.Tensor] = torch.load(file_name)
     x, emb = loaded_data["x"].to(device), loaded_data["emb"].to(device)
     out_ref = loaded_data["out"].to(device)

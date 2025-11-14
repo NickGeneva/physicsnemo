@@ -18,14 +18,15 @@ from typing import Tuple
 
 import pytest
 import torch
-from pytest_utils import import_or_fail
+
+from test.conftest import requires_module
 
 from . import common
 
 Tensor = torch.Tensor
 
 
-@import_or_fail("warp")
+@requires_module("warp")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_kelvin_helmholtz_2d_constructor(device, pytestconfig):
     from physicsnemo.datapipes.benchmarks.kelvin_helmholtz import KelvinHelmholtz2D
@@ -48,7 +49,7 @@ def test_kelvin_helmholtz_2d_constructor(device, pytestconfig):
     assert common.check_datapipe_iterable(datapipe)
 
 
-@import_or_fail("warp")
+@requires_module("warp")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_kelvin_helmholtz_2d_device(device, pytestconfig):
     from physicsnemo.datapipes.benchmarks.kelvin_helmholtz import KelvinHelmholtz2D
@@ -75,7 +76,7 @@ def test_kelvin_helmholtz_2d_device(device, pytestconfig):
         break
 
 
-@import_or_fail("warp")
+@requires_module("warp")
 @pytest.mark.parametrize("resolution", [32, 64])
 @pytest.mark.parametrize("batch_size", [1, 2, 3])
 @pytest.mark.parametrize("seq_length", [2, 3])
@@ -120,7 +121,7 @@ def test_kelvin_helmholtz_2d_shape(
         break
 
 
-@import_or_fail("warp")
+@requires_module("warp")
 @pytest.mark.parametrize("device", ["cuda:0"])
 def test_kelvin_helmholtz_cudagraphs(device, pytestconfig):
     from physicsnemo.datapipes.benchmarks.kelvin_helmholtz import KelvinHelmholtz2D
