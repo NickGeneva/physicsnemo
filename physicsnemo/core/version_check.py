@@ -18,96 +18,96 @@
 """
 Utilities for version compatibility checking.
 
-Specifically in use to prevent some newer physicsnemo modules from being used with
-and older version of pytorch.
-
+This is used to provide a uniform and consistent way to check for missing
+packages, when not all packages are required for the base physicsnemo
+install.  Additionally, for some packages (it's not mandatory to do this),
+we have a registry of packages -> install tip that is used
+to provide a helpful error message.
 """
 
-import importlib
+import functools
+from importlib import metadata
 from typing import Optional
 
-from packaging import version
+from packaging.specifiers import SpecifierSet
+from packaging.version import Version
 
-# Dictionary mapping module paths to their version requirements
-# This can be expanded as needed for different modules
-VERSION_REQUIREMENTS = {
-    "physicsnemo.distributed.shard_tensor": {"torch": "2.5.9"},
-    "device_mesh": {"torch": "2.4.0"},
+install_cmds = {
+    "cupy": "pip install cupy-cuda13",
+    "cuml": "pip install cuml-cu13",
+    "scipy": "pip install scipy",
+}
+
+extra_info = {
+    "cupy": "For more details about installing cupy, see https://docs.cupy.dev/en/stable/install.html/.",
+    "cuml": "For more details about installing cuml, see https://docs.rapids.ai/install/.",
+    "scipy": "For more details about installing scipy, see https://www.scipy.org/install/.",
 }
 
 
-def check_min_version(
-    package_name: str,
-    min_version: str,
+@functools.lru_cache(maxsize=None)
+def get_installed_version(distribution_name: str) -> Optional[str]:
+    """
+    Return the installed version for a given distribution without importing it.
+    Uses importlib.metadata to avoid heavy import-time side effects.
+    Cached for repeated lookups.
+    """
+    try:
+        return metadata.version(distribution_name)
+    except metadata.PackageNotFoundError:
+        return None
+
+
+def check_version_spec(
+    distribution_name: str,
+    spec: str,
+    *,
     error_msg: Optional[str] = None,
     hard_fail: bool = True,
 ) -> bool:
     """
-    Check if an installed package meets the minimum version requirement.
+    Check whether the installed distribution satisfies a PEP 440 version specifier.
 
     Args:
-        package_name: Name of the package to check
-        min_version: Minimum required version string (e.g. '2.6.0')
+        distribution_name: Distribution (package) name as installed by pip
+        spec: PEP 440 version specifier (e.g., '>=2.4,<2.6')
         error_msg: Optional custom error message
         hard_fail: Whether to raise an ImportError if the version requirement is not met
     Returns:
-        True if version requirement is met
+        True if version requirement is met; False if not and hard_fail=False
 
     Raises:
-        ImportError: If package is not installed or version is too low
+        ImportError: If package is not installed or requirement not satisfied (and hard_fail=True)
     """
-    try:
-        package = importlib.import_module(package_name)
-        package_version = getattr(package, "__version__", "0.0.0")
-    except ImportError:
+    installed = get_installed_version(distribution_name)
+    if installed is None:
         if hard_fail:
-            raise ImportError(f"Package {package_name} is required but not installed.")
+            raise ImportError(
+                f"Package '{distribution_name}' is required but not installed."
+            )
         else:
             return False
 
-    if version.parse(package_version) < version.parse(min_version):
+    ok = Version(installed) in SpecifierSet(spec)
+    if not ok:
         msg = (
             error_msg
-            or f"{package_name} version {min_version} or higher is required, but found {package_version}"
+            or f"{distribution_name} {spec} is required, but found {installed}"
         )
         if hard_fail:
             raise ImportError(msg)
-        else:
-            return False
+        return False
 
     return True
 
 
-def check_module_requirements(module_path: str, hard_fail: bool = True) -> bool:
+def require_version_spec(package_name: str, spec: str = ">=0.0.0"):
     """
-    Check all version requirements for a specific module.
-
-    Args:
-        module_path: The import path of the module to check requirements for
-
-    Raises:
-        ImportError: If any requirement is not met
-    """
-    if module_path not in VERSION_REQUIREMENTS:
-        return
-
-    requirements_pass = True
-
-    for package, min_version in VERSION_REQUIREMENTS[module_path].items():
-        result = check_min_version(package, min_version, hard_fail=hard_fail)
-        requirements_pass = requirements_pass and result
-
-    return requirements_pass
-
-
-def require_version(package_name: str, min_version: str):
-    """
-    Decorator that prevents a function from being called unless the
-    specified package meets the minimum version requirement.
+    Decorator variant that accepts a full PEP 440 specifier instead of a single minimum version.
 
     Args:
         package_name: Name of the package to check
-        min_version: Minimum required version string (e.g. '2.3')
+        spec: PEP 440 version specifier (e.g., '>=2.4,<2.6')
 
     Returns:
         Decorator function that checks version requirement before execution
@@ -120,16 +120,52 @@ def require_version(package_name: str, min_version: str):
     """
 
     def decorator(func):
-        import functools
-
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
-            # Verify the package meets minimum version before executing
-            check_min_version(package_name, min_version)
-
-            # If we get here, version check passed
+            check_version_spec(package_name, spec, hard_fail=True)
             return func(*args, **kwargs)
 
         return wrapper
 
     return decorator
+
+
+def ensure_available(
+    distribution_name: str,
+    spec: str = ">=0.0.0",
+    *,
+    install_hint: Optional[str] = None,
+    extra_message: Optional[str] = None,
+    hard_fail: bool = True,
+) -> bool:
+    """
+    Ensure a distribution is installed and satisfies the given specifier.
+    If not satisfied:
+      - When hard_fail=True, raises ImportError with an actionable message
+      - When hard_fail=False, returns False
+
+    Args:
+        distribution_name: Distribution (package) name as installed by pip
+        spec: PEP 440 specifier (e.g., '>=24.0.0', '>=2.4,<2.6')
+        install_hint: Optional string suggesting how to install (e.g., "pip install cupy-cuda12x")
+        extra_message: Optional extra context to append to the error
+        hard_fail: Whether to raise on failure
+    """
+    try:
+        return check_version_spec(distribution_name, spec, hard_fail=True)
+    except ImportError as e:
+        if not hard_fail:
+            return False
+        msg_parts = [str(e)]
+        # If not provided, and we have a hint above, use it:
+        if install_hint is None and distribution_name in install_cmds:
+            install_hint = install_cmds[distribution_name]
+        # If not provided, and we have extra info above, use it:
+        if extra_message is None and distribution_name in extra_message:
+            extra_message = extra_info[distribution_name]
+
+        if install_hint:
+            msg_parts.append(f"Install hint: {install_hint}")
+        if extra_message:
+            msg_parts.append(extra_message)
+        raise ImportError(" | ".join(msg_parts))

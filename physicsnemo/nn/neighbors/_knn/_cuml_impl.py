@@ -14,15 +14,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
+import importlib
+
 import torch
 
 from physicsnemo.core.version_check import check_min_version
 
 CUML_AVAILABLE = check_min_version("cuml", "24.0.0", hard_fail=False)
+CUPY_AVAILABLE = check_min_version("cupy", "13.0.0", hard_fail=False)
 
-if CUML_AVAILABLE:
-    import cuml
-    import cupy as cp
+if CUML_AVAILABLE and CUPY_AVAILABLE:
+    cuml = importlib.import_module("cuml")
+    cp = importlib.import_module("cupy")
 
     @torch.library.custom_op("physicsnemo::knn_cuml", mutates_args=())
     def knn_impl(
