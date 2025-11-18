@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import importlib
+
 import torch
 
 from physicsnemo.core.version_check import check_min_version
@@ -21,7 +23,7 @@ from physicsnemo.core.version_check import check_min_version
 SCIPY_AVAILABLE = check_min_version("scipy", "1.7.0", hard_fail=False)
 
 if SCIPY_AVAILABLE:
-    from scipy.spatial import KDTree
+    KDTree = importlib.import_module("scipy.spatial").KDTree
 
     @torch.library.custom_op("physicsnemo::knn_scipy", mutates_args=())
     def knn_impl(

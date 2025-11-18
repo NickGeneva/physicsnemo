@@ -28,12 +28,13 @@ from .base import RegisterableModule
 ENTRY_POINT_CLASSES = [
     EntryPoint,
 ]
-try:
-    from importlib_metadata import EntryPoint as EntryPointOld  # noqa: E402
+# This is now deprecated, since EntryPoint is python 3.10 or higher.
+# try:
+#     from importlib_metadata import EntryPoint as EntryPointOld  # noqa: E402
 
-    ENTRY_POINT_CLASSES.append(EntryPointOld)
-except ImportError:
-    pass
+#     ENTRY_POINT_CLASSES.append(EntryPointOld)
+# except ImportError:
+#     pass
 
 
 # This model registry follows conventions similar to fsspec,
