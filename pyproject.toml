@@ -1,18 +1,26 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [tool.uv]
 no-build-isolation-package = ["torch_scatter"]
 managed = true
 default-groups = ["physicsnemo"]
 
-#[tool.hatch.version]
+[tool.hatch.version]
 path = "physicsnemo/__init__.py"
 
-[tool.hatch.build]
-include = [
-    "physicsnemo",
-    "physicsnemo/*",
-    "LICENSE"
+[tool.hatch.build.targets.wheel]
+packages = ["physicsnemo"]
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+    "/.github",
+    "/docs",
+    "/examples",
+    "/test",
+    "/CODING_STANDARDS",
 ]
-exclude = ["tests", "examples"]
 
 
 # The dependency-group tree is critically important for physicsnemo.
