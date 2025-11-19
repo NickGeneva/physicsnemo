@@ -3,6 +3,25 @@ no-build-isolation-package = ["torch_scatter"]
 managed = true
 default-groups = ["physicsnemo"]
 
+########################################
+# Build configuration via hatchling
+########################################
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "physicsnemo/__init__.py"
+
+[tool.hatch.build]
+include = [
+    "physicsnemo",
+    "physicsnemo/*",
+    "LICENSE"
+]
+exclude = ["tests", "examples"]
+
+
 # The dependency-group tree is critically important for physicsnemo.
 # Here, we list dependencies for each physicsnemo pacakge.  Optional
 # dependencies are listed with the name `package`-extras.  Dependencies
@@ -27,9 +46,12 @@ core = [
     "tqdm>=4.60.0",
     "requests",
     "GitPython",
+    "s3fs",
+    "packaging",
 ]
 # no core-extras
 distributed = [
+    "treelib",
     "numpy>=1.22.4",
     {include-group = "core"}
 ]
@@ -37,6 +59,7 @@ distributed = [
 utils = [
     "termcolor",
     "onnx",
+    "warp-lang",
     "pandas",
     "nvtx",
     {include-group = "distributed"},
@@ -50,13 +73,34 @@ utils-extras = [
 ]
 nn = [
     "einops",
-    "warp-lang",
+    "timm",
+    "nvfuser",
+    "transformer_engine",
+    "torch_geometric",
+    "torch_scatter",
+    "typing_extensions",
+    "pylibcugraphops",
     {include-group= "utils"}
 ]
 nn-extras = [
     "cuml",
     "scipy",
     "cupy",
+]
+models = [
+    "hydra-core",
+    "omegaconf",
+    "xarray",
+    "torch_cluster",
+    "netCDF4",
+    "vtk",
+    "jaxtyping",
+    "cftime",
+    "earth2grid",
+    "torch_sparse",
+    "pyvista",
+    "ipdb",
+    {include-group="nn"}
 ]
 physicsnemo = [
     {include-group = "nn"},
@@ -114,3 +158,21 @@ exclude = ["docs", "physicsnemo/experimental"]
 
 # Ignore `S101` (assertions) in all `test` files.
 "test/*.py" = ["S101"]
+
+
+
+[project.entry-points."physicsnemo.models"]
+AFNO = "physicsnemo.models.afno:AFNO"
+DLWP = "physicsnemo.models.dlwp:DLWP"
+FNO = "physicsnemo.models.fno:FNO"
+GraphCastNet = "physicsnemo.models.graphcast:GraphCastNet"
+MeshGraphNet = "physicsnemo.models.meshgraphnet:MeshGraphNet"
+FullyConnected = "physicsnemo.models.mlp:FullyConnected"
+Pix2Pix = "physicsnemo.models.pix2pix:Pix2Pix"
+One2ManyRNN = "physicsnemo.models.rnn:One2ManyRNN"
+SRResNet = "physicsnemo.models.srrn:SRResNet"
+Pangu = "physicsnemo.models.pangu:Pangu"
+Fengwu = "physicsnemo.models.fengwu:Fengwu"
+SwinRNN = "physicsnemo.models.swinvrnn:SwinRNN"
+EDMPrecondSR = "physicsnemo.models.diffusion:EDMPrecondSR"
+UNet = "physicsnemo.models.diffusion:UNet"

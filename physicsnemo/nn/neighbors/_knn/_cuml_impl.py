@@ -19,10 +19,10 @@ import importlib
 
 import torch
 
-from physicsnemo.core.version_check import check_min_version
+from physicsnemo.core.version_check import check_version_spec
 
-CUML_AVAILABLE = check_min_version("cuml", "24.0.0", hard_fail=False)
-CUPY_AVAILABLE = check_min_version("cupy", "13.0.0", hard_fail=False)
+CUML_AVAILABLE = check_version_spec("cuml", "24.0.0", hard_fail=False)
+CUPY_AVAILABLE = check_version_spec("cupy", "13.0.0", hard_fail=False)
 
 if CUML_AVAILABLE and CUPY_AVAILABLE:
     cuml = importlib.import_module("cuml")
@@ -95,5 +95,5 @@ else:
         """
 
         raise ImportError(
-            "cuml is not installed, can not be used as a backend for a knn search"
+            "cuml or cupy is not installed, can not be used as a backend for a knn search"
         )

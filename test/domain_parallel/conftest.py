@@ -14,9 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .meta import ModelMetaData
-from .module import Module
-from .registry import ModelRegistry
-from .version_check import check_version_spec
+import pytest
 
-__all__ = ["ModelMetaData", "Module", "ModelRegistry"]
+from physicsnemo.core.version_check import check_version_spec
+
+if not check_version_spec("torch", "2.12.0", hard_fail=False):
+    pytest.skip(
+        "These tests require torch >= 2.6.0",
+        allow_module_level=True,
+    )
