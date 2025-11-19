@@ -170,7 +170,7 @@ def ensure_available(
         if install_hint is None and distribution_name in install_cmds:
             install_hint = install_cmds[distribution_name]
         # If not provided, and we have extra info above, use it:
-        if extra_message is None and distribution_name in extra_message:
+        if extra_message is None and distribution_name in extra_info:
             extra_message = extra_info[distribution_name]
 
         if install_hint:
