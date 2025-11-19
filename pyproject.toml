@@ -3,12 +3,74 @@ no-build-isolation-package = ["torch_scatter"]
 managed = true
 default-groups = ["physicsnemo"]
 
-########################################
-# Build configuration via hatchling
-########################################
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+# The dependency-group tree is critically important for physicsnemo.
+# Here, we list dependencies for each physicsnemo pacakge.  Optional
+# dependencies are listed with the name `package`-extras.  Dependencies
+# are chained together: for example, everything in core is a dep of the
+# entire repo, but utils-extra only shows up for subsequent *-extra
+# lists.
+# 
+# We do this to ensure a consistent install path for targeted levels of the
+# repository.  If you just want the distributed manager, for example, you can
+# target `distributed` instead of `physicsnemo` and you're up and running.
+# 
+# These lists are the SINGLE SOURCE OF TRUTH.  Models are also included
+# below, to make single-model installation easier.
+# 
+# In general, we do not draw a finer line than "required" and "extra".
+# So, physicsnemo.nn's requirements do not include scipy and cuml, but the
+# "extra" version includes BOTH. 
+
+[dependency-groups]
+core = [
+    "torch>=2.4.0",
+    "tqdm>=4.60.0",
+    "requests",
+    "GitPython",
+]
+# no core-extras
+distributed = [
+    "numpy>=1.22.4",
+    {include-group = "core"}
+]
+# no distributed-extras
+utils = [
+    "termcolor",
+    "onnx",
+    "pandas",
+    "nvtx",
+    {include-group = "distributed"},
+]
+utils-extras = [
+    "wandb",
+    "mlflow",
+    "line_profiler",
+    "vtx",
+    "warp-lang",
+]
+nn = [
+    "einops",
+    "warp-lang",
+    {include-group= "utils"}
+]
+nn-extras = [
+    "cuml",
+    "scipy",
+    "cupy",
+]
+physicsnemo = [
+    {include-group = "nn"},
+    {include-group = "utils"},
+]
+physicsnemo-extras = [
+    {include-group = "physicsnemo"},
+    {include-group = "nn-extras"},
+    {include-group = "utils-extras"},
+]
+dev = [
+    "pytest",
+    "import-linter"
+]
 
 [tool.hatch.version]
 path = "physicsnemo/__init__.py"

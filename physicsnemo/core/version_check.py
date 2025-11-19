@@ -79,7 +79,7 @@ def check_version_spec(
 
     Args:
         distribution_name: Distribution (package) name as installed by pip
-        spec: version specifier (e.g., '>=2.4,<2.6') (Not PEP 440 to allow dev versions, etc.)
+        spec: version specifier (e.g., '2.4') (Not PEP 440 to allow dev versions, etc.)
         error_msg: Optional custom error message
         hard_fail: Whether to raise an ImportError if the version requirement is not met
     Returns:
@@ -116,7 +116,7 @@ def require_version_spec(package_name: str, spec: str = ">=0.0.0"):
 
     Args:
         package_name: Name of the package to check
-        spec: version specifier (e.g., '>=2.4,<2.6') (Not PEP 440 to allow dev versions, etc.)
+        spec: version specifier (e.g., '2.4') (Not PEP 440 to allow dev versions, etc.)
 
     Returns:
         Decorator function that checks version requirement before execution
