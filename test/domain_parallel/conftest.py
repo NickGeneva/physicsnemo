@@ -18,7 +18,7 @@ import pytest
 
 from physicsnemo.core.version_check import check_version_spec
 
-if not check_version_spec("torch", "2.12.0", hard_fail=False):
+if not check_version_spec("torch", "2.6.0", hard_fail=False):
     pytest.skip(
         "These tests require torch >= 2.6.0",
         allow_module_level=True,
