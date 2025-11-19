@@ -29,8 +29,7 @@ import functools
 from importlib import metadata
 from typing import Optional
 
-from packaging.specifiers import SpecifierSet
-from packaging.version import Version
+from packaging.version import parse
 
 install_cmds = {
     "cupy": "pip install cupy-cuda13",
@@ -52,15 +51,25 @@ def get_installed_version(distribution_name: str) -> Optional[str]:
     Uses importlib.metadata to avoid heavy import-time side effects.
     Cached for repeated lookups.
     """
+
+    # First, try exact match:
     try:
         return metadata.version(distribution_name)
     except metadata.PackageNotFoundError:
-        return None
+        pass
+
+    # Some packages have only partial matches, like `cupy`
+    for dist in metadata.distributions():
+        name = dist.metadata["Name"].lower()
+        if name.startswith(distribution_name):
+            return dist.version
+
+    return None
 
 
 def check_version_spec(
     distribution_name: str,
-    spec: str,
+    spec: str = "0.0.0",
     *,
     error_msg: Optional[str] = None,
     hard_fail: bool = True,
@@ -70,7 +79,7 @@ def check_version_spec(
 
     Args:
         distribution_name: Distribution (package) name as installed by pip
-        spec: PEP 440 version specifier (e.g., '>=2.4,<2.6')
+        spec: version specifier (e.g., '2.4') (Not PEP 440 to allow dev versions, etc.)
         error_msg: Optional custom error message
         hard_fail: Whether to raise an ImportError if the version requirement is not met
     Returns:
@@ -88,7 +97,7 @@ def check_version_spec(
         else:
             return False
 
-    ok = Version(installed) in SpecifierSet(spec)
+    ok = parse(installed) >= parse(spec)
     if not ok:
         msg = (
             error_msg
@@ -103,11 +112,11 @@ def check_version_spec(
 
 def require_version_spec(package_name: str, spec: str = ">=0.0.0"):
     """
-    Decorator variant that accepts a full PEP 440 specifier instead of a single minimum version.
+    Decorator variant that accepts a full version specifier instead of a single minimum version.
 
     Args:
         package_name: Name of the package to check
-        spec: PEP 440 version specifier (e.g., '>=2.4,<2.6')
+        spec: version specifier (e.g., '2.4') (Not PEP 440 to allow dev versions, etc.)
 
     Returns:
         Decorator function that checks version requirement before execution
@@ -161,7 +170,7 @@ def ensure_available(
         if install_hint is None and distribution_name in install_cmds:
             install_hint = install_cmds[distribution_name]
         # If not provided, and we have extra info above, use it:
-        if extra_message is None and distribution_name in extra_message:
+        if extra_message is None and distribution_name in extra_info:
             extra_message = extra_info[distribution_name]
 
         if install_hint:

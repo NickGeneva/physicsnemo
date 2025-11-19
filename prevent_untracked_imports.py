@@ -27,6 +27,13 @@ from packaging.requirements import Requirement
 
 Dependency = Union[str, Dict[str, str]]
 
+# For irregular mappings that we don't want to have cause errors:
+dep_to_import_name = {
+    "warp-lang": "warp",
+    "hydra-core": "hydra",
+    "GitPython": "git",
+}
+
 
 class ForbiddenImportContract(Contract):
     """
@@ -46,7 +53,7 @@ class ForbiddenImportContract(Contract):
             f"Getting import details from {self.container} vs uv group {self.dependency_group}...",
         )
 
-        upstream_modules = graph.find_upstream_modules(self.container)
+        upstream_modules = graph.find_upstream_modules(self.container, as_package=True)
 
         # Remove any models that start with "physicsnemo":
         upstream_modules = set(
@@ -127,6 +134,10 @@ def resolve_dependency_group_no_versions(
 
     # remove duplicates while preserving order
     resolved = _resolve(group_name)
+
+    # Convert dep tree names to what they import as:
+    resolved = [dep_to_import_name.get(d, d) for d in resolved]
+
     seen_ordered = set()
     return set([d for d in resolved if not (d in seen_ordered or seen_ordered.add(d))])
 

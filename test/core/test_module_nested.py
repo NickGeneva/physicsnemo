@@ -163,6 +163,10 @@ def test_save_load(device, override):
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"], ids=["gpu", "cpu"])
 @pytest.mark.parametrize("override", [True, False], ids=["override", "no_override"])
 def test_load_from_checkpoint(device, override):
+    # CJA - Had to add this, the model was still registered here ...
+    # I think its becauses the tests aren't completing, yet, so the clear
+    # never happens at the bottom.  Delete eventually.
+    registry.__clear_registry__()
     file_name: str = str(
         Path(__file__).parents[0].resolve()
         / Path("data")
