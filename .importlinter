@@ -65,6 +65,21 @@ layers =
    neighbors 
    utils
 
+[importlinter:contract:physicsnemo-nn-gnn-layers]
+name = Control Internal Dependencies in PhysicsNeMo nn GNN Layers
+type = layers
+containers=
+   physicsnemo.nn.gnn_layers
+layers = 
+   bsms
+   mesh_graph_decoder | mesh_graph_encoder
+   mesh_node_block | mesh_edge_block
+   mesh_graph_mlp 
+   utils  
+   graph
+   distributed_graph
+   graph_types
+
 [importlinter:contract:physicsnemo-models]
 name = Prevent Imports between physicsnemo models
 type = layers
@@ -92,12 +107,12 @@ name = Prevent Non-listed external imports in physicsnemo utils
 type = forbidden_import
 container = physicsnemo.utils
 dependency_group = utils
-# 
-# [importlinter:contract:physicsnemo-nn-external-imports]
-# name = Prevent Non-listed external imports in physicsnemo nn
-# type = forbidden_import
-# container = physicsnemo.nn
-# dependency_group = nn
+
+[importlinter:contract:physicsnemo-nn-external-imports]
+name = Prevent Non-listed external imports in physicsnemo nn
+type = forbidden_import
+container = physicsnemo.nn
+dependency_group = nn
 # 
 # [importlinter:contract:physicsnemo-models-external-imports]
 # name = Prevent Non-listed external imports in physicsnemo models
