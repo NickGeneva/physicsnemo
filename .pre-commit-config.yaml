@@ -54,9 +54,7 @@ repos:
     - id: check-added-large-files
       args: [--maxkb=5000]
 
-# This should be enabled once all dependencies are cleared.
-# For now, check status with `lint-imports`
-# -   repo: https://github.com/seddonym/import-linter
-#     rev: v2.5.2
-#     hooks:
-#     - id: import-linter
+-   repo: https://github.com/seddonym/import-linter
+    rev: v2.5.2
+    hooks:
+    - id: import-linter

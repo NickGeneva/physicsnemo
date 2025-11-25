@@ -28,8 +28,8 @@ from torch.utils.tensorboard import SummaryWriter
 
 import numpy as np
 
-from physicsnemo.launch.utils import load_checkpoint, save_checkpoint
-from physicsnemo.launch.logging import PythonLogger, RankZeroLoggingWrapper
+from physicsnemo.utils import load_checkpoint, save_checkpoint
+from physicsnemo.utils.logging import PythonLogger, RankZeroLoggingWrapper
 from physicsnemo.distributed import DistributedManager
 
 from physicsnemo.utils.profiling import profile, Profiler

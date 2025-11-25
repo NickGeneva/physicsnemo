@@ -21,7 +21,6 @@ import pytest
 
 from physicsnemo.core.version_check import (
     check_version_spec,
-    ensure_available,
     get_installed_version,
     require_version_spec,
 )
@@ -120,18 +119,3 @@ def test_require_version_spec_failure():
         with pytest.raises(ImportError) as excinfo:
             fn()
     assert "not satisfied" in str(excinfo.value)
-
-
-def test_ensure_available_success():
-    """ensure_available returns True when requirement passes"""
-    with patch("physicsnemo.core.version_check.check_version_spec", return_value=True):
-        assert ensure_available("torch", "2.0.0") is True
-
-
-def test_ensure_available_soft_failure():
-    """ensure_available returns False when requirement fails and hard_fail=False"""
-    with patch(
-        "physicsnemo.core.version_check.check_version_spec",
-        side_effect=ImportError("bad"),
-    ):
-        assert ensure_available("torch", "3.0.0", hard_fail=False) is False
