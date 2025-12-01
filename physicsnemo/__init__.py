@@ -36,4 +36,4 @@ from .core.meta import ModelMetaData  # noqa E402
 from .core.module import Module  # noqa E402
 
 
-__version__ = "1.3.0a0"
+__version__ = "1.4.0a0"
