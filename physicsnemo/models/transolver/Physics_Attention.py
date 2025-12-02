@@ -74,6 +74,30 @@ def gumbel_softmax(logits: torch.Tensor, tau: float = 1.0) -> torch.Tensor:
     return y
 
 
+def gumbel_softmax(logits: torch.Tensor, tau: float = 1.0) -> torch.Tensor:
+    """
+    Implementation of Gumblel Softmax from transolver++.
+
+    Original code: https://github.com/thuml/Transolver_plus/blob/main/models/Transolver_plus.py#L69
+
+    Args:
+        logits (torch.Tensor): The logits to apply Gumblel Softmax to.
+        tau (float): The temperature parameter for the Gumblel Softmax.
+
+    Returns:
+        torch.Tensor: The Gumblel Softmax of the logits.
+    """
+    u = torch.rand_like(logits)
+    gumbel_noise = -torch.log(-torch.log(u + 1e-8) + 1e-8)
+
+    y = logits + gumbel_noise
+    y = y / tau
+
+    y = torch.nn.functional.softmax(y, dim=-1)
+
+    return y
+
+
 class PhysicsAttentionBase(nn.Module, ABC):
     """
     Base class for all physics attention modules.
