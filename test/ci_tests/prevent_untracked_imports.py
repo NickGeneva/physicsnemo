@@ -94,6 +94,8 @@ class ForbiddenImportContract(Contract):
         output.print_error("Listing broken imports by external package...")
         output.new_line()
 
+        n_invalid_imports = 0
+        n_file_violations = 0
         for broken_import in check.metadata["broken_imports"]:
             violating_files = check.metadata["violations"][broken_import]
             for violating_file in violating_files:
@@ -105,6 +107,7 @@ class ForbiddenImportContract(Contract):
                 f"{self.container} is not allowed to import {broken_import} (from {violations})",
                 bold=True,
             )
+            n_invalid_imports += 1
             output.new_line()
 
         output.print_error("Listing broken imports by internal file...")
@@ -116,6 +119,11 @@ class ForbiddenImportContract(Contract):
             )
             output.new_line()
             output.new_line()
+            n_file_violations += 1
+
+        output.print_error(
+            f"Found {n_invalid_imports} invalid imports and {n_file_violations} file violations"
+        )
 
 
 def resolve_dependency_group_no_versions(

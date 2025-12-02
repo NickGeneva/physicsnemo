@@ -151,8 +151,22 @@ models-extras = [
     {include-group="models"},
     {include-group="nn-extras"},
 ]
+metrics = [
+    {include-group="models"},
+]
+datapipes = [
+    {include-group="metrics"},
+]
+datapipes-extras = [
+    {include-group="datapipes"},
+    {include-group="models-extras"},
+]
+domain_parallel = [
+    {include-group = "nn"}
+]
 physicsnemo = [
-    {include-group = "models"},
+    {include-group = "domain-parallel"},
+    {include-group = "datapipes"},
 ]
 physicsnemo-extras = [
     {include-group = "physicsnemo"},
