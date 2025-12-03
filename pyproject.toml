@@ -13,21 +13,21 @@ license = "Apache-2.0"
 # NOTE: this is meant to move to `uv` off of dependency-groups.
 # This is just informational here:
 #_dependencies = [
-#     "certifi>=2023.7.22",
-#     "einops>=0.8.0",
-#     "fsspec>=2023.1.0",
-#     "numpy>=1.22.4",
-#     "onnx>=1.14.0",
-#     "packaging>=24.2",
-#     "requests>=2.32.2",
-#     "s3fs>=2023.5.0",
-#     "setuptools>=77.0.3",
-#     "timm>=1.0.0",
-#     "torch>=2.4.0",
-#     "tqdm>=4.60.0",
-#     "treelib>=1.2.5",
-#     "xarray>=2023.1.0",
-#     "zarr>=2.14.2",
+#     "certifi>=2023.7.22", # #PURGE?
+#     "einops>=0.8.0", # done
+#     "fsspec>=2023.1.0", #PURGE?
+#     "numpy>=1.22.4", # done
+#     "onnx>=1.14.0", #done
+#     "packaging>=24.2", # done
+#     "requests>=2.32.2"=2.32.2", # done
+#     "s3fs>=2023.5.0"=2023.5.0", # done
+#     "setuptools>=77.0.3", # PURGE?
+#     "timm>=1.0.0",  # done
+#     "torch>=2.4.0", # done
+#     "tqdm>=4.60.0", # done
+#     "treelib>=1.2.5", # done
+#     "xarray>=2023.1.0", # done
+#     "zarr>=2.14.2", # done
 # ]
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -92,22 +92,22 @@ exclude = [
 [dependency-groups]
 core = [
     "torch>=2.4.0",
-    "tqdm>=4.60.0",
-    "requests",
+    "tqdm>=4.60.0", # done
+    "requests>=2.32.2",
     "GitPython",
-    "s3fs",
-    "packaging",
+    "s3fs>=2023.5.0",
+    "packaging>=24.2",
 ]
 # no core-extras
 distributed = [
-    "treelib",
+    "treelib>=1.2.5",
     "numpy>=1.22.4",
     {include-group = "core"}
 ]
 # no distributed-extras
 utils = [
     "termcolor",
-    "onnx",
+    "onnx>=1.14.0",
     "warp-lang",
     "pandas",
     "nvtx",
@@ -123,8 +123,8 @@ utils-extras = [
     "cupy",
 ]
 nn = [
-    "einops",
-    "timm",
+    "einops>=0.8.0",
+    "timm>=1.0.0",
     {include-group= "utils"}
 ]
 nn-extras = [
@@ -138,8 +138,8 @@ models = [
     "cftime",
     "hydra-core",
     "omegaconf",
-    "xarray",
-    "zarr",
+    "xarray>=2023.1.0",
+    "zarr>=2.14.2",
     "jaxtyping",
     {include-group="nn"},
 ]
