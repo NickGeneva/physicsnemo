@@ -98,49 +98,6 @@ if VTK_AVAILABLE:
         if not writer.Write():
             raise RuntimeError(f"Failed to write unstructured grid to {output_path}")
 
-    def extract_surface_triangles(
-        tetrahedral_mesh: "vtk.vtkUnstructuredGrid",
-    ) -> list[int]:
-        """Extract surface triangle indices from a tetrahedral mesh.
-
-        This function identifies the boundary faces of a 3D tetrahedral mesh and
-        returns the vertex indices that form triangular faces on the surface.
-        This is essential for visualization and boundary condition application.
-
-        Args:
-            tetrahedral_mesh: VTK unstructured grid containing tetrahedral elements.
-
-        Returns:
-            List of vertex indices forming surface triangles. Every three consecutive
-            indices define one triangle.
-
-        Raises:
-            NotImplementedError: If the surface contains non-triangular faces.
-
-        """
-        # Extract the surface using VTK filter
-        surface_filter = vtk.vtkDataSetSurfaceFilter()
-        surface_filter.SetInputData(tetrahedral_mesh)
-        surface_filter.Update()
-
-        # Wrap with PyVista for easier manipulation
-        import pyvista as pv
-
-        surface_mesh = pv.wrap(surface_filter.GetOutput())
-        triangle_indices = []
-
-        # Process faces - PyVista stores faces as [n_vertices, v1, v2, ..., vn]
-        faces = surface_mesh.faces.reshape((-1, 4))
-        for face in faces:
-            if face[0] == 3:  # Triangle (3 vertices)
-                triangle_indices.extend([face[1], face[2], face[3]])
-            else:
-                raise NotImplementedError(
-                    f"Non-triangular face found with {face[0]} vertices"
-                )
-
-        return triangle_indices
-
     def convert_to_tet_mesh(polydata: "vtk.vtkPolyData") -> "vtk.vtkUnstructuredGrid":
         """Convert surface polydata to a tetrahedral volumetric mesh.
 
@@ -389,6 +346,66 @@ if VTK_AVAILABLE:
 
         return vertices, fields, edges
 
+    PYVISTA_AVAILABLE = check_version_spec("pyvista", "0.30.0", hard_fail=False)
+
+    if PYVISTA_AVAILABLE:
+        pv = importlib.import_module("pyvista")
+
+        def extract_surface_triangles(
+            tetrahedral_mesh: "vtk.vtkUnstructuredGrid",
+        ) -> list[int]:
+            """Extract surface triangle indices from a tetrahedral mesh.
+
+            This function identifies the boundary faces of a 3D tetrahedral mesh and
+            returns the vertex indices that form triangular faces on the surface.
+            This is essential for visualization and boundary condition application.
+
+            Args:
+                tetrahedral_mesh: VTK unstructured grid containing tetrahedral elements.
+
+            Returns:
+                List of vertex indices forming surface triangles. Every three consecutive
+                indices define one triangle.
+
+            Raises:
+                NotImplementedError: If the surface contains non-triangular faces.
+
+            """
+            # Extract the surface using VTK filter
+            surface_filter = vtk.vtkDataSetSurfaceFilter()
+            surface_filter.SetInputData(tetrahedral_mesh)
+            surface_filter.Update()
+
+            # Wrap with PyVista for easier manipulation
+
+            surface_mesh = pv.wrap(surface_filter.GetOutput())
+            triangle_indices = []
+
+            # Process faces - PyVista stores faces as [n_vertices, v1, v2, ..., vn]
+            faces = surface_mesh.faces.reshape((-1, 4))
+            for face in faces:
+                if face[0] == 3:  # Triangle (3 vertices)
+                    triangle_indices.extend([face[1], face[2], face[3]])
+                else:
+                    raise NotImplementedError(
+                        f"Non-triangular face found with {face[0]} vertices"
+                    )
+
+            return triangle_indices
+
+    else:
+
+        def _raise_pyvista_import_error():
+            """Import error for when pyvista is not installed."""
+            raise ImportError(
+                "pyvista is not installed, can not be used from domino/utils/vtk_file_utils.py"
+                "- To install pyvista, please see the installation guide at "
+                "https://docs.pyvista.org/getting-started/installation.html"
+            )
+
+        def extract_surface_triangles(*args, **kwargs):
+            """Dummy symbol for missing PyVista"""
+            _raise_pyvista_import_error()
 
 else:
 
@@ -396,7 +413,9 @@ else:
         """Import error for when vtk is not installed."""
         raise ImportError(
             "vtk is not installed, can not be used from domino/utils/vtk_file_utils.py"
-            "To install vtk, please see the installation guide at https://vtk.org/download/"
+            "- To install vtk, please see the installation guide at https://vtk.org/download/ \n"
+            "- For `extract_surface_triangles`, you will also need to install pyvista."
+            " See https://docs.pyvista.org/getting-started/installation.html for installation instructions."
         )
 
     def write_to_vtp(*args, **kwargs):
