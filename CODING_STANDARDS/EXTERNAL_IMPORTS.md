@@ -1,80 +1,81 @@
-<!-- markdownlint-disable-->
-
+<!-- markdownlint-disable MD012 MD013 MD024 MD031 MD032 MD033 MD034 MD040 MD046 -->
 
 # EXTERNAL_IMPORTS - Coding Standards
 
 ## Overview
 
-This document outlines coding standards for managing external imports in
-physicsnemo.  The motivation of these rules is to ensure our code base remains
-usable and changes in one area do not break another, unrelated area by
-introducing external dependencies that are not supported.
+This document defines the policies for managing external dependencies within
+`physicsnemo`. The objectives are to maintain a predictable dependency surface,
+prevent accidental coupling across modules, and ensure that optional
+accelerations never compromise default functionality.
 
-**Important:** These rules are enforced as strictly as possible. Deviations
-from these standards should only be made when absolutely necessary and must be
-documented with clear justification in code comments and approved during code
-review.
+**Important:** These requirements are enforced rigorously. Any deviation must be
+explicitly justified in code comments and approved during code review.
 
-PhysicsNeMo dependencies are contained in pyproject.toml.  For all code in
-physicsnemo's python package, or tests, this is the **sole source of truth**
-for external dependencies.  Examples may introduce additional dependencies
-for a specific example via requirements.txt.
+## Rule Index
 
-Physicsnemo is organized hierarchally, meaning submodules import acyclicly
-and therefore dependencies grow in higher levels of physicsnemo.  For example,
-the dependency list for `physicsnemo.core` is a subset of the dependency list
-of `physicsnemo.utils`, which is a subset of `physicsnemo.nn`, etc.  To
-enforce this hierarchy, the dependencies are organized by "dependency groups".
-See PEP 735 for more information.  In `pyproject.toml`, we organize
-by dependency group and include lower level groups in higher level groups.
+| Rule ID | Summary | Apply When |
+|---------|---------|------------|
+| `EXT-001` | Keep `pyproject.toml` as the single source of truth for dependencies | Declaring or modifying package requirements |
+| `EXT-002` | Preserve the dependency hierarchy via PEP 735 groups | Adding dependencies to any `physicsnemo` submodule |
+| `EXT-003` | Classify every external import as hard or optional and guard optional ones | Importing third-party packages anywhere in the codebase |
+| `EXT-004` | Use the delayed-error pattern for locally necessary optional packages | Implementing features that absolutely require an optional dependency |
+| `EXT-005` | Provide guarded accelerated paths alongside a reference implementation | Adding performance-oriented backends that rely on optional packages |
 
-Not every component of physicsnemo that requires specific external dependencies
-rises to the level of introducing that as a hard dependency.  For some examples,
-we use `cuml` in kNN calculations, and `torch_geometric` and `torch_scatter` in
-some GNN models.  These packages can be more complicated to install, and
-therefore aren't part of the default installation list.  They instead appear either
-in an `-extras` group or as an optional dependency list.  
+## Source of Truth for Dependencies
 
-Every external import in physics nemo must fall into one of two categories:
+The `pyproject.toml` file is the single authoritative record of every supported
+dependency for the Python package and the test suite. Example applications may
+list additional packages under `examples/**/requirements.txt`, but those
+requirements must not leak into the core package.
 
-1) It is an official, hard dependency of the submodule or a lower-level submodule
-   where it is imported.  Examples are `torch`, `warp`, etc.
-2) It is not an official hard dependency.  It is listed in the extras or in
-   an optional dependency group.  It's import is protected (see below) to
-   prevent installation and runtime errors unless that code is actively used.
+## Dependency Hierarchy and Groups
 
+`physicsnemo` is structured as an acyclic hierarchy. Lower-level packages (for
+example, `physicsnemo.core`) have strictly fewer dependencies than higher-level
+packages (such as `physicsnemo.nn`). To enforce this layering, dependencies are
+organized via the PEP 735 "dependency group" model in `pyproject.toml`; higher
+groups compose all dependencies from lower groups.
 
-## Protecting imports
+## Classification of External Imports
 
-There are two patterns in use to protect imports, depending on the specific
-use case.
+Every import from a third-party package must fall into one of two categories:
+
+1. **Hard dependency.** The package is part of the mandatory dependency group
+   of the importing submodule or any lower-level submodule. Typical examples
+   include `torch` and `warp`.
+2. **Optional dependency.** The package resides in an extras group or optional
+   dependency group. Its usage must be guarded so that importing the module
+   succeeds even when the package is absent.
+
+Packages such as `cuml`, `torch_geometric`, and `torch_scatter` remain optional
+because of their installation complexity; they are surfaced only through extras
+groups or per-example requirements.
+
+## Protecting Imports
+
+Two complementary patterns are used to guard optional dependencies.
 
 ### Locally Necessary Imports
 
-For some components, the external package is so critical that functionality
-can not be delivered without it.  For example, PyG in graph models.
+Certain features cannot be delivered without a specific package (for example,
+PyG for GraphCast backends). For such dependencies, follow the delayed-error
+pattern:
 
-In this case, the user should follow a delayed-error pattern:
+1. Perform a soft availability check via
+   `physicsnemo.core.version_check.check_version_spec`.
+2. When the dependency is present, import it with `importlib.import_module`
+   inside the guarded block and expose the fully functional implementation.
+3. When the dependency is absent, expose the same symbols, but raise an
+   informative exception upon instantiation or call. Static methods should be
+   treated as free functions for this purpose.
 
-1. Developers should check availability of a package with `physicsnemo.utils.version_check`
-   as a soft-check (no exceptions raised).
-2. Inside an `if:` scope, if the dependency is available, import it via 
-   `importlib.import_module` and implement the feature needed.
-3. Inside an `else:` scope, when the dependency is not available, implement
-   the same names as exposed in the `if` path with no functionality.  Instead,
-   for functions immediately raise an exception on call.  For classes, raise
-   an exception on instantiation.  For classes with static methods, treat them
-   as functions.
+Raised exceptions must explain who is raising the error, which package is
+missing, the minimum required version, and where to find installation
+instructions.
 
-**Raised exceptions about missing imports should be informative**.  Do not just
-state "package X is missing".  Instead provide information about the raiser, the
-package, and the installation steps.  For example:
-
-
-```
-
+```python
 import importlib
-
 import torch
 
 from physicsnemo.core.version_check import check_version_spec
@@ -85,49 +86,53 @@ CUPY_AVAILABLE = check_version_spec("cupy", "13.0.0", hard_fail=False)
 if CUML_AVAILABLE and CUPY_AVAILABLE:
     cuml = importlib.import_module("cuml")
     cp = importlib.import_module("cupy")
-    
-    def knn_impl(points, queries, k) -> torch.Tensor:
-       ....
 
+    def knn_impl(points, queries, k) -> torch.Tensor:
+        ...
 else:
 
-    def knn_impl(* args, **kwargs) -> None:
+    def knn_impl(*args, **kwargs) -> torch.Tensor:
         """
-        Dummy implementation for when cuml is not available.
+        Dummy implementation for when cuML or CuPy is unavailable.
         """
 
         raise ImportError(
-            "physics nemo kNN: cuml or cupy is not installed, can not be used as a backend for a knn search"
-            "Please install cuml and cupy, for installation instructions see: https://docs.rapids.ai/install"
+            "physicsnemo.nn.neighbors: cuML>=24.0.0 and CuPy>=13.0.0 are required "
+            "for the accelerated kNN backend. Install both packages; see "
+            "https://docs.rapids.ai/install for instructions."
         )
-
 ```
-
-Though this introduces 
-
-
-PACKAGE_AVAILALBE = 
-
 
 ### Locally Optional Imports
 
-Some packages offer an accelerated/improved execution path at the cost of an additional
-dependency.  For these packages, the implementation should include a reference
-implementation and an additional execution path.  To avoid full reuse of code,
-several patterns are acceptable, depending on the circumstance.
+Some dependencies simply provide accelerated code paths. In these situations,
+always provide a reference implementation that only relies on core
+dependencies, and add accelerated paths behind guarded imports. Two patterns
+are acceptable:
 
-1. Runtime dispatch at module-level.  In this path, the dependency is a core
-   component of the implementation, and an entry-point function will allow users
-   to select a "backend" for execution of their code.  There should be an "auto"
-   path that selects (or attempts to select) the best path.  The default path
-   must use standard dependencies.  The additional paths must still protect imports
-   and not raise an error unless specifically selected an the import fails.  In
-   this pattern, the different backend implementations should live in separate
-   files.  Example: `physicsnemo.nn.neighbors`
-2. Runtime dispatch at file-level.  In this path, the dependency is a small
-   component of the implementation and it is more reasonable to select a dispatch
-   path at the python execution level automatically.  Implementations should
-   live all in one file, and developers can perform a soft check (no `raise`)
-   with `physicsnemo.core.version_check`.  The boolean result of this check
-   can be used to automatically select execution paths in the code, or it may
-   be used with user-settings to raise an error at runtime if unavailable.
+1. **Module-level runtime dispatch.** The dependency is a central part of the
+   implementation. Provide an entry-point that selects among backends
+   (`"auto"` should try accelerated paths first while falling back to the
+   reference path). Each backend implementation must live in its own module and
+   independently guard its imports. Example: `physicsnemo.nn.neighbors`.
+2. **File-level runtime dispatch.** The dependency affects a small portion of
+   the implementation. Keep reference and accelerated code in the same module.
+   Use `check_version_spec` to pick the execution path automatically or to
+   respect a user override that demands the accelerated backend.
+
+In both cases the default behavior must rely exclusively on baseline
+dependencies, and accelerated code paths must never raise at import time merely
+because an optional dependency is missing.
+
+## Compliance
+
+- **Code review enforcement.** All pull requests must cite the relevant `EXT-00x`
+  rules when introducing new dependencies or optional backends. Reviewers block
+  changes that bypass `pyproject.toml`, break the dependency hierarchy, or ship
+  unguarded imports; deviations require explicit justification.
+- **Import-linter enforcement.** `test/ci_tests/prevent_untracked_imports.py`
+  and `.importlinter` translate these rules into automated checks. Import Linter
+  fails CI when modules violate declared contracts (for example, high-level
+  packages importing from disallowed lower layers or pulling in unapproved
+  third-party modules). Keep dependency declarations synchronized so these
+  automated guards remain authoritative.
