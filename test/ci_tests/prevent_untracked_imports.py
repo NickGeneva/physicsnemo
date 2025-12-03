@@ -118,6 +118,15 @@ class ForbiddenImportContract(Contract):
                 bold=True,
             )
             output.new_line()
+
+        output.print_error("Listing broken imports by internal file...")
+        output.new_line()
+        for violating_file, violating_imports in inverted_violations.items():
+            output.print_error(
+                f"{violating_file} is not allowed to import: {', '.join(violating_imports)}",
+                bold=True,
+            )
+            output.new_line()
             output.new_line()
             n_file_violations += 1
 
