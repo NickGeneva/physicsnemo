@@ -155,9 +155,12 @@ metrics = [
     {include-group="models"},
 ]
 datapipes = [
+    "h5py",
     {include-group="metrics"},
 ]
 datapipes-extras = [
+    "dask",
+    "tensorflow",
     {include-group="datapipes"},
     {include-group="models-extras"},
 ]
