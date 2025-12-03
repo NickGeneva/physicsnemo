@@ -135,6 +135,7 @@ nn-extras = [
     {include-group = "utils-extras"},
 ]
 models = [
+    "cftime",
     "hydra-core",
     "omegaconf",
     "xarray",
@@ -143,7 +144,6 @@ models = [
     {include-group="nn"},
 ]
 models-extras = [
-    "cftime",
     "transformer_engine",
     "netCDF4",
     "pyvista",

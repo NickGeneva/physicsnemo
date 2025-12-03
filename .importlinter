@@ -114,11 +114,11 @@ type = forbidden_import
 container = physicsnemo.nn
 dependency_group = nn
 
-; [importlinter:contract:physicsnemo-models-external-imports]
-; name = Prevent Non-listed external imports in physicsnemo models
-; type = forbidden_import
-; container = physicsnemo.models
-; dependency_group = models
+[importlinter:contract:physicsnemo-models-external-imports]
+name = Prevent Non-listed external imports in physicsnemo models
+type = forbidden_import
+container = physicsnemo.models
+dependency_group = models
 
 [importlinter:contract:physicsnemo-metrics-external-imports]
 name = Prevent Non-listed external imports in physicsnemo metrics

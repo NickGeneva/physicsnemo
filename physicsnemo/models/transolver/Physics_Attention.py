@@ -30,18 +30,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
+import importlib
 from abc import ABC, abstractmethod
 
 import torch
 import torch.nn as nn
 
-try:
-    import transformer_engine.pytorch as te
-except (ImportError, FileNotFoundError):
-    te = None
-    TE_AVAILABLE = False
+from physicsnemo.core.version_check import check_version_spec
+
+TE_AVAILABLE = check_version_spec("transformer_engine", hard_fail=False)
+
+if TE_AVAILABLE:
+    te = importlib.import_module("transformer_engine.pytorch")
 else:
-    TE_AVAILABLE = True
+    te = None
 
 from einops import rearrange
 from torch.autograd.profiler import record_function
