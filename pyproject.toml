@@ -187,6 +187,10 @@ gnns = [
     "nvfuser",
 ]
 
+healpix = [
+    "earth2grid",
+]
+
 [tool.ruff]
 # Enable flake8/pycodestyle (`E`), Pyflakes (`F`), flake8-bandit (`S`),
 # isort (`I`), and performance 'PERF' rules.
