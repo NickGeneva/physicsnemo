@@ -27,7 +27,7 @@ from torch.utils.checkpoint import checkpoint
 
 from physicsnemo.core.meta import ModelMetaData
 from physicsnemo.core.module import Module
-from physicsnemo.models.diffusion.layers import (
+from physicsnemo.nn import (
     Conv2d,
     FourierEmbedding,
     Linear,
@@ -35,7 +35,8 @@ from physicsnemo.models.diffusion.layers import (
     UNetBlock,
     get_group_norm,
 )
-from physicsnemo.models.diffusion.utils import _recursive_property
+
+from ._utils import _recursive_property
 
 # ------------------------------------------------------------------------------
 # Backbone architectures
@@ -176,7 +177,7 @@ class SongUNet(Module):
         of the image pixels, unlike the ``embedding_type`` parameter which encodes
         temporal information about the diffusion process. In that sense it is a
         simpler version of the positional embedding used in
-        :class:`~physicsnemo.models.diffusion.song_unet.SongUNetPosEmbd`.
+        :class:`~physicsnemo.models.diffusion_unets.SongUNetPosEmbd`.
     use_apex_gn : bool, optional, default=False
         A flag indicating whether we want to use Apex GroupNorm for NHWC layout.
         Apex needs to be installed for this to work. Need to set this as False on cpu.
@@ -685,7 +686,7 @@ class SongUNet(Module):
 
 class SongUNetPosEmbd(SongUNet):
     r"""This specialized architecture extends
-    :class:`~physicsnemo.models.diffusion.song_unet.SongUNet` with positional
+    :class:`~physicsnemo.models.diffusion_unets.SongUNet` with positional
     embeddings that encode global spatial coordinates of the pixels.
 
     This model supports the same type of conditioning as the base SongUNet, and
@@ -725,7 +726,7 @@ class SongUNetPosEmbd(SongUNet):
     used and channel-wise concatenated to the input image.
 
     Most parameters are the same as in the parent class
-    :class:`~physicsnemo.models.diffusion.song_unet.SongUNet`. Only the ones
+    :class:`~physicsnemo.models.diffusion_unets.SongUNet`. Only the ones
     that differ are listed below.
 
     Parameters
@@ -741,7 +742,7 @@ class SongUNetPosEmbd(SongUNet):
         is the number of channels in the positional embedding grid.
 
         **Important:** in comparison to the base
-        :class:`~physicsnemo.models.diffusion.song_unet.SongUNet`, this
+        :class:`~physicsnemo.models.diffusion_unets.SongUNet`, this
         parameter should also include the number of channels in the positional
         embedding grid :math:`C_{PE}`.
     gridtype : Literal["sinusoidal", "learnable", "linear", "test"], optional, default="sinusoidal"
@@ -752,14 +753,14 @@ class SongUNetPosEmbd(SongUNet):
         value. If 0, positional embedding is disabled (but ``lead_time_mode`` may still be used).
     lead_time_mode : bool, optional, default=False
         Provided for convenience. It is recommended to use the architecture
-        :class:`~physicsnemo.models.diffusion.song_unet.SongUNetPosLtEmbd`
+        :class:`~physicsnemo.models.diffusion_unets.SongUNetPosLtEmbd`
         for a lead-time aware model.
     lead_time_channels : int, optional, default=None
-        Provided for convenience. Refer to :class:`~physicsnemo.models.diffusion.song_unet.SongUNetPosLtEmbd`.
+        Provided for convenience. Refer to :class:`~physicsnemo.models.diffusion_unets.SongUNetPosLtEmbd`.
     lead_time_steps : int, optional, default=9
-        Provided for convenience. Refer to :class:`~physicsnemo.models.diffusion.song_unet.SongUNetPosLtEmbd`.
+        Provided for convenience. Refer to :class:`~physicsnemo.models.diffusion_unets.SongUNetPosLtEmbd`.
     prob_channels : List[int], optional, default=[]
-        Provided for convenience. Refer to :class:`~physicsnemo.models.diffusion.song_unet.SongUNetPosLtEmbd`.
+        Provided for convenience. Refer to :class:`~physicsnemo.models.diffusion_unets.SongUNetPosLtEmbd`.
 
 
     Forward
@@ -805,7 +806,7 @@ class SongUNetPosEmbd(SongUNet):
 
     .. important::
         Unlike positional embeddings defined by ``embedding_type`` in the parent
-        class :class:`~physicsnemo.models.diffusion.song_unet.SongUNet` that
+        class :class:`~physicsnemo.models.diffusion_unets.SongUNet` that
         encode the diffusion time-step (or noise level), the positional embeddings in this
         specialized architecture encode global spatial coordinates of the
         pixels.
@@ -813,7 +814,7 @@ class SongUNetPosEmbd(SongUNet):
     Examples
     --------
     >>> import torch
-    >>> from physicsnemo.models.diffusion.song_unet import SongUNetPosEmbd
+    >>> from physicsnemo.models.diffusion_unets.song_unet import SongUNetPosEmbd
     >>> from physicsnemo.utils.patching import GridPatching2D
     >>>
     >>> # Model initialization - in_channels must include both original input channels (2)
@@ -1341,7 +1342,7 @@ class SongUNetPosEmbd(SongUNet):
 class SongUNetPosLtEmbd(SongUNetPosEmbd):
     r"""
     This specialized architecture extends
-    :class:`~physicsnemo.models.diffusion.song_unet.SongUNetPosEmbd` with two
+    :class:`~physicsnemo.models.diffusion_unets.SongUNetPosEmbd` with two
     additional capabilities:
 
     1. The model can be conditioned on lead-time labels. These labels encode
@@ -1368,7 +1369,7 @@ class SongUNetPosLtEmbd(SongUNetPosEmbd):
       positional embeddings to the input ``x`` and pass them to the U-Net network.
 
     Most parameters are similar to the parent
-    :class:`~physicsnemo.models.diffusion.song_unet.SongUNetPosEmbd`, at the
+    :class:`~physicsnemo.models.diffusion_unets.SongUNetPosEmbd`, at the
     exception of the ones listed below.
 
     Parameters
@@ -1376,7 +1377,7 @@ class SongUNetPosLtEmbd(SongUNetPosEmbd):
     in_channels : int
         Number of channels :math:`C_{in} + C_{PE} + C_{LT}` in the image passed to the U-Net.
 
-        *Important:* in comparison to the base :class:`~physicsnemo.models.diffusion.song_unet.SongUNet`,
+        *Important:* in comparison to the base :class:`~physicsnemo.models.diffusion_unets.SongUNet`,
         this parameter should also include the number of channels in the positional embedding grid
         :math:`C_{PE}` and the number of channels in the lead-time embedding grid
         :math:`C_{LT}`.
@@ -1428,13 +1429,13 @@ class SongUNetPosLtEmbd(SongUNetPosEmbd):
     Notes
     -----
         - The lead-time embeddings differ from the diffusion time embeddings used in
-          :class:`~physicsnemo.models.diffusion.song_unet.SongUNet` class, as they do not
+          :class:`~physicsnemo.models.diffusion_unets.SongUNet` class, as they do not
           encode diffusion time-step but *physical forecast time*.
 
     Example
     --------
     >>> import torch
-    >>> from physicsnemo.models.diffusion.song_unet import SongUNetPosLtEmbd
+    >>> from physicsnemo.models.diffusion_unets.song_unet import SongUNetPosLtEmbd
     >>> from physicsnemo.utils.patching import GridPatching2D
     >>>
     >>> # Model initialization - in_channels must include original input channels (2),
@@ -1555,4 +1556,4 @@ class SongUNetPosLtEmbd(SongUNetPosEmbd):
         )
 
     # Nothing else is re-implemented, because everything is already in the
-    # parent SongUNetPosEmb
+    # parent SongUNetPosEmbd

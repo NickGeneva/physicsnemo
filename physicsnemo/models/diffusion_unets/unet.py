@@ -22,7 +22,8 @@ import torch
 
 from physicsnemo.core.meta import ModelMetaData
 from physicsnemo.core.module import Module
-from physicsnemo.models.diffusion.utils import _wrapped_property
+
+from ._utils import _wrapped_property
 
 network_module = importlib.import_module("physicsnemo.models.diffusion")
 
@@ -50,13 +51,13 @@ class UNet(Module):  # TODO a lot of redundancy, need to clean up
     regression model (and other deterministic downsampling models).
     It supports the following architectures:
 
-    - :class:`~physicsnemo.models.diffusion.song_unet.SongUNet`
+    - :class:`~physicsnemo.models.diffusion_unets.SongUNet`
 
-    - :class:`~physicsnemo.models.diffusion.song_unet.SongUNetPosEmbd`
+    - :class:`~physicsnemo.models.diffusion_unets.SongUNetPosEmbd`
 
-    - :class:`~physicsnemo.models.diffusion.song_unet.SongUNetPosLtEmbd`
+    - :class:`~physicsnemo.models.diffusion_unets.SongUNetPosLtEmbd`
 
-    - :class:`~physicsnemo.models.diffusion.dhariwal_unet.DhariwalUNet`
+    - :class:`~physicsnemo.models.diffusion_unets.DhariwalUNet`
 
     It shares the same architeture as a conditional diffusion model. It does so
     by concatenating a conditioning image to a zero-filled latent state, and by

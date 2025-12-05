@@ -20,8 +20,8 @@ import numpy as np
 import nvtx
 import torch
 
-from physicsnemo.models.diffusion import EDMPrecond
-from physicsnemo.models.diffusion.patching import GridPatching2D
+from physicsnemo.diffusion.multi_diffusion import GridPatching2D
+from physicsnemo.diffusion.preconditioners import EDMPrecond
 
 # ruff: noqa: E731
 

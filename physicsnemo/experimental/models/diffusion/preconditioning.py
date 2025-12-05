@@ -20,7 +20,7 @@ from typing import Any, Literal, Tuple, Union
 import numpy as np
 import torch
 
-from physicsnemo.models.diffusion.preconditioning import EDMPrecondSuperResolution
+from physicsnemo.diffusion.preconditioners import EDMPrecondSuperResolution
 from physicsnemo.core.meta import ModelMetaData
 
 

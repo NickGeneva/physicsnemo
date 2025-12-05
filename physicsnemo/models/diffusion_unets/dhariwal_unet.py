@@ -23,14 +23,15 @@ from torch.nn.functional import silu
 
 from physicsnemo.core.meta import ModelMetaData
 from physicsnemo.core.module import Module
-from physicsnemo.models.diffusion.layers import (
+from physicsnemo.nn import (
     Conv2d,
     Linear,
     PositionalEmbedding,
     UNetBlock,
     get_group_norm,
 )
-from physicsnemo.models.diffusion.utils import _recursive_property
+
+from ._utils import _recursive_property
 
 # ------------------------------------------------------------------------------
 # Backbone architectures
@@ -64,7 +65,7 @@ class DhariwalUNet(Module):
     self-attention.
 
     It is highly similar to the U-Net backbone defined in
-    :class:`~physicsnemo.models.diffusion.song_unet.SongUNet`, and only differs
+    :class:`~physicsnemo.models.diffusion_unets.SongUNet`, and only differs
     in a few aspects:
 
     • The embedding conditioning mechanism relies on adaptive scaling of the

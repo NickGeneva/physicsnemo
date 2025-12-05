@@ -51,7 +51,7 @@ class MockNet(torch.nn.Module):
 @requires_module("cftime")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_stochastic_sampler(device, pytestconfig):
-    from physicsnemo.models.diffusion.sampling import stochastic_sampler
+    from physicsnemo.diffusion.samplers import stochastic_sampler
 
     torch._dynamo.reset()
 
@@ -126,8 +126,8 @@ def test_stochastic_sampler(device, pytestconfig):
 @requires_module("cftime")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_stochastic_sampler_rectangle_patching(device, pytestconfig):
-    from physicsnemo.models.diffusion.patching import GridPatching2D
-    from physicsnemo.models.diffusion.sampling import stochastic_sampler
+    from physicsnemo.diffusion.multi_diffusion import GridPatching2D
+    from physicsnemo.diffusion.samplers import stochastic_sampler
 
     torch._dynamo.reset()
 
@@ -177,8 +177,8 @@ def test_stochastic_sampler_rectangle_patching(device, pytestconfig):
 @requires_module("cftime")
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_stochastic_sampler_patching_differentiable(device, pytestconfig):
-    from physicsnemo.models.diffusion.patching import GridPatching2D
-    from physicsnemo.models.diffusion.sampling import stochastic_sampler
+    from physicsnemo.diffusion.multi_diffusion import GridPatching2D
+    from physicsnemo.diffusion.samplers import stochastic_sampler
 
     torch._dynamo.reset()
 
@@ -290,7 +290,7 @@ class MockNet_lead_time_embedding:
 # The test function for patch-based stochastic sampler with lead_time_embedding
 @requires_module("cftime")
 def test_stochastic_sampler_with_lead_time_args(pytestconfig):
-    from physicsnemo.models.diffusion.sampling import stochastic_sampler
+    from physicsnemo.diffusion.samplers import stochastic_sampler
 
     net = MockNet_lead_time_embedding()
     latents = torch.randn(2, 3, 32, 32)  # Mock latents

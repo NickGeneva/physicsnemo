@@ -29,13 +29,11 @@ import hydra
 import torch
 from omegaconf import DictConfig
 from training_loop import training_loop
-from physicsnemo.models.diffusion.training_utils import (
-    EasyDict,
-    construct_class_by_name,
-)
+from misc import EasyDict
 
 from physicsnemo.distributed import DistributedManager
 from physicsnemo.utils.logging import PythonLogger, RankZeroLoggingWrapper
+from misc import construct_class_by_name
 
 try:
     from apex.optimizers import FusedAdam

@@ -14,16 +14,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Tuple, Union, Optional, Literal, Dict, Any, Callable, Type
+from typing import Tuple, Union, Optional, Literal, Dict, Any
 import torch
 import torch.nn as nn
 
-from physicsnemo.models.diffusion import PositionalEmbedding, Linear
+from physicsnemo.nn import PositionalEmbedding, Linear
 from dataclasses import dataclass
 from physicsnemo.core.meta import ModelMetaData
 from physicsnemo.core.module import Module
 from physicsnemo.experimental.models.dit import DiTBlock
 from physicsnemo.experimental.models.dit.layers import get_tokenizer, get_detokenizer, TokenizerModuleBase, DetokenizerModuleBase
+
 
 @dataclass
 class MetaData(ModelMetaData):

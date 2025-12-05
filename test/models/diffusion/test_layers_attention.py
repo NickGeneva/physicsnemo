@@ -21,7 +21,7 @@ import pytest
 import torch
 
 import physicsnemo
-from physicsnemo.models.diffusion.layers import Attention
+from physicsnemo.nn import Attention
 
 
 def _err(x: torch.Tensor, y: torch.Tensor) -> str:

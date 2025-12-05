@@ -30,7 +30,8 @@ import nvtx
 import wandb
 
 from physicsnemo import Module
-from physicsnemo.models.diffusion import UNet, EDMPrecondSuperResolution
+from physicsnemo.models.diffusion_unets import UNet
+from physicsnemo.diffusion.preconditioners import EDMPrecondSuperResolution
 from physicsnemo.distributed import DistributedManager
 from physicsnemo.metrics.diffusion import RegressionLoss, ResidualLoss, RegressionLossCE
 from physicsnemo.models.diffusion.patching import RandomPatching2D

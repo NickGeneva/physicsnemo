@@ -29,7 +29,7 @@ import importlib
 import sys
 import warnings
 
-COMPAT_MAP = {
+MODULE_COMPAT_MAP = {
     "physicsnemo.utils.filesystem": "physicsnemo.core.filesystem",
     "physicsnemo.utils.version_check": "physicsnemo.core.version_check",
     "physicsnemo.models.meta": "physicsnemo.core.meta",
@@ -59,17 +59,48 @@ COMPAT_MAP = {
     # "physicsnemo.models.layers.weight_norm": "physicsnemo.nn.layers.weight_norm",
     # "physicsnemo.utils.graphcast": "physicsnemo.models.graphcast.utils",
     "physicsnemo.utils.graphcast": "physicsnemo.models.graphcast.utils",
-    "physicsnemo.utils.diffusion": "physicsnemo.models.diffusion.utils",
-    "physicsnemo.utils.patching": "physicsnemo.nn.patching",
+    "physicsnemo.utils.diffusion": "physicsnemo.diffusion.utils",
+    "physicsnemo.utils.patching": "physicsnemo.diffusion.multi_diffusion",
+    "physicsnemo.models.diffusion.corrdiff_utils": "physicsnemo.diffusion.samplers",
+    "physicsnemo.metrics.diffusion": "physicsnemo.diffusion.metrics",
     "physicsnemo.utils.domino": "physicsnemo.models.domino.utils",
     "physicsnemo.launch.utils.checkpoint": "physicsnemo.utils.checkpoint",
     "physicsnemo.launch.logging": "physicsnemo.utils.logging",
 }
 
+OBJECT_COMPAT_MAP = {
+    # Diffusion layers
+    "physicsnemo.models.diffusion.AttentionOp": "physicsnemo.nn.AttentionOp",
+    "physicsnemo.models.diffusion.layers.Attention": "physicsnemo.nn.Attention",
+    "physicsnemo.models.diffusion.Conv2D": "physicsnemo.nn.Conv2d",
+    "physicsnemo.models.diffusion.FourierEmbedding": "physicsnemo.nn.FourierEmbedding",
+    "physicsnemo.models.diffusion.GroupNorm": "physicsnemo.nn.GroupNorm",
+    "physicsnemo.models.diffusion.get_group_norm": "physicsnemo.nn.get_group_norm",
+    "physicsnemo.models.diffusion.Linear": "physicsnemo.nn.Linear",
+    "physicsnemo.models.diffusion.PositionalEmbedding": "physicsnemo.nn.PositionalEmbedding",
+    "physicsnemo.models.diffusion.UNetBlock": "physicsnemo.nn.UNetBlock",
+    # Diffusion UNets
+    "physicsnemo.models.diffusion.SongUNet": "physicsnemo.models.diffusion_unets.SongUNet",
+    "physicsnemo.models.diffusion.SongUNetPosEmbd": "physicsnemo.models.diffusion_unets.SongUNetPosEmbd",
+    "physicsnemo.models.diffusion.SongUNetPosLtEmbd": "physicsnemo.models.diffusion_unets.SongUNetPosLtEmbd",
+    "physicsnemo.models.diffusion.DhariwalUNet": "physicsnemo.models.diffusion_unets.DhariwalUNet",
+    "physicsnemo.models.diffusion.UNet": "physicsnemo.models.diffusion_unets.UNet",
+    "physicsnemo.models.diffusion.StormCastUNet": "physicsnemo.models.diffusion_unets.StormCastUNet",
+    # Diffusion Preconditioners
+    "physicsnemo.models.diffusion.EDMPrecond": "physicsnemo.diffusion.preconditioners.EDMPrecond",
+    "physicsnemo.models.diffusion.EDMPrecondSuperResolution": "physicsnemo.diffusion.preconditioners.EDMPrecondSuperResolution",
+    "physicsnemo.models.diffusion.EDMPrecondSR": "physicsnemo.diffusion.preconditioners.EDMPrecondSR",
+    "physicsnemo.models.diffusion.VEPrecond": "physicsnemo.diffusion.preconditioners.VEPrecond",
+    "physicsnemo.models.diffusion.VPPrecond": "physicsnemo.diffusion.preconditioners.VPPrecond",
+    "physicsnemo.models.diffusion.iDDPMPrecond": "physicsnemo.diffusion.preconditioners.iDDPMPrecond",
+    "physicsnemo.models.diffusion.VEPrecond_dfsr_cond": "physicsnemo.diffusion.preconditioners.VEPrecond_dfsr_cond",
+    "physicsnemo.models.diffusion.VEPrecond_dfsr": "physicsnemo.diffusion.preconditioners.VEPrecond_dfsr",
+}
+
 
 def install():
     """Install backward-compatibility shims."""
-    for old_name, new_name in COMPAT_MAP.items():
+    for old_name, new_name in MODULE_COMPAT_MAP.items():
         try:
             new_mod = importlib.import_module(new_name)
         except ImportError:
@@ -95,5 +126,35 @@ def install():
 
         warnings.warn(
             f"[compat] {old_name} is moved; use {new_name} instead",
+            DeprecationWarning,
+        )
+
+    for old_path, new_path in OBJECT_COMPAT_MAP.items():
+        old_module_name, old_obj_name = old_path.rsplit(".", 1)
+        new_module_name, new_obj_name = new_path.rsplit(".", 1)
+
+        try:
+            new_mod = importlib.import_module(new_module_name)
+            new_obj = getattr(new_mod, new_obj_name)
+        except (ImportError, AttributeError):
+            warnings.warn(
+                f"Failed to import '{new_path}' for compat alias '{old_path}'"
+            )
+            continue
+
+        # Register object alias
+        try:
+            old_mod = sys.modules.get(old_module_name) or importlib.import_module(
+                old_module_name
+            )
+            setattr(old_mod, old_obj_name, new_obj)
+        except Exception:
+            warnings.warn(
+                f"Failed to attach '{old_path}' onto its parent "
+                "for compat alias; using sys.modules only"
+            )
+
+        warnings.warn(
+            f"[compat] {old_path} is moved; use {new_path} instead",
             DeprecationWarning,
         )

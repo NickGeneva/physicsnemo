@@ -17,8 +17,8 @@
 import pytest
 import torch
 
-from physicsnemo.models.diffusion import UNet
-from physicsnemo.models.diffusion.patching import RandomPatching2D
+from physicsnemo.diffusion.multi_diffusion import RandomPatching2D
+from physicsnemo.models.diffusion_unets import UNet
 
 
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])

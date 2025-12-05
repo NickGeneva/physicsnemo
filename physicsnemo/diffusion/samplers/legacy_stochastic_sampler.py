@@ -20,8 +20,8 @@ from typing import Callable, Optional
 import torch
 from torch import Tensor
 
-from physicsnemo.models.diffusion import EDMPrecond
-from physicsnemo.models.diffusion.patching import GridPatching2D
+from physicsnemo.diffusion.multi_diffusion import GridPatching2D
+from physicsnemo.diffusion.preconditioners import EDMPrecond
 
 
 # NOTE: use two wrappers for apply, to avoid recompilation when input shape changes
