@@ -105,7 +105,7 @@ def get_group_norm(
     torch.nn.Module
         The GroupNorm layer. If ``use_apex_gn`` is ``True``, returns an
         ApexGroupNorm layer, otherwise returns an instance of
-        :class:`~physicsnemo.models.diffusion.layers.GroupNorm`.
+        :class:`~physicsnemo.nn.GroupNorm`.
 
     .. note::
 
@@ -163,10 +163,10 @@ class GroupNorm(torch.nn.Module):
         A small number added to the variance to prevent division by zero.
     use_apex_gn : bool, optional, default=False
         Deprecated. Please use
-        :func:`~physicsnemo.models.diffusion.layers.get_group_norm` instead.
+        :func:`~physicsnemo.nn.get_group_norm` instead.
     fused_act : bool, optional, default=False
         Deprecated. Please use
-        :func:`~physicsnemo.models.diffusion.layers.get_group_norm` instead.
+        :func:`~physicsnemo.nn.get_group_norm` instead.
     act : str, optional, default=None
         The activation function to use when fusing activation with GroupNorm.
     amp_mode : bool, optional, default=False

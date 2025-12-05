@@ -22,9 +22,7 @@ import torch
 import tqdm
 
 from physicsnemo.core.warnings import ExperimentalFeatureWarning
-from physicsnemo.models.diffusion.training_utils import (
-    StackedRandomGenerator,
-)
+from physicsnemo.diffusion.utils import StackedRandomGenerator
 
 ############################################################################
 #                     CorrDiff Generation Utilities                        #

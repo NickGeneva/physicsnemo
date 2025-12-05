@@ -186,14 +186,14 @@ def main(cfg: DictConfig) -> None:
 
     # Preconditioning & loss function.
     if cfg.precond == "vp":
-        c.network_kwargs.class_name = "physicsnemo.models.diffusion.VPPrecond"
-        c.loss_kwargs.class_name = "physicsnemo.metrics.diffusion.VPLoss"
+        c.network_kwargs.class_name = "physicsnemo.diffusion.preconditioners.VPPrecond"
+        c.loss_kwargs.class_name = "physicsnemo.diffusion.metrics.VPLoss"
     elif cfg.precond == "ve":
-        c.network_kwargs.class_name = "physicsnemo.models.diffusion.VEPrecond"
-        c.loss_kwargs.class_name = "physicsnemo.metrics.diffusion.VELoss"
+        c.network_kwargs.class_name = "physicsnemo.diffusion.preconditioners.VEPrecond"
+        c.loss_kwargs.class_name = "physicsnemo.diffusion.metrics.VELoss"
     elif cfg.precond == "edm":
-        c.network_kwargs.class_name = "physicsnemo.models.diffusion.EDMPrecond"
-        c.loss_kwargs.class_name = "physicsnemo.metrics.diffusion.EDMLoss"
+        c.network_kwargs.class_name = "physicsnemo.diffusion.preconditioners.EDMPrecond"
+        c.loss_kwargs.class_name = "physicsnemo.diffusion.metrics.EDMLoss"
     # elif cfg.precond == 'unetregression':
     #     c.network_kwargs.class_name = 'training.networks.UNet'
     #     c.loss_kwargs.class_name = 'training.loss.RegressionLoss'
@@ -205,12 +205,16 @@ def main(cfg: DictConfig) -> None:
     #     c.loss_kwargs.class_name = 'training.loss.ResLoss'
     elif cfg.precond == "dfsr":
         # Configure model for fluid data super-resolution
-        c.network_kwargs.class_name = "physicsnemo.models.diffusion.VEPrecond_dfsr"
-        c.loss_kwargs.class_name = "physicsnemo.metrics.diffusion.VELoss_dfsr"
+        c.network_kwargs.class_name = (
+            "physicsnemo.diffusion.preconditioners.VEPrecond_dfsr"
+        )
+        c.loss_kwargs.class_name = "physicsnemo.diffusion.metrics.VELoss_dfsr"
     elif cfg.precond == "dfsr_cond":
         # Configure model for physics-informed conditional fluid data super-resolution
-        c.network_kwargs.class_name = "physicsnemo.models.diffusion.VEPrecond_dfsr_cond"
-        c.loss_kwargs.class_name = "physicsnemo.metrics.diffusion.VELoss_dfsr"
+        c.network_kwargs.class_name = (
+            "physicsnemo.diffusion.preconditioners.VEPrecond_dfsr_cond"
+        )
+        c.loss_kwargs.class_name = "physicsnemo.diffusion.metrics.VELoss_dfsr"
 
     # Network options.
     if cfg.cbase is not None:

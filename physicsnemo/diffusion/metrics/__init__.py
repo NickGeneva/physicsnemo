@@ -14,8 +14,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# NOTE: re-import these general metrics for increased visibility in the
+# diffusion subpackage
+from physicsnemo.metrics.general.calibration import rank_probability_score
+from physicsnemo.metrics.general.crps import crps, kcrps
+from physicsnemo.metrics.general.ensemble_metrics import EnsembleMetrics, Mean, Variance
+from physicsnemo.metrics.general.entropy import (
+    entropy_from_counts,
+    relative_entropy_from_counts,
+)
+from physicsnemo.metrics.general.histogram import (
+    Histogram,
+    cdf,
+    histogram,
+    normal_cdf,
+    normal_pdf,
+)
+from physicsnemo.metrics.general.power_spectrum import power_spectrum
+from physicsnemo.metrics.general.wasserstein import (
+    wasserstein_from_cdf,
+    wasserstein_from_normal,
+    wasserstein_from_samples,
+)
+
 from .fid import calculate_fid_from_inception_stats
-from .loss import (
+from .legacy_losses import (
     EDMLoss,
     EDMLossLogUniform,
     EDMLossSR,

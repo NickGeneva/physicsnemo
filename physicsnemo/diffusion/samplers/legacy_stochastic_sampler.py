@@ -142,7 +142,7 @@ def stochastic_sampler(
         extract patches from an image and batch the patches along dim=0.
         Should also implement a ``fuse`` method to reconstruct the original
         image from a batch of patches. See
-        :class:`~physicsnemo.utils.patching.GridPatching2D` for details. By
+        :class:`~physicsnemo.diffusion.multi_diffusion.GridPatching2D` for details. By
         default ``None``, in which case non-patched diffusion is used.
     mean_hr : Optional[Tensor], optional
         Optional tensor containing mean high-resolution images for
@@ -179,7 +179,7 @@ def stochastic_sampler(
 
     See Also
     --------
-    :class:`~physicsnemo.models.diffusion.preconditioning.EDMPrecondSuperResolution`: A model
+    :class:`~physicsnemo.diffusion.preconditioners.EDMPrecondSuperResolution`: A model
         wrapper that provides preconditioning for super-resolution diffusion
         models and implements the required interface for this sampler.
     """

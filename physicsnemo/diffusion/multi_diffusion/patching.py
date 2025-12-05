@@ -174,9 +174,9 @@ class RandomPatching2D(BasePatching2D):
 
     See Also
     --------
-    :class:`physicsnemo.utils.patching.BasePatching2D`
+    :class:`physicsnemo.diffusion.multi_diffusion.BasePatching2D`
         The base class providing the patching interface.
-    :class:`physicsnemo.utils.patching.GridPatching2D`
+    :class:`physicsnemo.diffusion.multi_diffusion.GridPatching2D`
         Alternative patching strategy using deterministic patch locations.
     """
 
@@ -275,7 +275,7 @@ class RandomPatching2D(BasePatching2D):
 
         See Also
         --------
-        :func:`physicsnemo.utils.patching.image_batching`
+        :func:`physicsnemo.diffusion.multi_diffusion.image_batching`
             The underlying function used to perform the patching operation.
         """
         B = input.shape[0]
@@ -350,9 +350,9 @@ class GridPatching2D(BasePatching2D):
 
     See Also
     --------
-    :class:`physicsnemo.utils.patching.BasePatching2D`
+    :class:`physicsnemo.diffusion.multi_diffusion.BasePatching2D`
         The base class providing the patching interface.
-    :class:`physicsnemo.utils.patching.RandomPatching2D`
+    :class:`physicsnemo.diffusion.multi_diffusion.RandomPatching2D`
         Alternative patching strategy using random patch locations.
     """
 
@@ -412,7 +412,7 @@ class GridPatching2D(BasePatching2D):
 
         See Also
         --------
-        :func:`physicsnemo.utils.patching.image_batching`
+        :func:`physicsnemo.diffusion.multi_diffusion.image_batching`
             The underlying function used to perform the patching operation.
         """
         if additional_input is not None:
@@ -445,7 +445,7 @@ class GridPatching2D(BasePatching2D):
             Input tensor containing patches with shape :math:`(P \times B, C, H_p, W_p)`.
             *Note: the patch layout along the batch dimension should be the same
             as the one returned by the method
-            :meth:`~physicsnemo.utils.patching.GridPatching2D.apply`.*
+            :meth:`~physicsnemo.diffusion.multi_diffusion.GridPatching2D.apply`.*
         batch_size : int
             The original batch size :math:`B` before patching.
 
@@ -456,7 +456,7 @@ class GridPatching2D(BasePatching2D):
 
         See Also
         --------
-        :func:`physicsnemo.utils.patching.image_fuse`
+        :func:`physicsnemo.diffusion.multi_diffusion.image_fuse`
             The underlying function used to perform the fusion operation.
         """
         out = image_fuse(
@@ -707,11 +707,11 @@ def image_fuse(
 ) -> Tensor:
     r"""
     Reconstructs a full image from a batch of patched images. Reverts the patching
-    operation performed by :func:`~physicsnemo.utils.patching.image_batching`.
+    operation performed by :func:`~physicsnemo.diffusion.multi_diffusion.image_batching`.
 
     It assumes that the patches are extracted in a grid-like pattern, and that
     their layout along the batch dimension is the same as the one returned by
-    :func:`~physicsnemo.utils.patching.image_batching`.
+    :func:`~physicsnemo.diffusion.multi_diffusion.image_batching`.
 
     This function takes a batch of image patches and reconstructs the full
     image by stitching the patches together. The function accounts for
@@ -738,7 +738,7 @@ def image_fuse(
         A tensor of shape :math:`(1, 1, H, W)` containing the number of
         overlaps for each pixel (i.e. the number of patches that cover each pixel).
         This is typically computed by
-        :meth:`~physicsnemo.utils.patching.GridPatching2D.get_overlap_count`.
+        :meth:`~physicsnemo.diffusion.multi_diffusion.GridPatching2D.get_overlap_count`.
         If not provided, it will be computed internally.
 
     Returns

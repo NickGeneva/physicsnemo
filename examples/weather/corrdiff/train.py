@@ -33,8 +33,8 @@ from physicsnemo import Module
 from physicsnemo.models.diffusion_unets import UNet
 from physicsnemo.diffusion.preconditioners import EDMPrecondSuperResolution
 from physicsnemo.distributed import DistributedManager
-from physicsnemo.metrics.diffusion import RegressionLoss, ResidualLoss, RegressionLossCE
-from physicsnemo.models.diffusion.patching import RandomPatching2D
+from physicsnemo.diffusion.metrics import RegressionLoss, ResidualLoss, RegressionLossCE
+from physicsnemo.diffusion.multi_diffusion import RandomPatching2D
 from physicsnemo.utils.logging.wandb import initialize_wandb
 from physicsnemo.utils.logging import PythonLogger, RankZeroLoggingWrapper
 from physicsnemo.utils import (

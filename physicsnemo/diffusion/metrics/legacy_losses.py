@@ -24,8 +24,7 @@ import numpy as np
 import torch
 from torch import Tensor
 
-# from physicsnemo.utils.patching import RandomPatching2D
-from physicsnemo.models.diffusion.patching import RandomPatching2D
+from physicsnemo.diffusion.multi_diffusion import RandomPatching2D
 
 
 class VPLoss:
@@ -715,7 +714,7 @@ class ResidualLoss:
 
         patching : Optional[RandomPatching2D], optional
             Patching strategy for processing large images, by default None. See
-            :class:`physicsnemo.utils.patching.RandomPatching2D` for details.
+            :class:`physicsnemo.diffusion.multi_diffusion.RandomPatching2D` for details.
             When provided, the patching strategy is used for both image patches
             and positional embeddings selection in the diffusion model `net`.
             Transforms tensors from shape (B, C, H, W) to (B*P, C, H_patch,
@@ -750,7 +749,7 @@ class ResidualLoss:
         Raises
         ------
         ValueError
-            If patching is provided but is not an instance of RandomPatching2D.
+            If patching is provided but is not an instance of :class:`physicsnemo.diffusion.multi_diffusion.RandomPatching2D`.
             If shapes of img_clean and img_lr are incompatible.
         """
 
@@ -1013,7 +1012,7 @@ class RegressionLossCE:
     """
     A regression loss function for deterministic predictions with probability
     channels and lead time labels. Adapted from
-    :class:`physicsnemo.metrics.diffusion.loss.RegressionLoss`. In this version,
+    :class:`physicsnemo.diffusion.metrics.RegressionLoss`. In this version,
     probability channels are evaluated using CrossEntropyLoss instead of
     squared error.
     Note: this loss does not apply any reduction.

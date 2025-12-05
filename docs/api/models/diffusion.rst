@@ -229,7 +229,7 @@ conditioning image* ``cond``, which is why we interpolate the conditioning image
 to the patch resolution and concatenate it to each individual patch.
 In practice it is not necessary to manually extract the patches from the latent
 state and the global grid, as PhysicsNeMo provides utilities to help with the
-patching operations, in :mod:`~physicsnemo.utils.patching`. For an example of how
+patching operations, in :mod:`~physicsnemo.diffusion.multi_diffusion`. For an example of how
 to use these utilities, see the `CorrDiff example <../../examples/weather/corrdiff/README.rst>`_.
 
 .. code:: python

@@ -32,7 +32,7 @@ from physicsnemo.utils.logging import PythonLogger, RankZeroLoggingWrapper
 from physicsnemo.experimental.models.diffusion.preconditioning import (
     tEDMPrecondSuperRes,
 )
-from physicsnemo.models.diffusion.patching import GridPatching2D
+from physicsnemo.diffusion.multi_diffusion import GridPatching2D
 from physicsnemo import Module
 from physicsnemo.diffusion.samplers import (
     deterministic_sampler,

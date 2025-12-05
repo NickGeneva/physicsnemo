@@ -103,7 +103,7 @@ class DiT(Module):
     block_kwargs (Dict[str, Any], optional):
         Additional keyword arguments for the DiTBlock modules.
     timestep_embed_kwargs (Dict[str, Any], optional):
-        Additional keyword arguments to be passed to :class:`physicsnemo.models.diffusion.PositionalEmbedding`.
+        Additional keyword arguments to be passed to :class:`physicsnemo.nn.PositionalEmbedding`.
     attn_kwargs (Dict[str, Any], optional):
         Additional keyword arguments for the attention module constructor, if using a custom attention backend.
     force_tokenization_fp32 (bool, optional):

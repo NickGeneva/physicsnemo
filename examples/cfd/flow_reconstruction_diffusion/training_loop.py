@@ -27,7 +27,7 @@ import psutil
 import torch
 from torch.nn.parallel import DistributedDataParallel
 from training_stats import default_collector, report, report0
-from physicsnemo.models.diffusion.training_utils import InfiniteSampler
+from physicsnemo.diffusion.utils import InfiniteSampler
 
 from misc import (
     open_url,
@@ -185,7 +185,10 @@ def training_loop(
     )  # cifar10
     # interface_kwargs = dict(img_resolution=yparams.crop_size_x, img_channels=img_out_channels, img_in_channels=img_in_channels, img_out_channels=img_out_channels, label_dim=0)    #weather
 
-    if network_kwargs.class_name == "physicsnemo.models.diffusion.VEPrecond_dfsr_cond":
+    if (
+        network_kwargs.class_name
+        == "physicsnemo.diffusion.preconditioners.VEPrecond_dfsr_cond"
+    ):
         # Load dataset scaling parameters to compute physics-informed conditioning variable (PDE residual w.r.t. vorticity)
         interface_kwargs["dataset_mean"] = dataset_obj.stat["mean"]
         interface_kwargs["dataset_scale"] = dataset_obj.stat["scale"]
@@ -209,7 +212,7 @@ def training_loop(
 
     if (
         not network_kwargs.class_name
-        == "physicsnemo.models.diffusion.VEPrecond_dfsr_cond"
+        == "physicsnemo.diffusion.preconditioners.VEPrecond_dfsr_cond"
     ):
         if dist.rank == 0:
             with torch.no_grad():

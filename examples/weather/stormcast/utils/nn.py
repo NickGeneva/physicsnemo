@@ -213,7 +213,7 @@ def regression_loss_fn(
     the EDMLoss and the same training loop can be used to train both regression and diffusion models
 
     Args:
-        net: physicsnemo.models.diffusion.StormCastUNet
+        net: physicsnemo.models.diffusion_unets.StormCastUNet
         images: Target data, shape [batch_size, target_channels, w, h]
         condition: input to the model, shape=[batch_size, condition_channel, w, h]
         class_labels: unused (applied to match EDMLoss signature)

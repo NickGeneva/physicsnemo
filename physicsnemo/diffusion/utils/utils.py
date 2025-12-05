@@ -20,7 +20,7 @@ import numpy as np
 import torch
 
 
-class StackedRandomGenerator:  # pragma: no cover
+class StackedRandomGenerator:
     """
     Wrapper for ``torch.Generator`` that allows specifying a different random
     seed for each sample in a minibatch.
@@ -180,7 +180,7 @@ class StackedRandomGenerator:  # pragma: no cover
         )
 
 
-class InfiniteSampler(torch.utils.data.Sampler[int]):  # pragma: no cover
+class InfiniteSampler(torch.utils.data.Sampler[int]):
     """Sampler for torch.utils.data.DataLoader that loops over the dataset indefinitely.
 
     This sampler yields indices indefinitely, optionally shuffling items as it goes.

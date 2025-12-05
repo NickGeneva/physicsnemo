@@ -143,7 +143,7 @@ def deterministic_sampler(
         extract patches from an image and batch the patches along dim=0.
         Should also implement a ``fuse`` method to reconstruct the original
         image from a batch of patches. See
-        :class:`~physicsnemo.utils.patching.GridPatching2D` for details. By
+        :class:`~physicsnemo.diffusion.multi_diffusion.GridPatching2D` for details. By
         default ``None``, in which case non-patched diffusion is used.
     mean_hr : Optional[Tensor], optional
         Optional tensor containing mean high-resolution images for

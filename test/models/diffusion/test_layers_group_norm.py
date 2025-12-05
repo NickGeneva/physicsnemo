@@ -21,8 +21,6 @@ import torch
 
 import physicsnemo
 from physicsnemo.nn import get_group_norm
-
-# from physicsnemo.models.diffusion.layers import GroupNorm
 from test import common  # noqa: E402
 
 

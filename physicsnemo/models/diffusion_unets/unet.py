@@ -25,7 +25,7 @@ from physicsnemo.core.module import Module
 
 from ._utils import _wrapped_property
 
-network_module = importlib.import_module("physicsnemo.models.diffusion")
+network_module = importlib.import_module("physicsnemo.models.diffusion_unets")
 
 
 @dataclass
