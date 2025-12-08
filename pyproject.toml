@@ -36,7 +36,9 @@ dependencies = [
     "packaging>=24.2",
     "h5py",
     "jaxtyping",
-    "cftime"
+    "cftime",
+    "timm>=1.0.22",
+    "xarray>=2025.6.1",
 ]
 
 [project.urls]
