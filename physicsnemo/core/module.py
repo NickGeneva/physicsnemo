@@ -360,8 +360,8 @@ class Module(torch.nn.Module):
 
         Examples
         --------
-        >>> from physicsnemo.models import Module
-        >>> from physicsnemo.registry import ModelRegistry
+        >>> from physicsnemo.core.module import Module
+        >>> from physicsnemo.core.registry import ModelRegistry
         >>> registry = ModelRegistry()
         >>> model_entry = registry.factory('FullyConnected')
         >>> fcn = model_entry(**{'in_features': 10})
