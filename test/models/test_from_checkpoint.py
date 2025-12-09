@@ -20,9 +20,20 @@ import pytest
 import torch
 
 import physicsnemo.core
+from physicsnemo.core import ModelRegistry
 
 
-class MockModel(physicsnemo.core.Module):
+# Fixture to clear registry between tests to avoid naming conflicts
+@pytest.fixture(autouse=True)
+def clear_registry():
+    """Clear and restore the model registry before and after each test"""
+    registry = ModelRegistry()
+    registry.__clear_registry__()
+    yield
+    registry.__restore_registry__()
+
+
+class MockModel(physicsnemo.core.Module, _register=False):
     """Fake model"""
 
     def __init__(self, layer_size=16):
@@ -31,7 +42,7 @@ class MockModel(physicsnemo.core.Module):
         self.layer = torch.nn.Linear(layer_size, layer_size)
 
 
-class NewMockModel(physicsnemo.core.Module):
+class NewMockModel(physicsnemo.core.Module, _register=False):
     """Fake model"""
 
     def __init__(self, layer_size=16):
@@ -40,7 +51,7 @@ class NewMockModel(physicsnemo.core.Module):
         self.layer = torch.nn.Linear(layer_size, layer_size)
 
 
-class MockModelNoOverride(physicsnemo.core.Module):
+class MockModelNoOverride(physicsnemo.core.Module, _register=False):
     """Fake model"""
 
     def __init__(self, value1, value2, x):
@@ -50,7 +61,7 @@ class MockModelNoOverride(physicsnemo.core.Module):
         self.x = x
 
 
-class MockModelWithOverride(physicsnemo.core.Module):
+class MockModelWithOverride(physicsnemo.core.Module, _register=False):
     """Fake model"""
 
     _overridable_args = {"value2", "x"}

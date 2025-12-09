@@ -41,7 +41,7 @@ import importlib
 
 import torch
 
-from physicsnemo.utils.version_utils import check_version_spec
+from physicsnemo.core.version_check import check_version_spec
 
 HEALPIXPAD_AVAILABLE = check_version_spec("earth2grid", "0.1.0", hard_fail=False)
 
