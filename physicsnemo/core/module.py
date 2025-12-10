@@ -646,7 +646,7 @@ class Module(torch.nn.Module):
         """
         Utility method for loading the model weights from a '.mdlus'
         checkpoint file. Unlike
-        :meth:`~physicsnemo.models.module.Module.from_checkpoint`, this method
+        :meth:`~physicsnemo.core.module.Module.from_checkpoint`, this method
         *does not* instantiate the model, but rather loads the ``state_dict`` for an
         already instantiated model.
 

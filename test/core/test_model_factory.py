@@ -54,7 +54,6 @@ def _retrieve_model(model: Module, name: str):
     registry.__restore_registry__()
 
 
-@pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_register_and_factory(device):
     # Register and retrieve the MockModel
     with _retrieve_model(MockModel, "mock_model") as RetrievedModel:
