@@ -168,6 +168,6 @@ def requires_module(names):
 
 
 @pytest.fixture(params=["cpu"] + (["cuda:0"] if torch.cuda.is_available() else []))
-def single_device(request):
+def device(request):
     """Device fixture that automatically skips CUDA tests when not available."""
     return request.param

@@ -43,7 +43,6 @@ class MockModel(Module, _register=False):
         self.layer = torch.nn.Linear(input_size, output_size)
 
 
-@pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 @pytest.mark.parametrize("LoadModel", [MockModel])
 def test_kwargs(device, LoadModel):
     """Test checkpointing custom physicsnemo module"""

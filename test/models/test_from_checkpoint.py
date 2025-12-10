@@ -73,7 +73,6 @@ class MockModelWithOverride(physicsnemo.core.Module, _register=False):
         self.x = x
 
 
-@pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 @pytest.mark.parametrize("LoadModel", [MockModel, NewMockModel])
 def test_from_checkpoint_custom(device, LoadModel):
     """Test checkpointing custom physicsnemo module"""
@@ -89,7 +88,6 @@ def test_from_checkpoint_custom(device, LoadModel):
     Path("checkpoint.mdlus").unlink(missing_ok=False)
 
 
-@pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_from_checkpoint_override(device):
     """Test checkpointing custom physicsnemo module with override"""
     torch.manual_seed(0)

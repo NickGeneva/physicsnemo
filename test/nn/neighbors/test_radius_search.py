@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
+
 import pytest
 import torch
 
@@ -23,7 +25,7 @@ from physicsnemo.nn.neighbors._radius_search._warp_impl import (
 )
 
 
-@pytest.mark.parametrize("device", ["cpu", "cuda"])
+@pytest.mark.skipif(sys.platform == "darwin", reason="Torch doesn't support pinned memory on mac")
 @pytest.mark.parametrize("return_dists", [True, False])
 @pytest.mark.parametrize("return_points", [True, False])
 @pytest.mark.parametrize("max_points", [5, None])
@@ -52,7 +54,7 @@ def test_radius_search(
     a better algorithm.
 
     the test here is to enforce agreement between the two utilities.
-    There is no reason to directly test the results: the algorithm
+    There is no reason "Torch doesn't support pinned memory on mac"m
     that would be written here is identical to the torch backend tools.
     """
 
@@ -197,12 +199,8 @@ def test_radius_search(
         assert indexes.shape[1] == expected_matches * query_space_points.shape[0]
 
 
-@pytest.mark.parametrize(
-    "device",
-    [
-        "cpu",
-    ],
-)
+
+@pytest.mark.skipif(sys.platform == "darwin", reason="Torch doesn't support pinned memory on mac")
 def test_radius_search_torch_compile_no_graph_break(device):
     # Cuda curnently disabled in this test, but it does work.
 
@@ -241,7 +239,12 @@ def test_radius_search_torch_compile_no_graph_break(device):
         assert torch.allclose(eager, compiled, atol=1e-6)
 
 
-def test_opcheck(device="cuda"):
+@pytest.mark.skipif(sys.platform == "darwin", reason="Torch doesn't support pinned memory on mac")
+def test_opcheck(device):
+    
+    if device == "cpu":
+        pytest.skip("CUDA only")
+    
     points = torch.randn(100, 3, device=device)
     queries = torch.randn(10, 3, device=device)
     radius = 0.5
@@ -252,7 +255,7 @@ def test_opcheck(device="cuda"):
     )
 
 
-@pytest.mark.parametrize("device", ["cpu", "cuda"])
+@pytest.mark.skipif(sys.platform == "darwin", reason="Torch doesn't support pinned memory on mac")
 @pytest.mark.parametrize("max_points", [22, None])
 def test_radius_search_comparison(device, max_points):
     torch.manual_seed(42)
@@ -302,7 +305,7 @@ def test_radius_search_comparison(device, max_points):
         assert torch.allclose(distance_warp.sum(), distance_torch.sum())
 
 
-@pytest.mark.parametrize("device", ["cpu", "cuda"])
+@pytest.mark.skipif(sys.platform == "darwin", reason="Torch doesn't support pinned memory on mac")
 @pytest.mark.parametrize("max_points", [8, None])
 def test_radius_search_gradients(device, max_points):
     # Gradients are only supported to flow through the output points.
@@ -352,8 +355,8 @@ def test_radius_search_gradients(device, max_points):
     # assert torch.allclose(qrs_grad_warp, qrs_grad_torch, atol=1e-5), "Query gradients do not match"
 
 
+@pytest.mark.skipif(sys.platform == "darwin", reason="Torch doesn't support pinned memory on mac")
 @pytest.mark.parametrize("precision", [torch.bfloat16, torch.float16, torch.float32])
-@pytest.mark.parametrize("device", ["cpu", "cuda"])
 @pytest.mark.parametrize("max_points", [8, None])
 def test_radius_search_reduced_precision(device, precision, max_points):
     """

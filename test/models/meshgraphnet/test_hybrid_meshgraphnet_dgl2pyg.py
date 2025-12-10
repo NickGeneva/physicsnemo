@@ -24,7 +24,6 @@ from test.conftest import requires_module
 
 
 @requires_module(["dgl", "torch_geometric"])
-@pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_hybrid_meshgraphnet_dgl_pyg_equivalence(
     device, pytestconfig, set_physicsnemo_force_te
 ):
@@ -109,7 +108,6 @@ def test_hybrid_meshgraphnet_dgl_pyg_equivalence(
 
 
 @requires_module(["dgl", "torch_geometric"])
-@pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_hybrid_meshgraphnet_gradient_equivalence(
     device, pytestconfig, set_physicsnemo_force_te
 ):
@@ -251,7 +249,6 @@ def test_hybrid_meshgraphnet_gradient_equivalence(
 
 
 @requires_module(["dgl", "torch_geometric"])
-@pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_hybrid_meshgraphnet_hetero_edge_processing(
     device, pytestconfig, set_physicsnemo_force_te
 ):
