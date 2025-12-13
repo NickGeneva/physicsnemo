@@ -485,7 +485,8 @@ class Module(torch.nn.Module):
             ------
             TypeError
                 If an argument is a ``torch.nn.Module`` instance that has not been converted
-                to a ``physicsnemo.Module`` using ``Module.from_torch``.
+                to a ``physicsnemo.Module`` using
+                :meth:`~physicsnemo.core.module.Module.from_torch`.
             """
 
             # Pointer to args["__args__"] for submodules
@@ -1114,6 +1115,14 @@ class Module(torch.nn.Module):
             Whether to register the class in the model registry. If True, the
             class will be registered and can be retrieved later using
             ``ModelRegistry().factory(name)``.
+
+            .. important::
+
+                To be able to later load the model with
+                :meth:`~physicsnemo.core.module.Module.from_checkpoint`, it is
+                necessary to register the class in the model registry by setting
+                ``register=True``. A class created via ``from_torch`` that is not
+                registered will not be able to be loaded with ``from_checkpoint``.
 
         Returns
         -------
