@@ -280,4 +280,4 @@ TopoDiff = "physicsnemo.models.topodiff:TopoDiff"
 Transolver = "physicsnemo.models.transolver:Transolver"
 
 # VFGN
-VFGN = "physicsnemo.models.vfgn:VFGN"
+VFGN = "physicsnemo.models.vfgn:VFGNLearnedSimulator"
