@@ -182,7 +182,7 @@ healpix = [
 lint.select = ["E", "F", "S", "I", "PERF"]
 lint.fixable = ["I"]
 
-# Never enforce `E402`, `E501` (line length violations),
+# Never enforce `E501` (line length violations),
 # and `S311` (random number generators)
 lint.ignore = ["E501", "S311"]
 
