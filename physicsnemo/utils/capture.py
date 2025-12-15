@@ -348,7 +348,7 @@ class StaticCaptureTraining(_StaticCapture):
 
     Parameters
     ----------
-    model : physicsnemo.models.Module
+    model : physicsnemo.core.Module
         PhysicsNeMo Model
     optim : torch.optim
         Optimizer
@@ -370,7 +370,7 @@ class StaticCaptureTraining(_StaticCapture):
     Raises
     ------
     ValueError
-        If the model provided is not a physicsnemo.models.Module. I.e. has no meta data.
+        If the model provided is not a physicsnemo.core.Module. I.e. has no meta data.
 
     Example
     -------
@@ -443,7 +443,7 @@ class StaticCaptureEvaluateNoGrad(_StaticCapture):
 
     Parameters
     ----------
-    model : physicsnemo.models.Module
+    model : physicsnemo.core.Module
         PhysicsNeMo Model
     logger : Optional[Logger], optional
         PhysicsNeMo Launch Logger, by default None
@@ -461,7 +461,7 @@ class StaticCaptureEvaluateNoGrad(_StaticCapture):
     Raises
     ------
     ValueError
-        If the model provided is not a physicsnemo.models.Module. I.e. has no meta data.
+        If the model provided is not a physicsnemo.core.Module. I.e. has no meta data.
 
     Example
     -------
