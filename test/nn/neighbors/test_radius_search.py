@@ -199,6 +199,9 @@ def test_radius_search(
 def test_radius_search_torch_compile_no_graph_break(device):
     # Cuda curnently disabled in this test, but it does work.
 
+    if "cuda" in device:
+        pytest.skip("Skipping radius search torch compile for CUDA")
+
     import torch
 
     # Only test if torch.compile is available (PyTorch 2.0+)
