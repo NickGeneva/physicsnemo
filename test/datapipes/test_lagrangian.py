@@ -29,7 +29,7 @@ def data_dir(nfs_data_dir):
     return nfs_data_dir.joinpath("datasets/water")
 
 
-@requires_module(["torch_geometric", "torch_scatter"])
+@requires_module(["torch_geometric", "torch_scatter", "tfrecord"])
 def test_lagrangian_dataset_constructor(data_dir, device, pytestconfig):
     from torch_geometric.data import Data as PyGData
 
@@ -55,7 +55,7 @@ def test_lagrangian_dataset_constructor(data_dir, device, pytestconfig):
     assert graph.y.shape[-1] > 0  # node targets
 
 
-@requires_module(["torch_geometric", "torch_scatter"])
+@requires_module(["torch_geometric", "torch_scatter", "tfrecord"])
 @pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_graph_construction(device, pytestconfig):
     from physicsnemo.datapipes.gnn.lagrangian_dataset import compute_edge_index

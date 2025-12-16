@@ -16,6 +16,8 @@
 
 import pytest
 
+from test.conftest import requires_module
+
 from . import common
 
 
@@ -24,6 +26,7 @@ def data_dir(nfs_data_dir):
     return nfs_data_dir.joinpath("datasets/vortex_shedding/cylinder_flow")
 
 
+@requires_module(["tfrecord"])
 @pytest.mark.parametrize(
     "split, num_nodes, num_edges",
     [("train", 1876, 10788), ("valid", 1896, 10908), ("test", 1923, 11070)],

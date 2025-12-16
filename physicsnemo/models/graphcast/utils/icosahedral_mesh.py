@@ -27,7 +27,7 @@ from physicsnemo.core.version_check import check_version_spec
 SCIPY_TRANSFORM_AVAILABLE = check_version_spec("scipy", hard_fail=False)
 
 if SCIPY_TRANSFORM_AVAILABLE:
-    transform = importlib.import_module("scipy.spatial")
+    transform = importlib.import_module("scipy.spatial").transform
 else:
     transform = None
 
