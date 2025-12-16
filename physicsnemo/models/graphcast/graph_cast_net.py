@@ -17,16 +17,10 @@
 import logging
 import warnings
 from dataclasses import dataclass
-from typing import Any, Literal, Optional
+from typing import Any, Literal, Optional, Self
 
 import torch
 from torch import Tensor
-
-try:
-    from typing import Self
-except ImportError:
-    # for Python versions < 3.11
-    from typing_extensions import Self
 
 from physicsnemo.core.meta import ModelMetaData
 from physicsnemo.core.module import Module
