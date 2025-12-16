@@ -14,15 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ruff: noqa: E402
-import os
-import sys
 
 import numpy as np
 import pytest
 import torch
-
-script_path = os.pathabspath(__file__)
-sys.path.append(os.path.join(os.path.dirname(script_path), ".."))
 
 from test import common
 from test.conftest import requires_module
