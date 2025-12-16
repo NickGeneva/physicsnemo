@@ -14,22 +14,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ruff: noqa: E402
-import os
 import random
-import sys
 
 import numpy as np
+import pytest
 import torch
-import torch_geometric as pyg
 
-script_path = os.path.abspath(__file__)
-sys.path.append(os.path.join(os.path.dirname(script_path), ".."))
+pytest.importorskip("torch_geometric")
 
 from test import common
+from test.conftest import requires_module
 
 
+@requires_module("torch_geometric")
 def rand_graph(num_nodes, num_edges, device=None):
     """Create a random graph."""
+
+    import torch_geometric as pyg
+
     src = torch.tensor([np.random.randint(num_nodes) for _ in range(num_edges)])
     dst = torch.tensor([np.random.randint(num_nodes) for _ in range(num_edges)])
     graph = pyg.data.Data(
@@ -41,8 +43,11 @@ def rand_graph(num_nodes, num_edges, device=None):
     return graph
 
 
+@requires_module("torch_geometric")
 def test_meshgraphnet_forward(device, pytestconfig, set_physicsnemo_force_te):
     """Test mehsgraphnet forward pass"""
+
+    import torch_geometric as pyg
 
     from physicsnemo.models.meshgraphnet import MeshGraphNet
 
@@ -79,8 +84,10 @@ def test_meshgraphnet_forward(device, pytestconfig, set_physicsnemo_force_te):
     )
 
 
+@requires_module("torch_geometric")
 def test_mehsgraphnet_constructor(device, pytestconfig, set_physicsnemo_force_te):
     """Test mehsgraphnet constructor options"""
+    import torch_geometric as pyg
 
     # Define dictionary of constructor args
     arg_list = [
@@ -135,8 +142,11 @@ def test_mehsgraphnet_constructor(device, pytestconfig, set_physicsnemo_force_te
         assert outvar.shape == (bsize * num_nodes, kw_args["output_dim"])
 
 
+@requires_module("torch_geometric")
 def test_meshgraphnet_optims(device, pytestconfig, set_physicsnemo_force_te):
     """Test meshgraphnet optimizations"""
+
+    import torch_geometric as pyg
 
     from physicsnemo.models.meshgraphnet import MeshGraphNet
 
@@ -172,8 +182,11 @@ def test_meshgraphnet_optims(device, pytestconfig, set_physicsnemo_force_te):
     assert common.validate_combo_optims(model, (*invar,))
 
 
+@requires_module("torch_geometric")
 def test_meshgraphnet_checkpoint(device, pytestconfig, set_physicsnemo_force_te):
     """Test meshgraphnet checkpoint save/load"""
+
+    import torch_geometric as pyg
 
     from physicsnemo.models.meshgraphnet import MeshGraphNet
 
@@ -208,9 +221,12 @@ def test_meshgraphnet_checkpoint(device, pytestconfig, set_physicsnemo_force_te)
     )
 
 
+@requires_module("torch_geometric")
 @common.check_ort_version()
 def test_meshgraphnet_deploy(device, pytestconfig, set_physicsnemo_force_te):
     """Test mesh-graph net deployment support"""
+
+    import torch_geometric as pyg
 
     from physicsnemo.models.meshgraphnet import MeshGraphNet
 

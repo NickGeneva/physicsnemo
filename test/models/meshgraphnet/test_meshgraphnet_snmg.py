@@ -15,10 +15,6 @@
 # limitations under the License.
 # ruff: noqa: E402
 import os
-import sys
-
-script_path = os.path.abspath(__file__)
-sys.path.append(os.path.join(os.path.dirname(script_path), ".."))
 
 import numpy as np
 import pytest
