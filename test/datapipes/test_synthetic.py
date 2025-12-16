@@ -15,8 +15,6 @@
 # limitations under the License.
 
 
-import pytest
-
 from test.conftest import requires_module
 
 
