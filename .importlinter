@@ -2,7 +2,7 @@
 root_package = physicsnemo
 include_external_packages = True
 contract_types =
-    forbidden_import: prevent_untracked_imports.ForbiddenImportContract
+    forbidden_import: test.ci_tests.prevent_untracked_imports.ForbiddenImportContract
 
 [importlinter:contract:physicsnemo-modules]
 name = Prevent Upward Imports in the PhysicsNemo Structure
@@ -12,6 +12,7 @@ containers=
 layers = 
    experimental
    active_learning
+   diffusion
    models  : registry : datapipes : metrics : domain_parallel
    nn
    utils
@@ -88,34 +89,11 @@ containers=
 layers = 
    mesh_reduced
    afno | dlwp | dlwp_healpix | domino | dpot | fengwu | figconvnet | fno | graphcast | meshgraphnet | pangu | pix2pix | rnn |  srrn | swinvrnn | topodiff | transolver  | vfgn 
-   unet | diffusion  | dlwp_healpix_layers 
+   unet | dlwp_healpix_layers 
 
-[importlinter:contract:physicsnemo-core-external-imports]
-name = Prevent Non-listed external imports in physicsnemo core
+[importlinter:contract:physicsnemo-external-imports]
+name = Prevent Non-listed external imports in physicsnemo
 type = forbidden_import
-container = physicsnemo.core
-dependency_group = core
-
-[importlinter:contract:physicsnemo-distributed-external-imports]
-name = Prevent Non-listed external imports in physicsnemo distributed
-type = forbidden_import
-container = physicsnemo.distributed
-dependency_group = distributed
-
-[importlinter:contract:physicsnemo-utils-external-imports]
-name = Prevent Non-listed external imports in physicsnemo utils
-type = forbidden_import
-container = physicsnemo.utils
-dependency_group = utils
-
-[importlinter:contract:physicsnemo-nn-external-imports]
-name = Prevent Non-listed external imports in physicsnemo nn
-type = forbidden_import
-container = physicsnemo.nn
-dependency_group = nn
-
-; [importlinter:contract:physicsnemo-models-external-imports]
-; name = Prevent Non-listed external imports in physicsnemo models
-; type = forbidden_import
-; container = physicsnemo.models
-; dependency_group = models
+container = physicsnemo
+exclude = 
+   datapipes

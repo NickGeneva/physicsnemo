@@ -17,7 +17,6 @@
 from functools import partial
 from typing import Callable, Optional
 
-import pytest
 import torch
 
 from test.conftest import requires_module
@@ -46,13 +45,12 @@ class MockNet:
 
 
 @requires_module("cftime")
-@pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_regression_step(device, pytestconfig):
     from physicsnemo.diffusion.samplers import regression_step
-    from physicsnemo.models.diffusion_unets import UNet
+    from physicsnemo.models.diffusion_unets import CorrDiffRegressionUNet
 
     # define the net
-    mock_unet = UNet(
+    mock_unet = CorrDiffRegressionUNet(
         img_resolution=[16, 16],
         img_in_channels=8,
         img_out_channels=2,
@@ -72,7 +70,6 @@ def test_regression_step(device, pytestconfig):
 
 
 @requires_module("cftime")
-@pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_diffusion_step(device, pytestconfig):
     from physicsnemo.diffusion.preconditioners import EDMPrecondSuperResolution
     from physicsnemo.diffusion.samplers import (
@@ -135,7 +132,6 @@ def test_diffusion_step(device, pytestconfig):
 
 
 @requires_module("cftime")
-@pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_diffusion_step_rectangle(device, pytestconfig):
     from physicsnemo.diffusion.multi_diffusion import GridPatching2D
     from physicsnemo.diffusion.samplers import diffusion_step, stochastic_sampler

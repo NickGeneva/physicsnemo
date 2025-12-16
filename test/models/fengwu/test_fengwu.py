@@ -16,14 +16,12 @@
 
 import random
 
-import pytest
 import torch
 
 from physicsnemo.models.fengwu import Fengwu
 from test import common
 
 
-@pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_fengwu_forward(device):
     """Test Fengwu forward pass"""
     torch.manual_seed(0)
@@ -57,7 +55,6 @@ def test_fengwu_forward(device):
     torch.cuda.empty_cache()
 
 
-@pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_fengwu_constructor(device):
     """Test Fengwu constructor options"""
     # Define dictionary of constructor args
@@ -162,7 +159,6 @@ def test_fengwu_constructor(device):
     torch.cuda.empty_cache()
 
 
-@pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_fengu_optims(device):
     """Test Fengu optimizations"""
 
@@ -207,7 +203,6 @@ def test_fengu_optims(device):
 
 
 @common.check_ort_version()
-@pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_fengwu_deploy(device):
     """Test Fengwu deployment support"""
     # Construct Fengwu model

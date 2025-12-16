@@ -16,7 +16,6 @@
 
 from typing import Callable, Optional
 
-import pytest
 import torch
 from torch import Tensor
 
@@ -49,7 +48,6 @@ class MockNet(torch.nn.Module):
 
 # The test function for edm_sampler
 @requires_module("cftime")
-@pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_stochastic_sampler(device, pytestconfig):
     from physicsnemo.diffusion.samplers import stochastic_sampler
 
@@ -124,7 +122,6 @@ def test_stochastic_sampler(device, pytestconfig):
 
 # The test function for edm_sampler with rectangular domain and patching
 @requires_module("cftime")
-@pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_stochastic_sampler_rectangle_patching(device, pytestconfig):
     from physicsnemo.diffusion.multi_diffusion import GridPatching2D
     from physicsnemo.diffusion.samplers import stochastic_sampler
@@ -175,7 +172,6 @@ def test_stochastic_sampler_rectangle_patching(device, pytestconfig):
 # Test that the stochastic sampler is differentiable with rectangular patching
 # (tests differentiation through the patching and fusing)
 @requires_module("cftime")
-@pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_stochastic_sampler_patching_differentiable(device, pytestconfig):
     from physicsnemo.diffusion.multi_diffusion import GridPatching2D
     from physicsnemo.diffusion.samplers import stochastic_sampler

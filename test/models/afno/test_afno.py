@@ -16,14 +16,12 @@
 
 import random
 
-import pytest
 import torch
 
 from physicsnemo.models.afno import AFNO
 from test import common
 
 
-@pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_afno_forward(device):
     """Test AFNO forward pass"""
     torch.manual_seed(0)
@@ -45,7 +43,6 @@ def test_afno_forward(device):
     )
 
 
-@pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_afno_constructor(device):
     """Test AFNO constructor options"""
     # Define dictionary of constructor args
@@ -108,7 +105,6 @@ def test_afno_constructor(device):
         pass
 
 
-@pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_afno_optims(device):
     """Test AFNO optimizations"""
 
@@ -142,7 +138,6 @@ def test_afno_optims(device):
     assert common.validate_combo_optims(model, (invar,))
 
 
-@pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_afno_checkpoint(device):
     """Test AFNO checkpoint save/load"""
     # Construct AFNO models
@@ -172,7 +167,6 @@ def test_afno_checkpoint(device):
 
 
 @common.check_ort_version()
-@pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_afno_deploy(device):
     """Test AFNO deployment support"""
     # Construct AFNO model

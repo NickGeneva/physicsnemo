@@ -20,6 +20,17 @@ import pytest
 import torch
 
 import physicsnemo.core
+from physicsnemo.core import ModelRegistry
+
+
+# Fixture to clear registry between tests to avoid naming conflicts
+@pytest.fixture(autouse=True)
+def clear_registry():
+    """Clear and restore the model registry before and after each test"""
+    registry = ModelRegistry()
+    registry.__clear_registry__()
+    yield
+    registry.__restore_registry__()
 
 
 class MockModel(physicsnemo.core.Module):
@@ -62,7 +73,6 @@ class MockModelWithOverride(physicsnemo.core.Module):
         self.x = x
 
 
-@pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 @pytest.mark.parametrize("LoadModel", [MockModel, NewMockModel])
 def test_from_checkpoint_custom(device, LoadModel):
     """Test checkpointing custom physicsnemo module"""
@@ -78,7 +88,6 @@ def test_from_checkpoint_custom(device, LoadModel):
     Path("checkpoint.mdlus").unlink(missing_ok=False)
 
 
-@pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_from_checkpoint_override(device):
     """Test checkpointing custom physicsnemo module with override"""
     torch.manual_seed(0)

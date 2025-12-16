@@ -19,7 +19,17 @@ from pathlib import Path
 import pytest
 import torch
 
-from physicsnemo.core import Module
+from physicsnemo.core import ModelRegistry, Module
+
+
+# Fixture to clear registry between tests to avoid naming conflicts
+@pytest.fixture(autouse=True)
+def clear_registry():
+    """Clear and restore the model registry before and after each test"""
+    registry = ModelRegistry()
+    registry.__clear_registry__()
+    yield
+    registry.__restore_registry__()
 
 
 class MockModel(Module):
@@ -33,7 +43,6 @@ class MockModel(Module):
         self.layer = torch.nn.Linear(input_size, output_size)
 
 
-@pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 @pytest.mark.parametrize("LoadModel", [MockModel])
 def test_kwargs(device, LoadModel):
     """Test checkpointing custom physicsnemo module"""

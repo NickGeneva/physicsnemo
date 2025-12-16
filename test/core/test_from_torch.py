@@ -17,7 +17,6 @@
 import random
 from dataclasses import dataclass
 
-import pytest
 import torch
 
 from physicsnemo.core.module import ModelMetaData, Module
@@ -55,7 +54,6 @@ class CustomMetaData(ModelMetaData):
     auto_grad: bool = True
 
 
-@pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_from_torch_forward(device):
     """Test forward pass from PyTorch"""
     torch.manual_seed(0)
@@ -71,7 +69,6 @@ def test_from_torch_forward(device):
     registry.__restore_registry__()
 
 
-@pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_from_torch_constructor(device):
     """Test constructor from PyTorch"""
 
@@ -84,7 +81,6 @@ def test_from_torch_constructor(device):
     registry.__restore_registry__()
 
 
-@pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_from_torch_optims(device):
     """Test optimizations from PyTorch"""
 
@@ -123,11 +119,12 @@ def test_from_torch_optims(device):
     # registry.__restore_registry__()
 
 
-@pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_from_torch_checkpoint(device):
     """Test checkpoint save/load from PyTorch"""
     # Construct CustomPhysicsNeMoModel
-    CustomPhysicsNeMoModel = Module.from_torch(CustomModel, CustomMetaData())
+    CustomPhysicsNeMoModel = Module.from_torch(
+        CustomModel, CustomMetaData(), register=True
+    )
     model_1 = CustomPhysicsNeMoModel(in_features=4, out_features=4).to(device)
 
     model_2 = CustomPhysicsNeMoModel(in_features=4, out_features=4).to(device)
@@ -140,7 +137,6 @@ def test_from_torch_checkpoint(device):
 
 
 @common.check_ort_version()
-@pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_from_torch_deploy(device):
     """Test deployment support from PyTorch"""
     # Construct CustomPhysicsNeMoModel

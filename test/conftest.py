@@ -20,6 +20,7 @@ import pathlib
 from collections import defaultdict
 
 import pytest
+import torch
 
 NFS_DATA_PATH = "/data/nfs/modulus-data"
 
@@ -164,3 +165,9 @@ def requires_module(names):
     else:
         # No missing dependencies → no skip mark
         return pytest.mark.skipif(False, reason="")
+
+
+@pytest.fixture(params=["cpu"] + (["cuda:0"] if torch.cuda.is_available() else []))
+def device(request):
+    """Device fixture that automatically skips CUDA tests when not available."""
+    return request.param

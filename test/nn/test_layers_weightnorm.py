@@ -16,13 +16,11 @@
 
 import random
 
-import pytest
 import torch
 
 from physicsnemo.nn import WeightNormLinear
 
 
-@pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_weight_norm(device):
     """Test weight norm"""
 

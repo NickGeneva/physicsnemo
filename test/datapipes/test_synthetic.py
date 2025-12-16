@@ -15,13 +15,10 @@
 # limitations under the License.
 
 
-import pytest
-
 from test.conftest import requires_module
 
 
-@requires_module("h5py")
-@pytest.mark.parametrize("device", ["cuda", "cpu"])
+@requires_module(["h5py", "netCDF4"])
 def test_dataloader_setup(device, pytestconfig):
     from physicsnemo.datapipes.climate import (
         SyntheticWeatherDataLoader,
@@ -44,8 +41,7 @@ def test_dataloader_setup(device, pytestconfig):
     assert isinstance(dataloader.dataset, SyntheticWeatherDataset)
 
 
-@requires_module("h5py")
-@pytest.mark.parametrize("device", ["cuda", "cpu"])
+@requires_module(["h5py", "netCDF4"])
 def test_dataloader_iteration(device, pytestconfig):
     """Test the iteration over batches in the DataLoader."""
 
@@ -70,13 +66,14 @@ def test_dataloader_iteration(device, pytestconfig):
         assert "outvar" in sample
         assert sample["invar"].shape == (dataloader.batch_size, 2, 24, 24)
         assert sample["outvar"].shape == (dataloader.batch_size, 4, 2, 24, 24)
-        assert sample["invar"].device.type == device
-        assert sample["outvar"].device.type == device
+        assert (
+            sample["invar"].device.type in device
+        )  # use "in" to allow "cuda" in "cuda:0"
+        assert sample["outvar"].device.type in device
         break  # Only test one batch for quick testing
 
 
-@requires_module("h5py")
-@pytest.mark.parametrize("device", ["cuda", "cpu"])
+@requires_module(["h5py", "netCDF4"])
 def test_dataloader_length(device, pytestconfig):
     """Test the length of the DataLoader to ensure it is correct based on the dataset and batch size."""
 

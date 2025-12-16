@@ -187,10 +187,10 @@ def test_mesh_utils(tmp_path, pytestconfig):
 def test_stl_gen(pytestconfig, backend, sphere_stl, tmp_path):
     from stl import mesh
 
+    from physicsnemo.nn.sdf import signed_distance_field
     from physicsnemo.utils.mesh import (
         sdf_to_stl,
     )
-    from physicsnemo.utils.sdf import signed_distance_field
 
     sphere_mesh = mesh.Mesh.from_file(str(sphere_stl))
 

@@ -15,14 +15,17 @@
 # limitations under the License.
 # ruff: noqa: E402
 
-import pytest
 import torch
 
 from physicsnemo.models.diffusion_unets import SongUNetPosLtEmbd
 from test import common
+from test.conftest import requires_module
 
 
-def setup_model_learnable_embd(img_resolution, lt_steps, lt_channels, N_pos, seed=0):
+@requires_module("apex")
+def setup_model_learnable_embd(
+    apex_device, img_resolution, lt_steps, lt_channels, N_pos, seed=0
+):
     """
     Create a model with similar architecture to CorrDiff (learnable positional
     embeddings, self-attention, learnable lead time embeddings).
@@ -133,8 +136,8 @@ def generate_data_no_patches(H, W, device):
     return input_image, noise_label, class_label, lead_time_label, global_index
 
 
-@pytest.mark.parametrize("device", ["cuda:0"])
-def test_song_unet_constructor(device):
+@requires_module("apex")
+def test_song_unet_constructor(apex_device):
     """
     Test the SongUNetPosLtEmbd constructor for different architectures and shapes.
     Also test the shapes of the positional and lead time embeddings.
@@ -145,7 +148,7 @@ def test_song_unet_constructor(device):
     H = W = 16
     model = (
         setup_model_ddm_plus_plus(H, lt_steps, lt_channels)
-        .to(device)
+        .to(apex_device)
         .to(memory_format=torch.channels_last)
     )
     assert model.pos_embd.shape == (4, H, W)
@@ -156,7 +159,7 @@ def test_song_unet_constructor(device):
     H, W = 16, 32
     model = (
         setup_model_ddm_plus_plus([H, W], lt_steps, lt_channels)
-        .to(device)
+        .to(apex_device)
         .to(memory_format=torch.channels_last)
     )
     assert model.pos_embd.shape == (4, H, W)
@@ -167,7 +170,7 @@ def test_song_unet_constructor(device):
     H, W = 16, 32
     model = (
         setup_model_ncsn_plus_plus([H, W], lt_steps, lt_channels)
-        .to(device)
+        .to(apex_device)
         .to(memory_format=torch.channels_last)
     )
     assert model.pos_embd.shape == (4, H, W)
@@ -178,7 +181,7 @@ def test_song_unet_constructor(device):
     H, W = 16, 32
     model = (
         setup_model_learnable_embd([H, W], lt_steps, lt_channels, N_pos)
-        .to(device)
+        .to(apex_device)
         .to(memory_format=torch.channels_last)
     )
     assert model.pos_embd.shape == (N_pos, H, W)
@@ -186,8 +189,8 @@ def test_song_unet_constructor(device):
 
 
 # TODO: duplicate tests for model.eval()
-@pytest.mark.parametrize("device", ["cuda:0"])
-def test_song_unet_forward_no_patches(device):
+@requires_module("apex")
+def test_song_unet_forward_no_patches(apex_device):
     """
     Test the forward method of the SongUNetPosLtEmbd for different architectures
     without patches (i.e. input image is the entire global image). Uses AMP, Apex GN,
@@ -204,11 +207,11 @@ def test_song_unet_forward_no_patches(device):
     N_pos, lt_channels = 4, 8
     model = (
         setup_model_ddm_plus_plus(H, lt_steps, lt_channels)
-        .to(device)
+        .to(apex_device)
         .to(memory_format=torch.channels_last)
     )
     with torch.autocast("cuda", dtype=torch.bfloat16, enabled=True):
-        output_image = model(*generate_data_no_patches(H, W, device))
+        output_image = model(*generate_data_no_patches(H, W, apex_device))
     assert output_image.shape == (B, C_x, H, W)
     loss = output_image.sum()
     loss.backward()
@@ -219,11 +222,11 @@ def test_song_unet_forward_no_patches(device):
     N_pos, lt_channels = 4, 8
     model = (
         setup_model_ncsn_plus_plus(H, lt_steps, lt_channels)
-        .to(device)
+        .to(apex_device)
         .to(memory_format=torch.channels_last)
     )
     with torch.autocast("cuda", dtype=torch.bfloat16, enabled=True):
-        output_image = model(*generate_data_no_patches(H, W, device))
+        output_image = model(*generate_data_no_patches(H, W, apex_device))
     assert output_image.shape == (B, C_x, H, W)
     loss = output_image.sum()
     loss.backward()
@@ -234,13 +237,13 @@ def test_song_unet_forward_no_patches(device):
     N_pos, lt_channels = 6, 8
     model = (
         setup_model_learnable_embd([H, W], lt_steps, lt_channels, N_pos)
-        .to(device)
+        .to(apex_device)
         .to(memory_format=torch.channels_last)
     )
     # Compile model
     model = common.torch_compile_model(model)
     with torch.autocast("cuda", dtype=torch.bfloat16, enabled=True):
-        output_image = model(*generate_data_no_patches(H, W, device))
+        output_image = model(*generate_data_no_patches(H, W, apex_device))
     assert output_image.shape == (B, C_x, H, W)
     loss = output_image.sum()
     loss.backward()
@@ -250,8 +253,8 @@ def test_song_unet_forward_no_patches(device):
 
 
 # TODO: duplicate tests for model.eval() mode
-@pytest.mark.parametrize("device", ["cuda:0"])
-def test_song_unet_forward_with_patches(device):
+@requires_module("apex")
+def test_song_unet_forward_with_patches(apex_device):
     """
     Test the forward method of the SongUNetPosLtEmbd for different architectures
     with patches (i.e. only a subset of the global image). Uses AMP, Apex GN,
@@ -268,11 +271,11 @@ def test_song_unet_forward_with_patches(device):
     N_pos, lt_channels = 4, 8
     model = (
         setup_model_ddm_plus_plus(H, lt_steps, lt_channels)
-        .to(device)
+        .to(apex_device)
         .to(memory_format=torch.channels_last)
     )
     with torch.autocast("cuda", dtype=torch.bfloat16, enabled=True):
-        output_image = model(*generate_data_with_patches(H_p, W_p, device))
+        output_image = model(*generate_data_with_patches(H_p, W_p, apex_device))
     assert output_image.shape == (P * B, C_x, H_p, W_p)
     loss = output_image.sum()
     loss.backward()
@@ -283,11 +286,11 @@ def test_song_unet_forward_with_patches(device):
     N_pos, lt_channels = 4, 8
     model = (
         setup_model_ncsn_plus_plus(H, lt_steps, lt_channels)
-        .to(device)
+        .to(apex_device)
         .to(memory_format=torch.channels_last)
     )
     with torch.autocast("cuda", dtype=torch.bfloat16, enabled=True):
-        output_image = model(*generate_data_with_patches(H_p, W_p, device))
+        output_image = model(*generate_data_with_patches(H_p, W_p, apex_device))
     assert output_image.shape == (P * B, C_x, H_p, W_p)
     loss = output_image.sum()
     loss.backward()
@@ -298,13 +301,13 @@ def test_song_unet_forward_with_patches(device):
     N_pos, lt_channels = 6, 8
     model = (
         setup_model_learnable_embd([H, W], lt_steps, lt_channels, N_pos)
-        .to(device)
+        .to(apex_device)
         .to(memory_format=torch.channels_last)
     )
     # Compile model
     model = common.torch_compile_model(model)
     with torch.autocast("cuda", dtype=torch.bfloat16, enabled=True):
-        output_image = model(*generate_data_with_patches(H_p, W_p, device))
+        output_image = model(*generate_data_with_patches(H_p, W_p, apex_device))
     assert output_image.shape == (P * B, C_x, H_p, W_p)
     loss = output_image.sum()
     loss.backward()
@@ -313,8 +316,8 @@ def test_song_unet_forward_with_patches(device):
     return
 
 
-@pytest.mark.parametrize("device", ["cuda:0"])
-def test_song_unet_positional_embedding_indexing_no_patches(device):
+@requires_module("apex")
+def test_song_unet_positional_embedding_indexing_no_patches(apex_device):
     """
     Test for positional_embedding_indexing method. Does not use patches (i.e.
     input image is the entire global image).
@@ -328,10 +331,10 @@ def test_song_unet_positional_embedding_indexing_no_patches(device):
     N_pos, lt_channels = 6, 8
     model = (
         setup_model_learnable_embd([H, W], lt_steps, lt_channels, N_pos)
-        .to(device)
+        .to(apex_device)
         .to(memory_format=torch.channels_last)
     )
-    inputs = generate_data_no_patches(H, W, device)
+    inputs = generate_data_no_patches(H, W, apex_device)
     pos_embed = model.positional_embedding_indexing(inputs[0], inputs[4], inputs[3])
     assert pos_embed.shape == (B, N_pos + lt_channels, H, W)
     assert common.validate_tensor_accuracy(
@@ -341,8 +344,8 @@ def test_song_unet_positional_embedding_indexing_no_patches(device):
     # TODO: add non-regression tests for other architectures
 
 
-@pytest.mark.parametrize("device", ["cuda:0"])
-def test_song_unet_positional_embedding_indexing_with_patches(device):
+@requires_module("apex")
+def test_song_unet_positional_embedding_indexing_with_patches(apex_device):
     """
     Test for positional_embedding_indexing method. Uses patches (i.e. input image
     is only a subset of the global image).
@@ -356,10 +359,10 @@ def test_song_unet_positional_embedding_indexing_with_patches(device):
     N_pos, lt_channels = 6, 8
     model = (
         setup_model_learnable_embd([H, W], lt_steps, lt_channels, N_pos)
-        .to(device)
+        .to(apex_device)
         .to(memory_format=torch.channels_last)
     )
-    inputs = generate_data_with_patches(H_p, W_p, device)
+    inputs = generate_data_with_patches(H_p, W_p, apex_device)
     pos_embed = model.positional_embedding_indexing(inputs[0], inputs[4], inputs[3])
     assert pos_embed.shape == (P * B, N_pos + lt_channels, H_p, W_p)
     assert common.validate_tensor_accuracy(
@@ -369,8 +372,8 @@ def test_song_unet_positional_embedding_indexing_with_patches(device):
     # TODO: add non-regression tests for other architectures
 
 
-@pytest.mark.parametrize("device", ["cuda:0"])
-def test_song_unet_optims_no_patches(device):
+@requires_module("apex")
+def test_song_unet_optims_no_patches(apex_device):
     """Test SongUNetPosLtEmbd optimizations (CUDA graphs, JIT, AMP). Uses input
     data without patches (i.e. the entire global image)."""
 
@@ -380,10 +383,10 @@ def test_song_unet_optims_no_patches(device):
         N_pos, lt_steps, lt_channels = 6, 4, 8
         model = (
             setup_model_learnable_embd([H, W], lt_steps, lt_channels, N_pos)
-            .to(device)
+            .to(apex_device)
             .to(memory_format=torch.channels_last)
         )
-        return model, generate_data_no_patches(H, W, device)
+        return model, generate_data_no_patches(H, W, apex_device)
 
     # Ideally always check graphs first
     model, invar = setup_model()
@@ -398,8 +401,8 @@ def test_song_unet_optims_no_patches(device):
         assert common.validate_amp(model, (*invar,))
 
 
-@pytest.mark.parametrize("device", ["cuda:0"])
-def test_song_unet_optims_with_patches(device):
+@requires_module("apex")
+def test_song_unet_optims_with_patches(apex_device):
     """Test SongUNetPosLtEmbd optimizations (CUDA graphs, JIT, AMP). Uses input
     data with patches (i.e. input image is only a subset of the global image)."""
 
@@ -410,10 +413,10 @@ def test_song_unet_optims_with_patches(device):
         N_pos, lt_steps, lt_channels = 6, 4, 8
         model = (
             setup_model_learnable_embd([H, W], lt_steps, lt_channels, N_pos)
-            .to(device)
+            .to(apex_device)
             .to(memory_format=torch.channels_last)
         )
-        return model, generate_data_with_patches(H_p, W_p, device)
+        return model, generate_data_with_patches(H_p, W_p, apex_device)
 
     # Ideally always check graphs first
     model, invar = setup_model()
@@ -428,8 +431,8 @@ def test_song_unet_optims_with_patches(device):
         assert common.validate_amp(model, (*invar,))
 
 
-@pytest.mark.parametrize("device", ["cuda:0"])
-def test_song_unet_checkpoint_no_patches(device):
+@requires_module("apex")
+def test_song_unet_checkpoint_no_patches(apex_device):
     """Test SongUNetPosLtEmbd checkpoint save/load for different
     architectures. Uses input data without patches (i.e. input image is the
     entire global image)."""
@@ -442,18 +445,18 @@ def test_song_unet_checkpoint_no_patches(device):
     lt_steps, lt_channels = 4, 8
     model_1 = (
         setup_model_ddm_plus_plus(H, lt_steps, lt_channels, seed=0)
-        .to(device)
+        .to(apex_device)
         .to(memory_format=torch.channels_last)
     )
     model_2 = (
         setup_model_ddm_plus_plus(H, lt_steps, lt_channels, seed=1)
-        .to(device)
+        .to(apex_device)
         .to(memory_format=torch.channels_last)
     )
     assert common.validate_checkpoint(
         model_1,
         model_2,
-        generate_data_no_patches(H, W, device),
+        generate_data_no_patches(H, W, apex_device),
         enable_autocast=True,
     )
 
@@ -462,18 +465,18 @@ def test_song_unet_checkpoint_no_patches(device):
     lt_steps, lt_channels = 4, 8
     model_1 = (
         setup_model_ncsn_plus_plus(H, lt_steps, lt_channels, seed=0)
-        .to(device)
+        .to(apex_device)
         .to(memory_format=torch.channels_last)
     )
     model_2 = (
         setup_model_ncsn_plus_plus(H, lt_steps, lt_channels, seed=1)
-        .to(device)
+        .to(apex_device)
         .to(memory_format=torch.channels_last)
     )
     assert common.validate_checkpoint(
         model_1,
         model_2,
-        generate_data_no_patches(H, W, device),
+        generate_data_no_patches(H, W, apex_device),
         enable_autocast=True,
     )
 
@@ -482,26 +485,26 @@ def test_song_unet_checkpoint_no_patches(device):
     N_pos, lt_steps, lt_channels = 6, 4, 8
     model_1 = (
         setup_model_learnable_embd([H, W], lt_steps, lt_channels, N_pos, seed=0)
-        .to(device)
+        .to(apex_device)
         .to(memory_format=torch.channels_last)
     )
     model_2 = (
         setup_model_learnable_embd([H, W], lt_steps, lt_channels, N_pos, seed=1)
-        .to(device)
+        .to(apex_device)
         .to(memory_format=torch.channels_last)
     )
     assert common.validate_checkpoint(
         model_1,
         model_2,
-        generate_data_no_patches(H, W, device),
+        generate_data_no_patches(H, W, apex_device),
         enable_autocast=True,
     )
 
     return
 
 
-@pytest.mark.parametrize("device", ["cuda:0"])
-def test_song_unet_checkpoint_with_patches(device):
+@requires_module("apex")
+def test_song_unet_checkpoint_with_patches(apex_device):
     """Test SongUNetPosLtEmbd checkpoint save/load for different
     architectures. Uses input data with patches (i.e. input image is only a
     subset of the global image)."""
@@ -514,18 +517,18 @@ def test_song_unet_checkpoint_with_patches(device):
     lt_steps, lt_channels = 4, 8
     model_1 = (
         setup_model_ddm_plus_plus(H, lt_steps, lt_channels, seed=0)
-        .to(device)
+        .to(apex_device)
         .to(memory_format=torch.channels_last)
     )
     model_2 = (
         setup_model_ddm_plus_plus(H, lt_steps, lt_channels, seed=1)
-        .to(device)
+        .to(apex_device)
         .to(memory_format=torch.channels_last)
     )
     assert common.validate_checkpoint(
         model_1,
         model_2,
-        generate_data_with_patches(H_p, W_p, device),
+        generate_data_with_patches(H_p, W_p, apex_device),
         enable_autocast=True,
     )
 
@@ -534,18 +537,18 @@ def test_song_unet_checkpoint_with_patches(device):
     lt_steps, lt_channels = 4, 8
     model_1 = (
         setup_model_ncsn_plus_plus(H, lt_steps, lt_channels, seed=0)
-        .to(device)
+        .to(apex_device)
         .to(memory_format=torch.channels_last)
     )
     model_2 = (
         setup_model_ncsn_plus_plus(H, lt_steps, lt_channels, seed=1)
-        .to(device)
+        .to(apex_device)
         .to(memory_format=torch.channels_last)
     )
     assert common.validate_checkpoint(
         model_1,
         model_2,
-        generate_data_with_patches(H_p, W_p, device),
+        generate_data_with_patches(H_p, W_p, apex_device),
         enable_autocast=True,
     )
 
@@ -554,18 +557,18 @@ def test_song_unet_checkpoint_with_patches(device):
     N_pos, lt_steps, lt_channels = 6, 4, 8
     model_1 = (
         setup_model_learnable_embd([H, W], lt_steps, lt_channels, N_pos, seed=0)
-        .to(device)
+        .to(apex_device)
         .to(memory_format=torch.channels_last)
     )
     model_2 = (
         setup_model_learnable_embd([H, W], lt_steps, lt_channels, N_pos, seed=1)
-        .to(device)
+        .to(apex_device)
         .to(memory_format=torch.channels_last)
     )
     assert common.validate_checkpoint(
         model_1,
         model_2,
-        generate_data_with_patches(H_p, W_p, device),
+        generate_data_with_patches(H_p, W_p, apex_device),
         enable_autocast=True,
     )
 
@@ -573,8 +576,8 @@ def test_song_unet_checkpoint_with_patches(device):
 
 
 @common.check_ort_version()
-@pytest.mark.parametrize("device", ["cuda:0"])
-def test_son_unet_deploy(device):
+@requires_module("apex")
+def test_son_unet_deploy(apex_device):
     """Test Song UNet deployment support"""
 
     # Common parameters
@@ -585,14 +588,14 @@ def test_son_unet_deploy(device):
     N_pos, lt_steps, lt_channels = 6, 4, 8
     model = (
         setup_model_learnable_embd([H, W], lt_steps, lt_channels, N_pos)
-        .to(device)
+        .to(apex_device)
         .to(memory_format=torch.channels_last)
     )
     assert common.validate_onnx_export(
         model,
-        generate_data_with_patches(H_p, W_p, device),
+        generate_data_with_patches(H_p, W_p, apex_device),
     )
     assert common.validate_onnx_runtime(
         model,
-        generate_data_with_patches(H_p, W_p, device),
+        generate_data_with_patches(H_p, W_p, apex_device),
     )

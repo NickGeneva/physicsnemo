@@ -24,7 +24,17 @@ import torch
 
 from physicsnemo.active_learning import protocols as p
 from physicsnemo.active_learning._registry import registry
-from physicsnemo.core import Module
+from physicsnemo.core import ModelRegistry, Module
+
+
+# Fixture to clear model registry between tests to avoid naming conflicts
+@pytest.fixture(autouse=True)
+def clear_model_registry():
+    """Clear and restore the model registry before and after each test"""
+    model_registry = ModelRegistry()
+    model_registry.__clear_registry__()
+    yield
+    model_registry.__restore_registry__()
 
 
 # Mock classes for testing serialization

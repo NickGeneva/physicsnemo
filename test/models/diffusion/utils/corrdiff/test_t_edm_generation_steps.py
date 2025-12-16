@@ -16,14 +16,12 @@
 
 from functools import partial
 
-import pytest
 import torch
 
 from test.conftest import requires_module
 
 
 @requires_module("cftime")
-@pytest.mark.parametrize("device", ["cuda:0", "cpu"])
 def test_diffusion_step(device, pytestconfig):
     from physicsnemo.diffusion.samplers import (
         deterministic_sampler,

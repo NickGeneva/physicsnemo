@@ -95,30 +95,21 @@ def generate_data(device: str):
     return x
 
 
-@pytest.mark.parametrize(
-    ("device", "use_apex_gn"),
-    [
-        ("cuda:0", False),
-        ("cuda:0", True),
-        ("cpu", False),
-    ],
-    ids=["gpu", "gpu-apexgn", "cpu"],
-)
+@pytest.mark.parametrize("use_apex_gn", [False, True], ids=["no-apexgn", "apexgn"])
 @pytest.mark.parametrize(
     "arch_type",
     ["gn_type_1", "gn_type_2", "gn_type_3"],
     ids=["arch1", "arch2", "arch3"],
 )
-def test_group_norm_non_regression(device, arch_type, use_apex_gn):
+def test_group_norm_non_regression(apex_device, arch_type, use_apex_gn):
     """
     Test that GroupNorm can be instantiated and compare the output with a
     reference output generated with v1.0.1.
     """
-
     model: GroupNormModule = GroupNormModule.factory(
         arch_type=arch_type,
         use_apex_gn=use_apex_gn,
-    ).to(device)
+    ).to(apex_device)
 
     # Check that the model is instantiated correctly
     if arch_type == "gn_type_1":
@@ -137,7 +128,7 @@ def test_group_norm_non_regression(device, arch_type, use_apex_gn):
         assert model.group_norm.bias.shape == (64,)
         assert model.group_norm.eps == 1e-3
 
-    x: torch.Tensor = generate_data(device)
+    x: torch.Tensor = generate_data(apex_device)
     out: torch.Tensor = model(x)
 
     assert common.validate_accuracy(
@@ -149,29 +140,21 @@ def test_group_norm_non_regression(device, arch_type, use_apex_gn):
 # TODO : currently only test overrding use_apex_gn from False to True. Need to
 # add test to do the opposite (that is load checkpoint with use_apex_gn=True and
 # override it to False)
-@pytest.mark.parametrize(
-    ("device", "use_apex_gn", "chkpt_use_apex_gn"),
-    [
-        ("cuda:0", False, False),
-        ("cuda:0", True, False),
-        ("cpu", False, False),
-    ],
-    ids=["gpu", "gpu-apexgn", "cpu"],
-)
+@pytest.mark.parametrize("use_apex_gn", [False, True], ids=["no-apexgn", "apexgn"])
+@pytest.mark.parametrize("chkpt_use_apex_gn", [False], ids=["chkpt-no-apexgn"])
 @pytest.mark.parametrize(
     "arch_type",
     ["gn_type_1", "gn_type_2", "gn_type_3"],
     ids=["arch1", "arch2", "arch3"],
 )
 def test_group_norm_non_regression_from_checkpoint(
-    device, arch_type, use_apex_gn, chkpt_use_apex_gn
+    apex_device, arch_type, use_apex_gn, chkpt_use_apex_gn
 ):
     """
     Tests simple loading and non-regression of a checkpoint generated with the
     get_group_norm class. Also tests the API to override ``use_apex_gn`` to
     use Apex-based group norm when loading the checkpoint.
     """
-
     script_dir = Path(__file__).parent
     file_name: str = str(
         script_dir / Path(f"data/checkpoint_diffusion_{arch_type}-v1.0.1.mdlus")
@@ -180,7 +163,7 @@ def test_group_norm_non_regression_from_checkpoint(
     model: physicsnemo.core.Module = physicsnemo.core.Module.from_checkpoint(
         file_name=file_name,
         override_args={"use_apex_gn": use_apex_gn},
-    ).to(device)
+    ).to(apex_device)
 
     # Check that the model is instantiated correctly
     if arch_type == "gn_type_1":
@@ -199,7 +182,7 @@ def test_group_norm_non_regression_from_checkpoint(
         assert model.group_norm.bias.shape == (64,)
         assert model.group_norm.eps == 1e-3
 
-    x: torch.Tensor = generate_data(device)
+    x: torch.Tensor = generate_data(apex_device)
     out: torch.Tensor = model(x)
 
     assert common.validate_accuracy(
