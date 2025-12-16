@@ -43,10 +43,10 @@ def test_knn(device: str, k: int, backend: str, dtype: torch.dtype):
             pytest.skip("scipy not available")
 
     # Skip cuml tests on CPU as it's not supported
-    if backend == "cuml" and device == "cpu":
+    if backend == "cuml" and "cpu" in device:
         pytest.skip("cuml backend not supported on CPU")
 
-    if backend == "scipy" and device == "cuda":
+    if backend == "scipy" and "cuda" in device:
         pytest.skip("scipy backend not supported on CUDA")
 
     # Generate a grid of query points
@@ -106,7 +106,7 @@ def test_knn_torch_compile_no_graph_break(device):
         pytest.skip("torch.compile not available in this version of PyTorch")
 
     # CUDA only:
-    if device == "cpu":
+    if "cpu" in device:
         pytest.skip("CUDA only")
 
     # Prepare test data
@@ -142,7 +142,7 @@ def test_opcheck(device):
     queries = torch.randn(10, 3, device=device)
     k = 5
 
-    if device == "cuda":
+    if "cuda" in device:
         if not check_version_spec("cuml", "24.0.0", hard_fail=False):
             pytest.skip("cuml not available")
         op = knn_cuml
@@ -160,13 +160,13 @@ def test_knn_comparison(device):
     k = 5
 
     if not check_version_spec("cuml", hard_fail=False):
-        if device == "cuda":
+        if "cuda" in device:
             pytest.skip("cuml not available")
     if not check_version_spec("scipy", hard_fail=False):
-        if device == "cpu":
+        if "cpu" in device:
             pytest.skip("scipy not available")
 
-    if device == "cuda":
+    if "cuda" in device:
         indices_cuml, distances_A = knn(points, queries, k, backend="cuml")
         indices_torch, distances_B = knn(points, queries, k, backend="torch")
     else:

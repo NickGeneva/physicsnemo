@@ -47,3 +47,8 @@ if ST_AVAILABLE:
     # Protect the automatic imports by checking cuda is available.
     if torch.cuda.is_available():
         register_custom_ops()
+
+else:
+    ShardTensor = None
+    ShardTensorSpec = None
+    scatter_tensor = None
