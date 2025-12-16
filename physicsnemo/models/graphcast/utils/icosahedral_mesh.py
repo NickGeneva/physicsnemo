@@ -16,8 +16,8 @@
 # ruff: noqa: S101
 """Utils for creating icosahedral meshes."""
 
-import itertools
 import importlib
+import itertools
 from typing import List, NamedTuple, Sequence, Tuple
 
 import numpy as np
@@ -119,7 +119,7 @@ def get_icosahedron() -> TriangularMesh:
            counterclock-wise when looking from the outside).
 
     """
-    
+
     if transform is None:
         raise ImportError(
             "scipy is not installed, cannot use get_icosahedron method. "

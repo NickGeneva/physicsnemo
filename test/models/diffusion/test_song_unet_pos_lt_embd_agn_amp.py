@@ -21,11 +21,11 @@ import torch
 from physicsnemo.models.diffusion import SongUNetPosLtEmbd
 from test import common
 
+
 @pytest.fixture(autouse=True)
 def skip_on_cpu(device):
     if device == "cpu":
         pytest.skip("Skip SongUNetPosLtEmbd AMP/agnostic tests on cpu")
-
 
 
 def setup_model_learnable_embd(img_resolution, lt_steps, lt_channels, N_pos, seed=0):

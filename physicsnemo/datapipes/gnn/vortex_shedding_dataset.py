@@ -21,10 +21,9 @@ import os
 import numpy as np
 import torch
 import torch_geometric as pyg
+from tfrecord.torch.dataset import TFRecordDataset
 from torch.nn import functional as F
 from torch.utils.data import Dataset
-
-from tfrecord.torch.dataset import TFRecordDataset
 
 from physicsnemo.datapipes.gnn.utils import load_json, save_json
 

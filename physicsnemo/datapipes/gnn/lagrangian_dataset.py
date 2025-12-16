@@ -23,12 +23,11 @@ from typing import Optional
 
 import numpy as np
 import torch
+from tfrecord.torch.dataset import TFRecordDataset
 from torch import Tensor
 from torch.nn import functional as F
 from torch.utils.data import Dataset
 from torch_geometric.data import Data as PyGData
-
-from tfrecord.torch.dataset import TFRecordDataset
 
 logger = logging.getLogger("lmgn")
 
@@ -187,9 +186,7 @@ class LagrangianDataset(Dataset):
             )  # (num_steps, num_particles, dim)
             assert position.shape[0] == self.num_steps, f"{self.num_steps=}, {i=}"
 
-            node_type = torch.from_numpy(
-                data_np["particle_type"]
-            )  # (num_particles,)
+            node_type = torch.from_numpy(data_np["particle_type"])  # (num_particles,)
             assert node_type.shape[0] == position.shape[1], f"{i=}"
 
             features = {}
@@ -609,7 +606,9 @@ class LagrangianDataset(Dataset):
             for ctx_bytes in sequence["step_context"]:
                 ctx = np.frombuffer(ctx_bytes, dtype=np.float32)
                 context_list.append(ctx)
-            result["step_context"] = np.ascontiguousarray(np.stack(context_list, axis=0))
+            result["step_context"] = np.ascontiguousarray(
+                np.stack(context_list, axis=0)
+            )
 
         return result
 

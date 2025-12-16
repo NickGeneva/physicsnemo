@@ -21,6 +21,7 @@ import torch
 from physicsnemo.models.diffusion import SongUNetPosEmbd as UNet
 from test import common
 
+
 @pytest.fixture(autouse=True)
 def skip_on_cpu(device):
     if device == "cpu":

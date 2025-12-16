@@ -21,11 +21,11 @@ import torch
 from physicsnemo.models.diffusion import SongUNet as UNet
 from test import common
 
+
 @pytest.fixture(autouse=True)
 def skip_on_cpu(device):
     if device == "cpu":
         pytest.skip("Skip SongUNetPosLtEmbd AMP/agnostic tests on cpu")
-
 
 
 def test_song_unet_constructor(device):

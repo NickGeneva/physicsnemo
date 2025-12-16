@@ -270,10 +270,9 @@ class _DiTBlockWrapper(nn.Module):
 
 
 def test_ditblock_forward_accuracy_timm(device):
-    
     if device == "cpu":
         pytest.skip("CUDA only")
-        
+
     torch.manual_seed(0)
     hidden_size = 128
     num_heads = 4
@@ -308,10 +307,9 @@ def test_ditblock_forward_accuracy_timm(device):
 
 @requires_module(["natten"])
 def test_ditblock_forward_accuracy_natten(device, pytestconfig):
-    
     if device == "cpu":
         pytest.skip("natten not available on CPU")
-    
+
     torch.manual_seed(0)
     hidden_size = 64
     num_heads = 4

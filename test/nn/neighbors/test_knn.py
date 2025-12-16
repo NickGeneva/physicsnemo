@@ -104,11 +104,10 @@ def test_knn_torch_compile_no_graph_break(device):
     # Only test if torch.compile is available (PyTorch 2.0+)
     if not hasattr(torch, "compile"):
         pytest.skip("torch.compile not available in this version of PyTorch")
-    
+
     # CUDA only:
     if device == "cpu":
         pytest.skip("CUDA only")
-
 
     # Prepare test data
     points = torch.randn(207, 3, device=device)
@@ -136,7 +135,6 @@ def test_knn_torch_compile_no_graph_break(device):
     # Compare outputs (tuple of tensors)
     for eager, compiled in zip(out_eager, out_compiled):
         assert torch.allclose(eager, compiled, atol=1e-6)
-
 
 
 def test_opcheck(device):

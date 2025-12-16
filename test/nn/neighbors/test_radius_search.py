@@ -196,7 +196,6 @@ def test_radius_search(
         assert indexes.shape[1] == expected_matches * query_space_points.shape[0]
 
 
-
 def test_radius_search_torch_compile_no_graph_break(device):
     # Cuda curnently disabled in this test, but it does work.
 
@@ -236,10 +235,9 @@ def test_radius_search_torch_compile_no_graph_break(device):
 
 
 def test_opcheck(device):
-    
     if device == "cpu":
         pytest.skip("CUDA only")
-    
+
     points = torch.randn(100, 3, device=device)
     queries = torch.randn(10, 3, device=device)
     radius = 0.5
