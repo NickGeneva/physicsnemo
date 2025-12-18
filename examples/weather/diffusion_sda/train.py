@@ -119,7 +119,7 @@ def main():
         load_checkpoint(checkpoint_dir, models=model)
 
     # Compile model
-    # model = torch.compile(model)
+    model = torch.compile(model)
 
     # TODO-NG: Create training and validation dataloaders with InfiniteSampler.
     # Requirements:
