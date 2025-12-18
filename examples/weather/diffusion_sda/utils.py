@@ -56,12 +56,12 @@ class EDMPreconditioner(Module):
                     f"but got {condition.values()} instead."
                 )
 
-        sigma = t
+        sigma = t.view(B, *((1,) * (x.ndim - 1)))
 
         c_skip = self.sigma_data**2 / (sigma**2 + self.sigma_data**2)
         c_out = sigma * self.sigma_data / (sigma**2 + self.sigma_data**2).sqrt()
         c_in = 1 / (self.sigma_data**2 + sigma**2).sqrt()
-        c_noise = sigma.log() / 4
+        c_noise = (sigma.log() / 4).flatten()
 
         return c_skip * x + c_out * self.model(
             c_in * x, c_noise, condition, **model_kwargs
@@ -131,7 +131,7 @@ class EDMLoss:
         Returns
         -------
         Tuple[torch.Tensor, torch.Tensor, torch.Tensor]
-            - Noise ``n`` of shape :math:`(B,)` to be added to the latent state.
+            - Noise ``n`` of shape :math:`(B, *)` to be added to the latent state.
             - Noise level ``sigma`` of shape :math:`(B,)`.
             - Weight ``weight`` of shape :math:`(B,` to multiply the loss.
         """
@@ -141,7 +141,7 @@ class EDMLoss:
         # Loss weight
         weight = (sigma**2 + self.sigma_data**2) / (sigma * self.sigma_data) ** 2
         # Sample noise
-        n = torch.randn_like(x) * sigma
+        n = torch.randn_like(x) * sigma.view(x.shape[0], *((1,) * (x.ndim - 1)))
         return n, sigma, weight
 
     def __call__(
@@ -164,7 +164,7 @@ class EDMLoss:
         n, sigma, weight = self.get_noise_params(x)
 
         x_0 = self.model(
-            x + n.view(x.shape[0], *((1,) * (x.ndim - 1))),
+            x + n,
             sigma,
             condition,
             global_index=(

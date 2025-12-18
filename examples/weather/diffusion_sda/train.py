@@ -44,49 +44,32 @@ torch._logging.set_logs(recompiles=True, graph_breaks=True)
 
 
 def main():
-    # # Configuration
-    # # TODO-NG: update with actual number of variables (channels). Let's keep
-    # # the raw resolution. If problem with patching, the right
-    # # approach should be to make the patching operations work for *any*
-    # # resolution instead of cropping the global image or some other trickery.
-    # img_resolution = [1059, 1799]
-    # img_channels = 8
-    # # TODO-NG: update with actual patch size, must be a multiple of 16 and
-    # # as close as possible to being a divisor of the image resolution (not
-    # # sure?). US CorrDiff seems to be using 448x448 patches (not sure
-    # # that's right, but it's what we have in the physicsnemo codebase.
-    # # Maybe the NIM has something different?). So we should use *at least*
-    # # whatever value was used for US cOrrDiff, but it could be larger as
-    # # long as it fits in memory.
-    # patch_shape = (448, 448)
-    # patch_num = 4
-    # # TODO-NG: need to update with actual parameters below
-    # batch_size_per_gpu = 64
-    # load_checkpoint_from_file = False
-    # checkpoint_dir = "./checkpoints"
-    # max_training_samples = 10000000
-    # checkpoint_frequency = 100000
-    # validation_frequency = 10000
-    # num_validation_samples = 1000
-    # logging_frequency = 1000
-    # use_apex = False
-    # use_amp = False
-
-    # DEBUG
+    # Configuration
+    # TODO-NG: update with actual number of variables (channels). Let's keep
+    # the raw resolution. If problem with patching, the right
+    # approach should be to make the patching operations work for *any*
+    # resolution instead of cropping the global image or some other trickery.
     img_resolution = [1059, 1799]
     img_channels = 8
+    # TODO-NG: update with actual patch size, must be a multiple of 16 and
+    # as close as possible to being a divisor of the image resolution (not
+    # sure?). US CorrDiff seems to be using 448x448 patches (not sure
+    # that's right, but it's what we have in the physicsnemo codebase.
+    # Maybe the NIM has something different?). So we should use *at least*
+    # whatever value was used for US cOrrDiff, but it could be larger as
+    # long as it fits in memory.
     patch_shape = (448, 448)
-    patch_num = 2
-    batch_size_per_gpu = 2
+    patch_num = 4
+    # TODO-NG: need to update with actual parameters below
+    batch_size_per_gpu = 64
     load_checkpoint_from_file = False
     checkpoint_dir = "./checkpoints"
-    max_training_samples = 10
-    checkpoint_frequency = 2
-    validation_frequency = 2
-    num_validation_samples = 10
-    logging_frequency = 2
+    max_training_samples = 10000000
+    checkpoint_frequency = 100000
+    validation_frequency = 10000
+    num_validation_samples = 1000
+    logging_frequency = 1000
     use_apex = False
-    use_amp = False
 
     # Initialize distributed environment
     DistributedManager.initialize()
@@ -109,7 +92,6 @@ def main():
         channel_mult=channel_mult,
         attn_resolutions=[img_resolution[0] >> len(channel_mult)],
         use_apex_gn=use_apex,
-        amp_mode=use_amp,
     )
     model = (
         EDMPreconditioner(
@@ -137,7 +119,7 @@ def main():
         load_checkpoint(checkpoint_dir, models=model)
 
     # Compile model
-    model = torch.compile(model)
+    # model = torch.compile(model)
 
     # TODO-NG: Create training and validation dataloaders with InfiniteSampler.
     # Requirements:
@@ -154,58 +136,9 @@ def main():
     # val_loader = HRRRDataPipe(path_to_data, batch_size_per_gpu, "val")
     # train_iter = iter(train_loader)
     # val_iter = iter(val_loader)
-    # train_iter = None  # Placeholder
-    # val_iter = None  # Placeholder
-    # num_training_samples = train_loader.num_total_samples
-
-    # Dummy dataset and InfiniteSampler for debugging (remove in final version)
-    class DummyDataset(torch.utils.data.Dataset):
-        def __init__(self, num_samples, channels, resolution):
-            self.num_samples = num_samples
-            self.channels = channels
-            self.resolution = resolution
-
-        def __len__(self):
-            return self.num_samples
-
-        def __getitem__(self, idx):
-            return torch.randn(self.channels, *self.resolution)
-
-    train_dataset = DummyDataset(num_training_samples, img_channels, img_resolution)
-    val_dataset = DummyDataset(1000, img_channels, img_resolution)
-
-    train_sampler = InfiniteSampler(
-        dataset=train_dataset,
-        rank=dist.rank,
-        num_replicas=dist.world_size,
-        shuffle=True,
-        seed=0,
-    )
-    val_sampler = InfiniteSampler(
-        dataset=val_dataset,
-        rank=dist.rank,
-        num_replicas=dist.world_size,
-        shuffle=False,
-        seed=0,
-    )
-
-    train_loader = torch.utils.data.DataLoader(
-        train_dataset,
-        batch_size=batch_size_per_gpu,
-        sampler=train_sampler,
-        num_workers=0,
-        pin_memory=True,
-    )
-    val_loader = torch.utils.data.DataLoader(
-        val_dataset,
-        batch_size=batch_size_per_gpu,
-        sampler=val_sampler,
-        num_workers=0,
-        pin_memory=True,
-    )
-
-    train_iter = iter(train_loader)
-    val_iter = iter(val_loader)
+    train_iter = None  # Placeholder
+    val_iter = None  # Placeholder
+    num_training_samples = train_loader.num_total_samples
 
     # Create loss function with multi-diffusion support
     patching = RandomPatching2D(
@@ -288,8 +221,7 @@ def main():
 
         # Forward pass
         optimizer.zero_grad(**({} if use_apex else {"set_to_none": True}))
-        with torch.autocast("cuda", dtype=torch.bfloat16, enabled=use_amp):
-            loss = loss_fn(x, {}).mean()
+        loss = loss_fn(x, {}).mean()
 
         # Backward pass and optimize
         loss.backward()
@@ -339,8 +271,7 @@ def main():
                         memory_format=torch.channels_last
                     )
                     val_batch_size = x_val.shape[0]
-                    with torch.autocast("cuda", dtype=torch.bfloat16, enabled=use_amp):
-                        val_loss = loss_fn(x_val, {}).mean()
+                    val_loss = loss_fn(x_val, {}).mean()
                     mean_val_loss = (
                         reduce_loss(val_loss.item() * val_batch_size, dst_rank=0)
                         / total_batch_size
@@ -377,7 +308,7 @@ def main():
                 )
             samples_since_checkpoint = 0
 
-    # Cleanup.
+    # Cleanup
     rank_zero_logger.info("Training completed!")
 
 
