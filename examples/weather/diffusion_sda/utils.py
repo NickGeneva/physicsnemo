@@ -131,9 +131,9 @@ class EDMLoss:
         Returns
         -------
         Tuple[torch.Tensor, torch.Tensor, torch.Tensor]
-            - Noise ``n`` of shape :math:`(B, 1, ..., 1)` to be added to the latent state.
+            - Noise ``n`` of shape :math:`(B,)` to be added to the latent state.
             - Noise level ``sigma`` of shape :math:`(B,)`.
-            - Weight ``weight`` of shape :math:`(B, 1, ..., 1)` to multiply the loss.
+            - Weight ``weight`` of shape :math:`(B,` to multiply the loss.
         """
         # Sample noise level
         rnd_normal = torch.randn([x.shape[0]], device=x.device)
@@ -142,11 +142,7 @@ class EDMLoss:
         weight = (sigma**2 + self.sigma_data**2) / (sigma * self.sigma_data) ** 2
         # Sample noise
         n = torch.randn_like(x) * sigma
-        return (
-            n.view(x.shape[0], *((1,) * (x.ndim - 1))),
-            sigma.view(x.shape[0], *((1,) * (x.ndim - 1))),
-            weight.view(x.shape[0], *((1,) * (x.ndim - 1))),
-        )
+        return n, sigma, weight
 
     def __call__(
         self,
@@ -161,16 +157,14 @@ class EDMLoss:
         if self.patching:
             # (P * B, C, H_p, W_p)
             x = self.patching.apply(x)
-            # TODO: adapt for conditional multi-diffusion
-            # Patched conditioning on y_lr and interp(img_lr)
-            # (batch_size * patch_num, 2*c_in, patch_shape_y, patch_shape_x)
-            y_lr_patched = self.patching.apply(input=y_lr, additional_input=img_lr)
+            for cond_name, y_cond in condition.items():
+                condition[cond_name] = self.patching.apply(input=y_cond)
 
         # Compute noise parameters
         n, sigma, weight = self.get_noise_params(x)
 
         x_0 = self.model(
-            x + n,
+            x + n.view(x.shape[0], *((1,) * (x.ndim - 1))),
             sigma,
             condition,
             global_index=(
@@ -180,4 +174,4 @@ class EDMLoss:
             ),
             **model_kwargs,
         )
-        return weight * ((x_0 - x) ** 2)
+        return weight.view(x.shape[0], *((1,) * (x.ndim - 1))) * ((x_0 - x) ** 2)

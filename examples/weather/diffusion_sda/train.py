@@ -14,28 +14,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import datetime
 import time
+import importlib
 
 import torch
-import wandb
 from torch.nn.parallel import DistributedDataParallel
 from torch.optim.lr_scheduler import CosineAnnealingLR
 
 from physicsnemo.distributed import DistributedManager
-from physicsnemo import Module
-from physicsnemo.core import ModelMetaData
 from physicsnemo.utils.logging import PythonLogger, RankZeroLoggingWrapper
-from physicsnemo.utils.logging.wandb import initialize_wandb
-from physicsnemo.utils import (
-    load_checkpoint,
-    save_checkpoint,
-    get_checkpoint_dir,
-)
+from physicsnemo.utils import load_checkpoint, save_checkpoint
+from physicsnemo.distributed.utils import reduce_loss
 
 # TODO: update with base DiffusionUNet once refactor is complete
 from physicsnemo.models.diffusion_unets import SongUNetPosEmbd
 from physicsnemo.diffusion.multi_diffusion import RandomPatching2D
+from physicsnemo.diffusion.utils.utils import InfiniteSampler
 
 # TODO: replace with updated APIs once refactor is complete
 from utils import EDMPreconditioner, EDMLoss, DiffusionAdapter
@@ -50,53 +44,61 @@ torch._logging.set_logs(recompiles=True, graph_breaks=True)
 
 
 def main():
-    # Configuration
-    # TODO-NG: need to update with actual parameters
-    load_checkpoint_flag = False
+    # # Configuration
+    # # TODO-NG: update with actual number of variables (channels). Let's keep
+    # # the raw resolution. If problem with patching, the right
+    # # approach should be to make the patching operations work for *any*
+    # # resolution instead of cropping the global image or some other trickery.
+    # img_resolution = [1059, 1799]
+    # img_channels = 8
+    # # TODO-NG: update with actual patch size, must be a multiple of 16 and
+    # # as close as possible to being a divisor of the image resolution (not
+    # # sure?). US CorrDiff seems to be using 448x448 patches (not sure
+    # # that's right, but it's what we have in the physicsnemo codebase.
+    # # Maybe the NIM has something different?). So we should use *at least*
+    # # whatever value was used for US cOrrDiff, but it could be larger as
+    # # long as it fits in memory.
+    # patch_shape = (448, 448)
+    # patch_num = 4
+    # # TODO-NG: need to update with actual parameters below
+    # batch_size_per_gpu = 64
+    # load_checkpoint_from_file = False
+    # checkpoint_dir = "./checkpoints"
+    # max_training_samples = 10000000
+    # checkpoint_frequency = 100000
+    # validation_frequency = 10000
+    # num_validation_samples = 1000
+    # logging_frequency = 1000
+    # use_apex = False
+    # use_amp = False
+
+    # DEBUG
+    img_resolution = [1059, 1799]
+    img_channels = 8
+    patch_shape = (448, 448)
+    patch_num = 2
+    batch_size_per_gpu = 2
+    load_checkpoint_from_file = False
     checkpoint_dir = "./checkpoints"
-    checkpoint_freq = 10
-    log_freq = 10
-    max_epochs = 100
-    use_apex_flag = False
+    max_training_samples = 10
+    checkpoint_frequency = 2
+    validation_frequency = 2
+    num_validation_samples = 10
+    logging_frequency = 2
+    use_apex = False
+    use_amp = False
 
     # Initialize distributed environment
     DistributedManager.initialize()
     dist = DistributedManager()
 
     # Setup logging
-    timestamp = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     logger = PythonLogger("main")
     rank_zero_logger = RankZeroLoggingWrapper(logger, dist)
 
-    # Initialize Weights & Biases
-    checkpoint_path = get_checkpoint_dir(checkpoint_dir, "diffusion_sda")
-    if load_checkpoint_flag:
-        metadata = {"wandb_id": None}
-        load_checkpoint(checkpoint_dir, metadata_dict=metadata)
-        wandb_id: str = metadata["wandb_id"]
-        resume: str = "must"
-        rank_zero_logger.info(f"Resuming wandb run with ID: {wandb_id}")
-    else:
-        wandb_id, resume = None, None
-    initialize_wandb(
-        project="DiffusionSDA-Training",
-        entity="PhysicsNeMo",
-        mode="disabled",
-        results_dir="./wandb",
-        wandb_id=wandb_id,
-        resume=resume,
-        save_code=True,
-        name=f"train-{timestamp}",
-        init_timeout=600,
-    )
-
     # Create model
-    # TODO-NG: update with actual resolution of the global domain and number of
-    # variables (channels). Then we need to tune some other parameters as well
-    # based on these values.
-    img_resolution = [128, 256]
-    img_channels = 4
-    num_grid_channels = 100
+    channel_mult = [1, 2, 2, 2, 2]
+    num_grid_channels = 20
     model_backbone = SongUNetPosEmbd(
         img_resolution=img_resolution,
         in_channels=img_channels + num_grid_channels,
@@ -104,13 +106,18 @@ def main():
         N_grid_channels=num_grid_channels,
         gridtype="learnable",
         model_channels=128,
-        channel_mult=[1, 2, 2, 2, 2],
-        attn_resolutions=[28],
-        use_apex_gn=use_apex_flag,
-    ).to(dist.device)
-    model = EDMPreconditioner(
-        model=DiffusionAdapter(model_backbone),
-        sigma_data=1.0,
+        channel_mult=channel_mult,
+        attn_resolutions=[img_resolution[0] >> len(channel_mult)],
+        use_apex_gn=use_apex,
+        amp_mode=use_amp,
+    )
+    model = (
+        EDMPreconditioner(
+            model=DiffusionAdapter(model_backbone),
+            sigma_data=1.0,
+        )
+        .to(dist.device)
+        .to(memory_format=torch.channels_last)
     )
     rank_zero_logger.info(f"Training model with {model.num_parameters()} parameters.")
 
@@ -119,188 +126,259 @@ def main():
         model = DistributedDataParallel(
             model,
             device_ids=[dist.local_rank],
+            broadcast_buffers=True,
             output_device=dist.device,
-            broadcast_buffers=dist.broadcast_buffers,
-            find_unused_parameters=dist.find_unused_parameters,
+            find_unused_parameters=True,
+            bucket_cap_mb=35,
+            gradient_as_bucket_view=True,
+            static_graph=True,
         )
+    if load_checkpoint_from_file:
+        load_checkpoint(checkpoint_dir, models=model)
 
     # Compile model
     model = torch.compile(model)
-    rank_zero_logger.info("Model compiled.")
 
     # TODO-NG: Create training and validation dataloaders with InfiniteSampler.
     # Requirements:
-    # - The data has to be z-score normalized (mean=0, std=1)
+    # - The data has to be z-score normalized per-channel (mean=0, std=1). (we
+    #   need a stats.json to denormalize the data back to the original scale
+    #   later on)
     # - Use InfiniteSampler for infinite iteration
-    # train_loader = ...
-    # val_loader = ...
+    # - Need to take an input batch_size_per_gpu
+    # - Must have a attribute num_total_samples that returns the total number
+    #   of samples in the dataset (NOT per GPU but for the entire dataset).
+    # - The data type returned should be float32.
+    # - Other arguments like pin_memory, num_workers, etc. could also be useful here
+    # train_loader = HRRRDataPipe(path_to_data, batch_size_per_gpu, "train")
+    # val_loader = HRRRDataPipe(path_to_data, batch_size_per_gpu, "val")
     # train_iter = iter(train_loader)
     # val_iter = iter(val_loader)
-    train_iter = None  # Placeholder
-    val_iter = None  # Placeholder
+    # train_iter = None  # Placeholder
+    # val_iter = None  # Placeholder
+    # num_training_samples = train_loader.num_total_samples
+
+    # Dummy dataset and InfiniteSampler for debugging (remove in final version)
+    class DummyDataset(torch.utils.data.Dataset):
+        def __init__(self, num_samples, channels, resolution):
+            self.num_samples = num_samples
+            self.channels = channels
+            self.resolution = resolution
+
+        def __len__(self):
+            return self.num_samples
+
+        def __getitem__(self, idx):
+            return torch.randn(self.channels, *self.resolution)
+
+    train_dataset = DummyDataset(num_training_samples, img_channels, img_resolution)
+    val_dataset = DummyDataset(1000, img_channels, img_resolution)
+
+    train_sampler = InfiniteSampler(
+        dataset=train_dataset,
+        rank=dist.rank,
+        num_replicas=dist.world_size,
+        shuffle=True,
+        seed=0,
+    )
+    val_sampler = InfiniteSampler(
+        dataset=val_dataset,
+        rank=dist.rank,
+        num_replicas=dist.world_size,
+        shuffle=False,
+        seed=0,
+    )
+
+    train_loader = torch.utils.data.DataLoader(
+        train_dataset,
+        batch_size=batch_size_per_gpu,
+        sampler=train_sampler,
+        num_workers=0,
+        pin_memory=True,
+    )
+    val_loader = torch.utils.data.DataLoader(
+        val_dataset,
+        batch_size=batch_size_per_gpu,
+        sampler=val_sampler,
+        num_workers=0,
+        pin_memory=True,
+    )
+
+    train_iter = iter(train_loader)
+    val_iter = iter(val_loader)
 
     # Create loss function with multi-diffusion support
     patching = RandomPatching2D(
         img_shape=img_resolution,
-        # TODO-NG: update with actual patch size, must be either a power of 2
-        # or a multiple of 16
-        patch_shape=(16, 16),
-        patch_num=4,
+        patch_shape=patch_shape,
+        patch_num=patch_num,
     )
     loss_fn = EDMLoss(
         model=model,
         P_mean=0.0,
-        P_std=1.0,
+        P_std=1.2,
         sigma_data=1.0,
         patching=patching,
     )
 
-    # Initialize optimizer.
-    if use_apex_flag:
+    # Initialize optimizer
+    if use_apex:
         FusedAdam = getattr(importlib.import_module("apex.optimizers"), "FusedAdam")
         optimizer = FusedAdam(
             model.parameters(),
-            lr=1e-4,
+            lr=5e-4,
             weight_decay=0.0,
-            betas=(0.9, 0.999),
         )
     else:
         optimizer = torch.optim.AdamW(
             model.parameters(),
-            lr=1e-4,
+            lr=5e-4,
             weight_decay=0.0,
-            betas=(0.9, 0.999),
         )
 
     # Initialize learning rate scheduler
     scheduler = CosineAnnealingLR(
         optimizer,
-        T_max=max_epochs,
-        eta_min=1e-6,
+        T_max=max_training_samples // num_training_samples,
+        eta_min=5e-6,
     )
 
     # Load checkpoint if requested
-    loaded_epoch, total_samples_trained = 0, 0
+    current_samples_trained = 0
     if dist.world_size > 1:
         torch.distributed.barrier()
-    if load_checkpoint_flag:
-        metadata = {"total_samples_trained": total_samples_trained}
-        loaded_epoch = load_checkpoint(
-            checkpoint_path,
-            models=model,
+    if load_checkpoint_from_file:
+        metadata = {"current_samples_trained": current_samples_trained}
+        load_checkpoint(
+            checkpoint_dir,
             optimizer=optimizer,
             scheduler=scheduler,
             device=dist.device,
             metadata_dict=metadata,
         )
-        total_samples_trained = metadata["total_samples_trained"]
-        rank_zero_logger.info(f"Resumed from epoch {loaded_epoch}")
+        current_samples_trained = metadata["current_samples_trained"]
+        rank_zero_logger.info(
+            f"Resumed from samples trained: {current_samples_trained}"
+        )
 
     # Training loop (batch-based with InfiniteSampler)
     rank_zero_logger.info("Training started...")
-    model.train()
 
     # Running average for loss
     loss_running_mean = 0.0
     n_loss_running_mean = 1
 
-    cur_iter = total_samples_trained
-    max_iter = 100000  # TODO-NG: set based on training requirements
-    tick_start_time = time.time()
+    total_batch_size = batch_size_per_gpu * dist.world_size
 
-    while cur_iter < max_iter:
+    # Counters for periodic tasks
+    samples_since_scheduler_update = 0
+    samples_since_logging = 0
+    samples_since_validation = 0
+    samples_since_checkpoint = 0
+
+    while current_samples_trained < max_training_samples:
+        tick_start_time = time.time()
+
+        model.train()
+
         # Get next batch from infinite sampler
         x = next(train_iter)
-        x = x.to(dist.device)
+        x = x.to(dist.device, non_blocking=True).to(memory_format=torch.channels_last)
+        batch_size = x.shape[0]
 
         # Forward pass
-        loss = loss_fn(x).mean()
+        optimizer.zero_grad(**({} if use_apex else {"set_to_none": True}))
+        with torch.autocast("cuda", dtype=torch.bfloat16, enabled=use_amp):
+            loss = loss_fn(x, {}).mean()
 
-        # Backward pass
-        optimizer.zero_grad(**({} if use_apex_flag else {"set_to_none": True}))
+        # Backward pass and optimize
         loss.backward()
         optimizer.step()
 
+        mean_loss = reduce_loss(loss.item() * batch_size, dst_rank=0) / total_batch_size
+
         # Update running mean of loss
-        loss_val = loss.item()
-        loss_running_mean += (loss_val - loss_running_mean) / n_loss_running_mean
-        n_loss_running_mean += 1
-        cur_iter += 1
+        if dist.rank == 0:
+            loss_running_mean += (mean_loss - loss_running_mean) / n_loss_running_mean
+            n_loss_running_mean += 1
+            current_samples_trained += total_batch_size
+
+        # Update scheduler periodically
+        samples_since_scheduler_update += total_batch_size
+        if samples_since_scheduler_update >= num_training_samples:
+            scheduler.step()
+            samples_since_scheduler_update = 0
 
         # Periodic logging
-        if cur_iter % log_freq == 0:
-            current_lr = optimizer.param_groups[0]["lr"]
-            if dist.rank == 0:
-                wandb.log(
-                    {
-                        "iter": cur_iter,
-                        "loss": loss_val,
-                        "loss_running_mean": loss_running_mean,
-                        "lr": current_lr,
-                    }
-                )
+        samples_since_logging += total_batch_size
+        if samples_since_logging >= logging_frequency:
             elapsed = time.time() - tick_start_time
-            msg = f"iter: {cur_iter}, loss: {loss_running_mean:.3e}, "
-            msg += f"lr: {current_lr:.2e}, time: {elapsed:.1f}s"
-            rank_zero_logger.info(msg)
-
+            rank_zero_logger.info(
+                f"Samples trained: {current_samples_trained}, "
+                f"loss: {loss_running_mean:.3e}, "
+                f"learning rate: {optimizer.param_groups[0]['lr']:.2e}, "
+                f"time per 1k samples: {(elapsed / (samples_since_logging)) * 1000:.1f}s"
+            )
             # Reset running mean after logging
             loss_running_mean = 0.0
             n_loss_running_mean = 1
             tick_start_time = time.time()
+            samples_since_logging = 0
 
-        # Periodic validation
-        if cur_iter % (log_freq * 10) == 0:
-            val_loss = validation_step(model, val_iter, loss_fn, dist)
-            if dist.rank == 0:
-                wandb.log({"val_loss": val_loss, "iter": cur_iter})
-            rank_zero_logger.info(f"iter: {cur_iter}, val_loss: {val_loss:.3e}")
-            model.train()
+        # Validation step
+        samples_since_validation += total_batch_size
+        if samples_since_validation >= validation_frequency:
+            model.eval()
+            val_loss_running_mean = 0.0
+            n_val_loss_running_mean = 1
+            current_validation_samples = 0
+            with torch.no_grad():
+                while current_validation_samples < num_validation_samples:
+                    x_val = next(val_iter)
+                    x_val = x_val.to(dist.device, non_blocking=True).to(
+                        memory_format=torch.channels_last
+                    )
+                    val_batch_size = x_val.shape[0]
+                    with torch.autocast("cuda", dtype=torch.bfloat16, enabled=use_amp):
+                        val_loss = loss_fn(x_val, {}).mean()
+                    mean_val_loss = (
+                        reduce_loss(val_loss.item() * val_batch_size, dst_rank=0)
+                        / total_batch_size
+                    )
+                    if dist.rank == 0:
+                        val_loss_running_mean += (
+                            mean_val_loss - val_loss_running_mean
+                        ) / n_val_loss_running_mean
+                        n_val_loss_running_mean += 1
+                    current_validation_samples += total_batch_size
+            rank_zero_logger.info(
+                f"Samples trained: {current_samples_trained}, "
+                f"val_loss: {val_loss_running_mean:.3e}, "
+            )
+            samples_since_validation = 0
 
         # Periodic checkpoint
-        if cur_iter % checkpoint_freq == 0:
+        samples_since_checkpoint += total_batch_size
+        if samples_since_checkpoint >= checkpoint_frequency:
             if dist.world_size > 1:
                 torch.distributed.barrier()
             if dist.rank == 0:
                 save_checkpoint(
-                    checkpoint_path,
+                    checkpoint_dir,
                     models=model,
                     optimizer=optimizer,
                     scheduler=scheduler,
-                    epoch=cur_iter,
                     metadata={
-                        "wandb_id": wandb.run.id,
-                        "total_samples_trained": cur_iter,
+                        "current_samples_trained": current_samples_trained,
                     },
                 )
-                rank_zero_logger.info(f"Saved checkpoint at iter {cur_iter}")
+                rank_zero_logger.info(
+                    f"Saved checkpoint at samples trained: {current_samples_trained}"
+                )
+            samples_since_checkpoint = 0
 
     # Cleanup.
-    wandb.finish()
     rank_zero_logger.info("Training completed!")
-
-
-@torch.no_grad()
-def validation_step(model, val_iter, loss_fn, dist, num_steps=10):
-    """Compute validation loss using running average."""
-    model.eval()
-
-    # Running average for validation loss
-    loss_running_mean = 0.0
-    n_loss_running_mean = 1
-
-    for _ in range(num_steps):
-        x = next(val_iter)
-        x = x.to(dist.device)
-
-        loss = loss_fn(x).mean()
-        loss_val = loss.item()
-
-        # Update running mean
-        loss_running_mean += (loss_val - loss_running_mean) / n_loss_running_mean
-        n_loss_running_mean += 1
-
-    return loss_running_mean
 
 
 if __name__ == "__main__":
