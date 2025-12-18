@@ -107,7 +107,7 @@ class EDMLoss:
 
     def __init__(
         self,
-        model: Callable[[Tensor, Tensor, Dict[str, Tensor], *Any], Tensor],
+        model: Callable[[Tensor, Tensor, Dict[str, Tensor], Any], Tensor],
         P_mean: float = 0.0,
         P_std: float = 1.2,
         sigma_data: float = 0.5,
