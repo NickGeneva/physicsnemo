@@ -1,0 +1,16 @@
+[project]
+name = "diffusion-sda"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12, <3.14"
+dependencies = [
+    "earth2studio[data]",
+    "matplotlib>=3.10.8",
+]
+
+[tool.uv.sources]
+earth2studio = { git = "https://github.com/NVIDIA/earth2studio.git" }
+
+[tool.setuptools]
+package-dir = {"" = "."} 

@@ -1,0 +1,228 @@
+import numpy as np
+import zarr
+from datetime import timedelta
+import os
+import csv
+import time as pytime
+
+from loguru import logger
+from earth2studio.data import HRRR, HRRR_FX
+
+
+def _append_missing_dates_to_csv(datetimes: np.ndarray, csv_path: str) -> None:
+    """Append an array of numpy datetime64 values to a CSV file.
+
+    Creates the file with a header if it does not exist.
+    """
+    file_exists = os.path.exists(csv_path)
+    # Ensure 1-D array iteration
+    flat_times = np.asarray(datetimes).ravel()
+    with open(csv_path, "a", newline="") as f:
+        writer = csv.writer(f)
+        if not file_exists:
+            writer.writerow(["datetime"])
+        for t in flat_times:
+            # Convert numpy datetime64 to ISO string (second precision)
+            writer.writerow([np.datetime_as_string(t, unit="s")])
+
+
+def init_zarr_store(zarr_root: zarr.group, time: np.ndarray, variable: str):
+    """Initizes the HRRR Zarr store for training, will overwrite the coordinates every
+    run but will not overwrite variable arrays if they exist. Each variable will be in
+    a seperate array and chunked along the time dimension
+
+
+    Parameters
+    ----------
+    zarr_path : str
+        Location of zarr store
+    time : np.ndarray
+        Time array
+    variable : str
+        Variables to create arrays for
+    """
+    lat, lon = HRRR.grid()
+
+    # Write the coordinates
+    zarr_root.create_array(
+        "time",
+        shape=time.shape,
+        chunks=time.shape,
+        dtype=time.dtype,
+        dimension_names=["time"],
+        overwrite=True,
+    )
+    zarr_root["time"][:] = time
+    zarr_root.create_array(
+        "hrrr_y",
+        shape=(lat.shape[0],),
+        dtype=lat.dtype,
+        dimension_names=["hrrr_y"],
+        overwrite=True,
+    )
+    zarr_root["hrrr_y"][:] = np.arange(lat.shape[0])
+    zarr_root.create_array(
+        "hrrr_x",
+        shape=(lat.shape[1],),
+        dtype=lat.dtype,
+        dimension_names=["hrrr_x"],
+        overwrite=True,
+    )
+    zarr_root["hrrr_x"][:] = np.arange(lat.shape[1])
+
+    zarr_root.create_array(
+        "lat",
+        shape=lat.shape,
+        dtype=lat.dtype,
+        dimension_names=["hrrr_y", "hrrr_x"],
+        overwrite=True,
+    )
+    zarr_root["lat"][:] = lat
+    zarr_root.create_array(
+        "lon",
+        shape=lon.shape,
+        dtype=lon.dtype,
+        dimension_names=["hrrr_y", "hrrr_x"],
+        overwrite=True,
+    )
+    zarr_root["lon"][:] = lon
+
+    # Set up chunking of variable arrays
+    shape = (time.size, lat.shape[0], lat.shape[1])
+    chunks = (128, lat.shape[0], lat.shape[1])  # adjust as needed
+
+    # Create 3D variable arrays (time, hrrr_y, hrrr_x)
+    for v in variable:
+        try:
+            zarr_root.create_array(
+                v,
+                shape=shape,
+                chunks=chunks,
+                dtype="float32",
+                fill_value=np.nan,
+                dimension_names=["time", "hrrr_y", "hrrr_x"],
+            )
+        except zarr.errors.ContainsArrayError:
+            pass
+
+
+def pull_hrrr_data(zarr_root: zarr.group, time: np.ndarray, variable: str, batch_size: int = 1):
+
+    ds = HRRR(verbose=False, cache=False)
+    # Batch over times present
+    for sidx in range(0, len(time), batch_size):
+        eidx = min([time.shape[0] - 1, sidx + batch_size])
+        logger.warning(f"Fetching times between {time[sidx]} to {time[eidx]}")
+        batch_t = time[sidx : eidx + 1]
+
+        try:
+            da = ds(batch_t, variable)
+        except FileNotFoundError as exc:
+            logger.warning(
+                f"File not found for times {batch_t[0]} to {batch_t[-1]} - recording and continuing. Details: {exc}"
+            )
+            _append_missing_dates_to_csv(batch_t, "missing_dates_hrrr.csv")
+            continue
+        time_indices = np.where(np.isin(zarr_root["time"][:], da["time"].values))[0]
+
+        # Save to zarr store
+        for i, v in enumerate(variable):
+            try:
+                zarr_root[v][time_indices, :, :] = da.values[:, i]
+            except Exception:
+                pytime.sleep(4)
+                zarr_root[v][time_indices, :, :] = da.values[:, i]
+
+
+def pull_hrrr_fx_data(zarr_root: zarr.group, time: np.ndarray, variable: str, batch_size: int = 1):
+
+    ds = HRRR_FX(verbose=False, cache=False)
+    # Batch over times present
+    for sidx in range(0, len(time), batch_size):
+        eidx = min([time.shape[0] - 1, sidx + batch_size])
+        logger.warning(f"Fetching times between {time[sidx]} to {time[eidx]}")
+        batch_t = time[sidx : eidx + 1]
+
+        try:
+            da = ds(batch_t, timedelta(hours=1), variable).isel(lead_time=0)
+        except FileNotFoundError as exc:
+            logger.warning(
+                f"File not found for times {batch_t[0]} to {batch_t[-1]} - recording and continuing. Details: {exc}"
+            )
+            _append_missing_dates_to_csv(batch_t, "missing_dates_hrrr.csv")
+            continue
+        time_indices = np.where(np.isin(zarr_root["time"][:], da["time"].values))[0]
+
+        # Save to zarr store
+        for i, v in enumerate(variable):
+            try:
+                zarr_root[v][time_indices, :, :] = da.values[:, i]
+            except Exception:
+                pytime.sleep(4)
+                zarr_root[v][time_indices, :, :] = da.values[:, i]
+
+
+
+# store = zarr.storage.LocalStore("/lustre/fsw/coreai_climate_earth2/ngeneva/hrrr_surface.zarr")
+# root = zarr.group(store=store, overwrite=False)
+
+# export LOGURU_LEVEL="INFO"
+root = zarr.open_group(store='s3://hrrr-surface-sda/zarr-v1', mode='a', storage_options={'endpoint_url': 'https://pdx.s8k.io'})
+hrrr_variables = [
+    "u10m",
+    "v10m",
+    "u80m",
+    "v80m",
+    "t2m",
+    "d2m",
+    "q2m",
+    "sp",
+    "fg10m",
+    "tcc",
+    "sde",
+    "snowc",
+    "refc",
+    "rsds",
+]
+hrrr_fx_variables = ["tp", "aerot"]
+variable = hrrr_variables + hrrr_fx_variables
+
+time = np.arange("2017-01-01T00:00:00", "2027-01-01T00:00:00", dtype="datetime64[h]")
+
+init_zarr_store(root, time, variable)
+# Set start time
+# start_date = np.datetime64("2023-09-01T00:00:00")
+# end_date = np.datetime64("2023-10-01T00:00:00")
+# sidx = np.where(time == start_date)[0][0]
+# eidx = np.where(time == end_date)[0][0]
+
+# pull_hrrr_data(root, time[sidx:eidx+1], hrrr_variables, batch_size=12)
+# pull_hrrr_fx_data(root, time[sidx:eidx+1], hrrr_fx_variables, batch_size=12)
+
+
+# start_date = np.datetime64("2023-10-01T00:00:00")
+# end_date = np.datetime64("2023-11-01T00:00:00")
+# sidx = np.where(time == start_date)[0][0]
+# eidx = np.where(time == end_date)[0][0]
+
+# pull_hrrr_data(root, time[sidx:eidx+1], hrrr_variables, batch_size=12)
+# pull_hrrr_fx_data(root, time[sidx:eidx+1], hrrr_fx_variables, batch_size=12)
+
+start_date = np.datetime64("2023-11-01T00:00:00")
+end_date = np.datetime64("2023-12-01T00:00:00")
+sidx = np.where(time == start_date)[0][0]
+eidx = np.where(time == end_date)[0][0]
+
+start_date = np.datetime64("2023-11-11T00:00:00")
+sidx2 = np.where(time == start_date)[0][0]
+
+pull_hrrr_data(root, time[sidx2:eidx+1], hrrr_variables, batch_size=12)
+pull_hrrr_fx_data(root, time[sidx:eidx+1], hrrr_fx_variables, batch_size=12)
+
+start_date = np.datetime64("2023-12-01T00:00:00")
+end_date = np.datetime64("2024-01-01T00:00:00")
+sidx = np.where(time == start_date)[0][0]
+eidx = np.where(time == end_date)[0][0]
+
+pull_hrrr_data(root, time[sidx:eidx+1], hrrr_variables, batch_size=12)
+pull_hrrr_fx_data(root, time[sidx:eidx+1], hrrr_fx_variables, batch_size=12)
